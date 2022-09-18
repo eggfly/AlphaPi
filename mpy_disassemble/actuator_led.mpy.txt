@@ -1,0 +1,1168 @@
+mpy_source_file: ./rootfs/actuator_led.mpy
+source_file: .\actuator_led.py
+header: 4d:06:00:1f
+qstr_table[60]:
+    .\actuator_led.py
+    <module>
+    neopixel
+    machine
+    DataStruct
+    basic
+    InitNP
+    NeoPixel
+    Pin
+    clear
+    n
+    insert
+    write
+    BrightnessUp
+    IntValue
+    SetBrightness
+    UpdateBrightness
+    GetBrightness
+    ShowRainbow
+    setPixelColorWithoutWrightRGBOne
+    setPixelColorWithoutWright
+    setPixelColor
+    pixelMove
+    append
+    pixelShowU
+    clamp
+    hsl
+    packRGB
+    packRGBd
+    unpackR
+    unpackG
+    unpackB
+    version
+    brightness
+    np
+    rawRGB
+    pin_port
+    br_d
+    index
+    rgb
+    r
+    g
+    b
+    index_d
+    rgb_d
+    step_d
+    towards
+    value_d
+    max_value_d
+    minValue
+    maxValue
+    value
+    h
+    s
+    l
+    round
+    abs
+    r_d
+    g_d
+    b_d
+obj_table: [(0, 0, 0), 'v_2020_7_30']
+simple_name: <module>
+  raw bytecode: 157 08:56:01:26:26:4c:23:23:64:84:0a:84:08:84:07:84:0d:64:20:84:21:84:07:84:10:84:0b:84:16:84:18:84:08:84:2e:64:20:84:07:64:40:64:40:64:40:80:51:1b:02:16:02:80:51:1b:03:16:03:80:10:04:2a:01:1b:05:1c:04:16:04:59:8a:17:21:51:17:22:2b:00:16:23:32:00:16:06:32:01:16:0d:32:02:16:0f:32:03:16:10:32:04:16:11:32:05:16:12:32:06:16:13:32:07:16:14:32:08:16:15:32:09:16:16:32:0a:16:18:32:0b:16:19:32:0c:16:1a:32:0d:16:1b:32:0e:16:1c:32:0f:16:1d:32:10:16:1e:32:11:16:1f:32:12:16:20:51:63
+  prelude: (2, 0, 0, 0, 0, 0)
+  args: []
+  line info: 26:26:4c:23:23:64:84:0a:84:08:84:07:84:0d:64:20:84:21:84:07:84:10:84:0b:84:16:84:18:84:08:84:2e:64:20:84:07:64:40:64:40:64:40
+  80          LOAD_CONST_SMALL_INT 0 
+  51          LOAD_CONST_NONE 
+  1b:02       IMPORT_NAME neopixel
+  16:02       STORE_NAME neopixel
+  80          LOAD_CONST_SMALL_INT 0 
+  51          LOAD_CONST_NONE 
+  1b:03       IMPORT_NAME machine
+  16:03       STORE_NAME machine
+  80          LOAD_CONST_SMALL_INT 0 
+  10:04       LOAD_CONST_STRING DataStruct
+  2a:01       BUILD_TUPLE 1
+  1b:05       IMPORT_NAME basic
+  1c:04       IMPORT_FROM DataStruct
+  16:04       STORE_NAME DataStruct
+  59          POP_TOP 
+  8a          LOAD_CONST_SMALL_INT 10 
+  17:21       STORE_GLOBAL brightness
+  51          LOAD_CONST_NONE 
+  17:22       STORE_GLOBAL np
+  2b:00       BUILD_LIST 0
+  16:23       STORE_NAME rawRGB
+  32:00       MAKE_FUNCTION 0
+  16:06       STORE_NAME InitNP
+  32:01       MAKE_FUNCTION 1
+  16:0d       STORE_NAME BrightnessUp
+  32:02       MAKE_FUNCTION 2
+  16:0f       STORE_NAME SetBrightness
+  32:03       MAKE_FUNCTION 3
+  16:10       STORE_NAME UpdateBrightness
+  32:04       MAKE_FUNCTION 4
+  16:11       STORE_NAME GetBrightness
+  32:05       MAKE_FUNCTION 5
+  16:12       STORE_NAME ShowRainbow
+  32:06       MAKE_FUNCTION 6
+  16:13       STORE_NAME setPixelColorWithoutWrightRGBOne
+  32:07       MAKE_FUNCTION 7
+  16:14       STORE_NAME setPixelColorWithoutWright
+  32:08       MAKE_FUNCTION 8
+  16:15       STORE_NAME setPixelColor
+  32:09       MAKE_FUNCTION 9
+  16:16       STORE_NAME pixelMove
+  32:0a       MAKE_FUNCTION 10
+  16:18       STORE_NAME pixelShowU
+  32:0b       MAKE_FUNCTION 11
+  16:19       STORE_NAME clamp
+  32:0c       MAKE_FUNCTION 12
+  16:1a       STORE_NAME hsl
+  32:0d       MAKE_FUNCTION 13
+  16:1b       STORE_NAME packRGB
+  32:0e       MAKE_FUNCTION 14
+  16:1c       STORE_NAME packRGBd
+  32:0f       MAKE_FUNCTION 15
+  16:1d       STORE_NAME unpackR
+  32:10       MAKE_FUNCTION 16
+  16:1e       STORE_NAME unpackG
+  32:11       MAKE_FUNCTION 17
+  16:1f       STORE_NAME unpackB
+  32:12       MAKE_FUNCTION 18
+  16:20       STORE_NAME version
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: ['InitNP', 'BrightnessUp', 'SetBrightness', 'UpdateBrightness', 'GetBrightness', 'ShowRainbow', 'setPixelColorWithoutWrightRGBOne', 'setPixelColorWithoutWright', 'setPixelColor', 'pixelMove', 'pixelShowU', 'clamp', 'hsl', 'packRGB', 'packRGBd', 'unpackR', 'unpackG', 'unpackB', 'version']
+simple_name: InitNP
+  raw bytecode: 78 39:14:06:24:80:0a:20:30:27:29:2a:2f:12:02:14:07:12:03:14:08:b0:36:01:8e:36:02:17:22:12:23:14:09:36:00:59:12:22:13:0a:80:42:54:57:c1:12:23:14:0b:b1:23:00:36:02:59:23:00:12:22:b1:56:81:e5:58:5a:d7:43:27:59:59:12:22:14:0c:36:00:59:51:63
+  prelude: (8, 0, 0, 1, 0, 0)
+  args: ['pin_port']
+  line info: 80:0a:20:30:27:29:2a:2f
+  12:02       LOAD_GLOBAL neopixel
+  14:07       LOAD_METHOD NeoPixel
+  12:03       LOAD_GLOBAL machine
+  14:08       LOAD_METHOD Pin
+  b0          LOAD_FAST 0 
+  36:01       CALL_METHOD 1
+  8e          LOAD_CONST_SMALL_INT 14 
+  36:02       CALL_METHOD 2
+  17:22       STORE_GLOBAL np
+  12:23       LOAD_GLOBAL rawRGB
+  14:09       LOAD_METHOD clear
+  36:00       CALL_METHOD 0
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  80          LOAD_CONST_SMALL_INT 0 
+  42:54       JUMP 20
+  57          DUP_TOP 
+  c1          STORE_FAST 1 
+  12:23       LOAD_GLOBAL rawRGB
+  14:0b       LOAD_METHOD insert
+  b1          LOAD_FAST 1 
+  23:00       LOAD_CONST_OBJ (0, 0, 0)
+  36:02       CALL_METHOD 2
+  59          POP_TOP 
+  23:00       LOAD_CONST_OBJ (0, 0, 0)
+  12:22       LOAD_GLOBAL np
+  b1          LOAD_FAST 1 
+  56          STORE_SUBSCR 
+  81          LOAD_CONST_SMALL_INT 1 
+  e5          BINARY_OP 14 __iadd__ 
+  58          DUP_TOP_TWO 
+  5a          ROT_TWO 
+  d7          BINARY_OP 0 __lt__ 
+  43:27       POP_JUMP_IF_TRUE -25
+  59          POP_TOP 
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  14:0c       LOAD_METHOD write
+  36:00       CALL_METHOD 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: BrightnessUp
+  raw bytecode: 41 29:10:0d:25:80:14:26:20:26:2c:b0:14:0e:36:00:c1:12:21:b1:e5:17:21:12:19:80:22:80:64:12:21:34:03:17:21:12:10:34:00:59:51:63
+  prelude: (6, 0, 0, 1, 0, 0)
+  args: ['br_d']
+  line info: 80:14:26:20:26:2c
+  b0          LOAD_FAST 0 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c1          STORE_FAST 1 
+  12:21       LOAD_GLOBAL brightness
+  b1          LOAD_FAST 1 
+  e5          BINARY_OP 14 __iadd__ 
+  17:21       STORE_GLOBAL brightness
+  12:19       LOAD_GLOBAL clamp
+  80          LOAD_CONST_SMALL_INT 0 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  12:21       LOAD_GLOBAL brightness
+  34:03       CALL_FUNCTION 3
+  17:21       STORE_GLOBAL brightness
+  12:10       LOAD_GLOBAL UpdateBrightness
+  34:00       CALL_FUNCTION 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: SetBrightness
+  raw bytecode: 33 29:0e:0f:25:80:1c:26:20:2b:b0:14:0e:36:00:c1:12:19:80:22:80:64:b1:34:03:17:21:12:10:34:00:59:51:63
+  prelude: (6, 0, 0, 1, 0, 0)
+  args: ['br_d']
+  line info: 80:1c:26:20:2b
+  b0          LOAD_FAST 0 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c1          STORE_FAST 1 
+  12:19       LOAD_GLOBAL clamp
+  80          LOAD_CONST_SMALL_INT 0 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  b1          LOAD_FAST 1 
+  34:03       CALL_FUNCTION 3
+  17:21       STORE_GLOBAL brightness
+  12:10       LOAD_GLOBAL UpdateBrightness
+  34:00       CALL_FUNCTION 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: UpdateBrightness
+  raw bytecode: 88 48:18:10:80:23:20:2b:20:29:29:26:26:26:32:12:21:22:81:7f:f4:22:80:64:f6:c0:12:22:13:0a:80:42:68:57:c1:12:23:b1:55:30:03:c2:c3:c4:b2:b0:f4:88:f1:c2:b3:b0:f4:88:f1:c3:b4:b0:f4:88:f1:c4:b2:b3:b4:2a:03:12:22:b1:56:81:e5:58:5a:d7:43:13:59:59:12:22:14:0c:36:00:59:51:63
+  prelude: (10, 0, 0, 0, 0, 0)
+  args: []
+  line info: 80:23:20:2b:20:29:29:26:26:26:32
+  12:21       LOAD_GLOBAL brightness
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  f4          BINARY_OP 29 __mul__ 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f6          BINARY_OP 31 __floordiv__ 
+  c0          STORE_FAST 0 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  80          LOAD_CONST_SMALL_INT 0 
+  42:68       JUMP 40
+  57          DUP_TOP 
+  c1          STORE_FAST 1 
+  12:23       LOAD_GLOBAL rawRGB
+  b1          LOAD_FAST 1 
+  55          LOAD_SUBSCR 
+  30:03       UNPACK_SEQUENCE 3
+  c2          STORE_FAST 2 
+  c3          STORE_FAST 3 
+  c4          STORE_FAST 4 
+  b2          LOAD_FAST 2 
+  b0          LOAD_FAST 0 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  c2          STORE_FAST 2 
+  b3          LOAD_FAST 3 
+  b0          LOAD_FAST 0 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  c3          STORE_FAST 3 
+  b4          LOAD_FAST 4 
+  b0          LOAD_FAST 0 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  c4          STORE_FAST 4 
+  b2          LOAD_FAST 2 
+  b3          LOAD_FAST 3 
+  b4          LOAD_FAST 4 
+  2a:03       BUILD_TUPLE 3
+  12:22       LOAD_GLOBAL np
+  b1          LOAD_FAST 1 
+  56          STORE_SUBSCR 
+  81          LOAD_CONST_SMALL_INT 1 
+  e5          BINARY_OP 14 __iadd__ 
+  58          DUP_TOP_TWO 
+  5a          ROT_TWO 
+  d7          BINARY_OP 0 __lt__ 
+  43:13       POP_JUMP_IF_TRUE -45
+  59          POP_TOP 
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  14:0c       LOAD_METHOD write
+  36:00       CALL_METHOD 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: GetBrightness
+  raw bytecode: 8 00:06:11:80:30:12:21:63
+  prelude: (1, 0, 0, 0, 0, 0)
+  args: []
+  line info: 80:30
+  12:21       LOAD_GLOBAL brightness
+  63          RETURN_VALUE 
+  children: []
+simple_name: ShowRainbow
+  raw bytecode: 250 f0:10:40:12:80:34:20:25:25:22:22:24:2c:28:22:26:24:24:24:24:24:26:23:23:23:25:26:27:2d:2a:30:2c:2e:3b:2f:12:22:13:0a:c0:b0:80:da:44:42:51:63:81:c1:22:82:68:c2:b2:22:82:68:f2:b1:f3:22:82:68:f8:c3:b3:22:80:64:f4:b0:f6:c4:b4:c5:b1:22:80:64:f4:c6:22:80:64:c7:22:80:64:c8:22:80:64:c9:b9:b8:f3:ca:ba:b0:f6:cb:b8:22:80:64:f4:cc:22:32:cd:22:32:ce:22:32:cf:bf:be:f3:26:10:24:10:b0:f6:26:11:be:22:80:64:f4:26:12:12:13:80:12:1a:b1:b7:bd:34:03:34:02:59:b0:81:f3:81:42:c0:80:57:26:13:b6:24:13:b5:f4:f2:22:80:64:f6:22:82:68:f2:26:14:bc:24:13:bb:f4:f2:22:80:64:f6:26:15:24:12:24:13:24:11:f4:f2:22:80:64:f6:26:16:12:13:24:13:12:1a:24:14:24:15:24:16:34:03:34:02:59:81:e5:58:5a:d7:43:ba:7f:59:59:12:13:b0:81:f3:12:1a:b2:b7:bd:34:03:34:02:59:12:22:14:0c:36:00:59:51:63
+  prelude: (31, 0, 0, 0, 0, 0)
+  args: []
+  line info: 80:34:20:25:25:22:22:24:2c:28:22:26:24:24:24:24:24:26:23:23:23:25:26:27:2d:2a:30:2c:2e:3b:2f
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  c0          STORE_FAST 0 
+  b0          LOAD_FAST 0 
+  80          LOAD_CONST_SMALL_INT 0 
+  da          BINARY_OP 3 __le__ 
+  44:42       POP_JUMP_IF_FALSE 2
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  81          LOAD_CONST_SMALL_INT 1 
+  c1          STORE_FAST 1 
+  22:82:68    LOAD_CONST_SMALL_INT 360
+  c2          STORE_FAST 2 
+  b2          LOAD_FAST 2 
+  22:82:68    LOAD_CONST_SMALL_INT 360
+  f2          BINARY_OP 27 __add__ 
+  b1          LOAD_FAST 1 
+  f3          BINARY_OP 28 __sub__ 
+  22:82:68    LOAD_CONST_SMALL_INT 360
+  f8          BINARY_OP 33 __mod__ 
+  c3          STORE_FAST 3 
+  b3          LOAD_FAST 3 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f4          BINARY_OP 29 __mul__ 
+  b0          LOAD_FAST 0 
+  f6          BINARY_OP 31 __floordiv__ 
+  c4          STORE_FAST 4 
+  b4          LOAD_FAST 4 
+  c5          STORE_FAST 5 
+  b1          LOAD_FAST 1 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f4          BINARY_OP 29 __mul__ 
+  c6          STORE_FAST 6 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  c7          STORE_FAST 7 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  c8          STORE_FAST 8 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  c9          STORE_FAST 9 
+  b9          LOAD_FAST 9 
+  b8          LOAD_FAST 8 
+  f3          BINARY_OP 28 __sub__ 
+  ca          STORE_FAST 10 
+  ba          LOAD_FAST 10 
+  b0          LOAD_FAST 0 
+  f6          BINARY_OP 31 __floordiv__ 
+  cb          STORE_FAST 11 
+  b8          LOAD_FAST 8 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f4          BINARY_OP 29 __mul__ 
+  cc          STORE_FAST 12 
+  22:32       LOAD_CONST_SMALL_INT 50
+  cd          STORE_FAST 13 
+  22:32       LOAD_CONST_SMALL_INT 50
+  ce          STORE_FAST 14 
+  22:32       LOAD_CONST_SMALL_INT 50
+  cf          STORE_FAST 15 
+  bf          LOAD_FAST 15 
+  be          LOAD_FAST 14 
+  f3          BINARY_OP 28 __sub__ 
+  26:10       STORE_FAST_N 16
+  24:10       LOAD_FAST_N 16
+  b0          LOAD_FAST 0 
+  f6          BINARY_OP 31 __floordiv__ 
+  26:11       STORE_FAST_N 17
+  be          LOAD_FAST 14 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f4          BINARY_OP 29 __mul__ 
+  26:12       STORE_FAST_N 18
+  12:13       LOAD_GLOBAL setPixelColorWithoutWrightRGBOne
+  80          LOAD_CONST_SMALL_INT 0 
+  12:1a       LOAD_GLOBAL hsl
+  b1          LOAD_FAST 1 
+  b7          LOAD_FAST 7 
+  bd          LOAD_FAST 13 
+  34:03       CALL_FUNCTION 3
+  34:02       CALL_FUNCTION 2
+  59          POP_TOP 
+  b0          LOAD_FAST 0 
+  81          LOAD_CONST_SMALL_INT 1 
+  f3          BINARY_OP 28 __sub__ 
+  81          LOAD_CONST_SMALL_INT 1 
+  42:c0:80    JUMP 64
+  57          DUP_TOP 
+  26:13       STORE_FAST_N 19
+  b6          LOAD_FAST 6 
+  24:13       LOAD_FAST_N 19
+  b5          LOAD_FAST 5 
+  f4          BINARY_OP 29 __mul__ 
+  f2          BINARY_OP 27 __add__ 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f6          BINARY_OP 31 __floordiv__ 
+  22:82:68    LOAD_CONST_SMALL_INT 360
+  f2          BINARY_OP 27 __add__ 
+  26:14       STORE_FAST_N 20
+  bc          LOAD_FAST 12 
+  24:13       LOAD_FAST_N 19
+  bb          LOAD_FAST 11 
+  f4          BINARY_OP 29 __mul__ 
+  f2          BINARY_OP 27 __add__ 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f6          BINARY_OP 31 __floordiv__ 
+  26:15       STORE_FAST_N 21
+  24:12       LOAD_FAST_N 18
+  24:13       LOAD_FAST_N 19
+  24:11       LOAD_FAST_N 17
+  f4          BINARY_OP 29 __mul__ 
+  f2          BINARY_OP 27 __add__ 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f6          BINARY_OP 31 __floordiv__ 
+  26:16       STORE_FAST_N 22
+  12:13       LOAD_GLOBAL setPixelColorWithoutWrightRGBOne
+  24:13       LOAD_FAST_N 19
+  12:1a       LOAD_GLOBAL hsl
+  24:14       LOAD_FAST_N 20
+  24:15       LOAD_FAST_N 21
+  24:16       LOAD_FAST_N 22
+  34:03       CALL_FUNCTION 3
+  34:02       CALL_FUNCTION 2
+  59          POP_TOP 
+  81          LOAD_CONST_SMALL_INT 1 
+  e5          BINARY_OP 14 __iadd__ 
+  58          DUP_TOP_TWO 
+  5a          ROT_TWO 
+  d7          BINARY_OP 0 __lt__ 
+  43:ba:7f    POP_JUMP_IF_TRUE -70
+  59          POP_TOP 
+  59          POP_TOP 
+  12:13       LOAD_GLOBAL setPixelColorWithoutWrightRGBOne
+  b0          LOAD_FAST 0 
+  81          LOAD_CONST_SMALL_INT 1 
+  f3          BINARY_OP 28 __sub__ 
+  12:1a       LOAD_GLOBAL hsl
+  b2          LOAD_FAST 2 
+  b7          LOAD_FAST 7 
+  bd          LOAD_FAST 13 
+  34:03       CALL_FUNCTION 3
+  34:02       CALL_FUNCTION 2
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  14:0c       LOAD_METHOD write
+  36:00       CALL_METHOD 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: setPixelColorWithoutWrightRGBOne
+  raw bytecode: 39 4a:10:13:26:27:80:55:26:26:26:12:1d:b1:34:01:c2:12:1e:b1:34:01:c3:12:1f:b1:34:01:c4:12:14:b0:b2:b3:b4:34:04:59:51:63
+  prelude: (10, 0, 0, 2, 0, 0)
+  args: ['index', 'rgb']
+  line info: 80:55:26:26:26
+  12:1d       LOAD_GLOBAL unpackR
+  b1          LOAD_FAST 1 
+  34:01       CALL_FUNCTION 1
+  c2          STORE_FAST 2 
+  12:1e       LOAD_GLOBAL unpackG
+  b1          LOAD_FAST 1 
+  34:01       CALL_FUNCTION 1
+  c3          STORE_FAST 3 
+  12:1f       LOAD_GLOBAL unpackB
+  b1          LOAD_FAST 1 
+  34:01       CALL_FUNCTION 1
+  c4          STORE_FAST 4 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  b0          LOAD_FAST 0 
+  b2          LOAD_FAST 2 
+  b3          LOAD_FAST 3 
+  b4          LOAD_FAST 4 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: setPixelColorWithoutWright
+  raw bytecode: 116 e8:04:24:14:26:28:29:2a:80:5c:20:20:2b:26:26:26:28:29:29:54:29:12:21:22:81:7f:f4:22:80:64:f6:c4:b1:b4:f4:88:f1:c5:b2:b4:f4:88:f1:c6:b3:b4:f4:88:f1:c7:b0:12:22:13:0a:db:44:66:12:22:13:0a:80:42:56:57:c8:b5:b6:b7:2a:03:12:22:b8:56:b1:b2:b3:2a:03:12:23:b8:56:81:e5:58:5a:d7:43:25:59:59:42:52:b5:b6:b7:2a:03:12:22:b0:56:b1:b2:b3:2a:03:12:23:b0:56:51:63
+  prelude: (14, 0, 0, 4, 0, 0)
+  args: ['index', 'r', 'g', 'b']
+  line info: 80:5c:20:20:2b:26:26:26:28:29:29:54:29
+  12:21       LOAD_GLOBAL brightness
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  f4          BINARY_OP 29 __mul__ 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f6          BINARY_OP 31 __floordiv__ 
+  c4          STORE_FAST 4 
+  b1          LOAD_FAST 1 
+  b4          LOAD_FAST 4 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  c5          STORE_FAST 5 
+  b2          LOAD_FAST 2 
+  b4          LOAD_FAST 4 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  c6          STORE_FAST 6 
+  b3          LOAD_FAST 3 
+  b4          LOAD_FAST 4 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  c7          STORE_FAST 7 
+  b0          LOAD_FAST 0 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  db          BINARY_OP 4 __ge__ 
+  44:66       POP_JUMP_IF_FALSE 38
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  80          LOAD_CONST_SMALL_INT 0 
+  42:56       JUMP 22
+  57          DUP_TOP 
+  c8          STORE_FAST 8 
+  b5          LOAD_FAST 5 
+  b6          LOAD_FAST 6 
+  b7          LOAD_FAST 7 
+  2a:03       BUILD_TUPLE 3
+  12:22       LOAD_GLOBAL np
+  b8          LOAD_FAST 8 
+  56          STORE_SUBSCR 
+  b1          LOAD_FAST 1 
+  b2          LOAD_FAST 2 
+  b3          LOAD_FAST 3 
+  2a:03       BUILD_TUPLE 3
+  12:23       LOAD_GLOBAL rawRGB
+  b8          LOAD_FAST 8 
+  56          STORE_SUBSCR 
+  81          LOAD_CONST_SMALL_INT 1 
+  e5          BINARY_OP 14 __iadd__ 
+  58          DUP_TOP_TWO 
+  5a          ROT_TWO 
+  d7          BINARY_OP 0 __lt__ 
+  43:25       POP_JUMP_IF_TRUE -27
+  59          POP_TOP 
+  59          POP_TOP 
+  42:52       JUMP 18
+  b5          LOAD_FAST 5 
+  b6          LOAD_FAST 6 
+  b7          LOAD_FAST 7 
+  2a:03       BUILD_TUPLE 3
+  12:22       LOAD_GLOBAL np
+  b0          LOAD_FAST 0 
+  56          STORE_SUBSCR 
+  b1          LOAD_FAST 1 
+  b2          LOAD_FAST 2 
+  b3          LOAD_FAST 3 
+  2a:03       BUILD_TUPLE 3
+  12:23       LOAD_GLOBAL rawRGB
+  b0          LOAD_FAST 0 
+  56          STORE_SUBSCR 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: setPixelColor
+  raw bytecode: 62 5a:18:15:2b:2c:80:6c:20:26:26:26:26:26:29:b0:14:0e:36:00:c2:b1:14:0e:36:00:c3:12:1d:b3:34:01:c4:12:1e:b3:34:01:c5:12:1f:b3:34:01:c6:12:14:b2:b4:b5:b6:34:04:59:12:22:14:0c:36:00:59:51:63
+  prelude: (12, 0, 0, 2, 0, 0)
+  args: ['index_d', 'rgb_d']
+  line info: 80:6c:20:26:26:26:26:26:29
+  b0          LOAD_FAST 0 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c2          STORE_FAST 2 
+  b1          LOAD_FAST 1 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c3          STORE_FAST 3 
+  12:1d       LOAD_GLOBAL unpackR
+  b3          LOAD_FAST 3 
+  34:01       CALL_FUNCTION 1
+  c4          STORE_FAST 4 
+  12:1e       LOAD_GLOBAL unpackG
+  b3          LOAD_FAST 3 
+  34:01       CALL_FUNCTION 1
+  c5          STORE_FAST 5 
+  12:1f       LOAD_GLOBAL unpackB
+  b3          LOAD_FAST 3 
+  34:01       CALL_FUNCTION 1
+  c6          STORE_FAST 6 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  b2          LOAD_FAST 2 
+  b4          LOAD_FAST 4 
+  b5          LOAD_FAST 5 
+  b6          LOAD_FAST 6 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  14:0c       LOAD_METHOD write
+  36:00       CALL_METHOD 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: pixelMove
+  raw bytecode: 178 62:2e:16:2d:2e:80:77:26:20:27:25:22:23:23:2b:2a:33:2b:26:2a:2b:25:2b:27:31:b0:14:0e:36:00:c2:b2:12:22:13:0a:f8:c2:b2:80:d9:44:42:51:63:2b:00:c3:2b:00:c4:12:22:13:0a:82:f3:80:42:58:57:c5:b3:14:17:12:22:b5:55:36:01:59:b4:14:17:12:23:b5:55:36:01:59:81:e5:58:5a:d7:43:23:59:59:12:22:13:0a:82:f3:80:42:7d:57:c5:b5:b2:b1:f4:f3:c6:b6:12:22:13:0a:82:f3:db:44:4b:b6:12:22:13:0a:82:f3:e6:c6:42:50:b6:80:d7:44:4b:b6:12:22:13:0a:82:f3:e5:c6:42:40:b3:b6:55:12:22:b5:56:b4:b6:55:12:23:b5:56:81:e5:58:5a:d7:43:bd:7f:59:59:12:22:14:0c:36:00:59:51:63
+  prelude: (13, 0, 0, 2, 0, 0)
+  args: ['step_d', 'towards']
+  line info: 80:77:26:20:27:25:22:23:23:2b:2a:33:2b:26:2a:2b:25:2b:27:31
+  b0          LOAD_FAST 0 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c2          STORE_FAST 2 
+  b2          LOAD_FAST 2 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  f8          BINARY_OP 33 __mod__ 
+  c2          STORE_FAST 2 
+  b2          LOAD_FAST 2 
+  80          LOAD_CONST_SMALL_INT 0 
+  d9          BINARY_OP 2 __eq__ 
+  44:42       POP_JUMP_IF_FALSE 2
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  2b:00       BUILD_LIST 0
+  c3          STORE_FAST 3 
+  2b:00       BUILD_LIST 0
+  c4          STORE_FAST 4 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  82          LOAD_CONST_SMALL_INT 2 
+  f3          BINARY_OP 28 __sub__ 
+  80          LOAD_CONST_SMALL_INT 0 
+  42:58       JUMP 24
+  57          DUP_TOP 
+  c5          STORE_FAST 5 
+  b3          LOAD_FAST 3 
+  14:17       LOAD_METHOD append
+  12:22       LOAD_GLOBAL np
+  b5          LOAD_FAST 5 
+  55          LOAD_SUBSCR 
+  36:01       CALL_METHOD 1
+  59          POP_TOP 
+  b4          LOAD_FAST 4 
+  14:17       LOAD_METHOD append
+  12:23       LOAD_GLOBAL rawRGB
+  b5          LOAD_FAST 5 
+  55          LOAD_SUBSCR 
+  36:01       CALL_METHOD 1
+  59          POP_TOP 
+  81          LOAD_CONST_SMALL_INT 1 
+  e5          BINARY_OP 14 __iadd__ 
+  58          DUP_TOP_TWO 
+  5a          ROT_TWO 
+  d7          BINARY_OP 0 __lt__ 
+  43:23       POP_JUMP_IF_TRUE -29
+  59          POP_TOP 
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  82          LOAD_CONST_SMALL_INT 2 
+  f3          BINARY_OP 28 __sub__ 
+  80          LOAD_CONST_SMALL_INT 0 
+  42:7d       JUMP 61
+  57          DUP_TOP 
+  c5          STORE_FAST 5 
+  b5          LOAD_FAST 5 
+  b2          LOAD_FAST 2 
+  b1          LOAD_FAST 1 
+  f4          BINARY_OP 29 __mul__ 
+  f3          BINARY_OP 28 __sub__ 
+  c6          STORE_FAST 6 
+  b6          LOAD_FAST 6 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  82          LOAD_CONST_SMALL_INT 2 
+  f3          BINARY_OP 28 __sub__ 
+  db          BINARY_OP 4 __ge__ 
+  44:4b       POP_JUMP_IF_FALSE 11
+  b6          LOAD_FAST 6 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  82          LOAD_CONST_SMALL_INT 2 
+  f3          BINARY_OP 28 __sub__ 
+  e6          BINARY_OP 15 __isub__ 
+  c6          STORE_FAST 6 
+  42:50       JUMP 16
+  b6          LOAD_FAST 6 
+  80          LOAD_CONST_SMALL_INT 0 
+  d7          BINARY_OP 0 __lt__ 
+  44:4b       POP_JUMP_IF_FALSE 11
+  b6          LOAD_FAST 6 
+  12:22       LOAD_GLOBAL np
+  13:0a       LOAD_ATTR n
+  82          LOAD_CONST_SMALL_INT 2 
+  f3          BINARY_OP 28 __sub__ 
+  e5          BINARY_OP 14 __iadd__ 
+  c6          STORE_FAST 6 
+  42:40       JUMP 0
+  b3          LOAD_FAST 3 
+  b6          LOAD_FAST 6 
+  55          LOAD_SUBSCR 
+  12:22       LOAD_GLOBAL np
+  b5          LOAD_FAST 5 
+  56          STORE_SUBSCR 
+  b4          LOAD_FAST 4 
+  b6          LOAD_FAST 6 
+  55          LOAD_SUBSCR 
+  12:23       LOAD_GLOBAL rawRGB
+  b5          LOAD_FAST 5 
+  56          STORE_SUBSCR 
+  81          LOAD_CONST_SMALL_INT 1 
+  e5          BINARY_OP 14 __iadd__ 
+  58          DUP_TOP_TWO 
+  5a          ROT_TWO 
+  d7          BINARY_OP 0 __lt__ 
+  43:bd:7f    POP_JUMP_IF_TRUE -67
+  59          POP_TOP 
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  14:0c       LOAD_METHOD write
+  36:00       CALL_METHOD 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: pixelShowU
+  raw bytecode: 233 52:32:18:2f:30:80:8d:26:28:25:31:25:2d:2d:27:2d:2d:27:2d:2d:27:2d:2d:27:2c:2c:20:b0:14:0e:36:00:c2:b1:14:0e:36:00:86:f6:c3:80:42:4d:57:c4:12:14:b4:80:80:80:34:04:59:81:e5:57:8e:d7:43:2e:59:b2:b3:d8:44:5a:12:14:81:22:81:7f:22:81:7f:80:34:04:59:12:14:8b:22:81:7f:22:81:7f:80:34:04:59:b2:82:b3:f4:d8:44:5a:12:14:82:22:81:7f:22:81:4c:80:34:04:59:12:14:8a:22:81:7f:22:81:4c:80:34:04:59:b2:83:b3:f4:d8:44:5a:12:14:83:22:81:7f:22:81:19:80:34:04:59:12:14:89:22:81:7f:22:81:19:80:34:04:59:b2:84:b3:f4:d8:44:5a:12:14:88:22:81:7f:22:80:66:80:34:04:59:12:14:84:22:81:7f:22:80:66:80:34:04:59:b2:85:b3:f4:d8:44:58:12:14:85:22:81:7f:22:33:80:34:04:59:12:14:87:22:81:7f:22:33:80:34:04:59:12:22:14:0c:36:00:59:51:63
+  prelude: (11, 0, 0, 2, 0, 0)
+  args: ['value_d', 'max_value_d']
+  line info: 80:8d:26:28:25:31:25:2d:2d:27:2d:2d:27:2d:2d:27:2d:2d:27:2c:2c:20
+  b0          LOAD_FAST 0 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c2          STORE_FAST 2 
+  b1          LOAD_FAST 1 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  86          LOAD_CONST_SMALL_INT 6 
+  f6          BINARY_OP 31 __floordiv__ 
+  c3          STORE_FAST 3 
+  80          LOAD_CONST_SMALL_INT 0 
+  42:4d       JUMP 13
+  57          DUP_TOP 
+  c4          STORE_FAST 4 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  b4          LOAD_FAST 4 
+  80          LOAD_CONST_SMALL_INT 0 
+  80          LOAD_CONST_SMALL_INT 0 
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  81          LOAD_CONST_SMALL_INT 1 
+  e5          BINARY_OP 14 __iadd__ 
+  57          DUP_TOP 
+  8e          LOAD_CONST_SMALL_INT 14 
+  d7          BINARY_OP 0 __lt__ 
+  43:2e       POP_JUMP_IF_TRUE -18
+  59          POP_TOP 
+  b2          LOAD_FAST 2 
+  b3          LOAD_FAST 3 
+  d8          BINARY_OP 1 __gt__ 
+  44:5a       POP_JUMP_IF_FALSE 26
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  81          LOAD_CONST_SMALL_INT 1 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  8b          LOAD_CONST_SMALL_INT 11 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  b2          LOAD_FAST 2 
+  82          LOAD_CONST_SMALL_INT 2 
+  b3          LOAD_FAST 3 
+  f4          BINARY_OP 29 __mul__ 
+  d8          BINARY_OP 1 __gt__ 
+  44:5a       POP_JUMP_IF_FALSE 26
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  82          LOAD_CONST_SMALL_INT 2 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:81:4c    LOAD_CONST_SMALL_INT 204
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  8a          LOAD_CONST_SMALL_INT 10 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:81:4c    LOAD_CONST_SMALL_INT 204
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  b2          LOAD_FAST 2 
+  83          LOAD_CONST_SMALL_INT 3 
+  b3          LOAD_FAST 3 
+  f4          BINARY_OP 29 __mul__ 
+  d8          BINARY_OP 1 __gt__ 
+  44:5a       POP_JUMP_IF_FALSE 26
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  83          LOAD_CONST_SMALL_INT 3 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:81:19    LOAD_CONST_SMALL_INT 153
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  89          LOAD_CONST_SMALL_INT 9 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:81:19    LOAD_CONST_SMALL_INT 153
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  b2          LOAD_FAST 2 
+  84          LOAD_CONST_SMALL_INT 4 
+  b3          LOAD_FAST 3 
+  f4          BINARY_OP 29 __mul__ 
+  d8          BINARY_OP 1 __gt__ 
+  44:5a       POP_JUMP_IF_FALSE 26
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  88          LOAD_CONST_SMALL_INT 8 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:80:66    LOAD_CONST_SMALL_INT 102
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  84          LOAD_CONST_SMALL_INT 4 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:80:66    LOAD_CONST_SMALL_INT 102
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  b2          LOAD_FAST 2 
+  85          LOAD_CONST_SMALL_INT 5 
+  b3          LOAD_FAST 3 
+  f4          BINARY_OP 29 __mul__ 
+  d8          BINARY_OP 1 __gt__ 
+  44:58       POP_JUMP_IF_FALSE 24
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  85          LOAD_CONST_SMALL_INT 5 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:33       LOAD_CONST_SMALL_INT 51
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  12:14       LOAD_GLOBAL setPixelColorWithoutWright
+  87          LOAD_CONST_SMALL_INT 7 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  22:33       LOAD_CONST_SMALL_INT 51
+  80          LOAD_CONST_SMALL_INT 0 
+  34:04       CALL_FUNCTION 4
+  59          POP_TOP 
+  12:22       LOAD_GLOBAL np
+  14:0c       LOAD_METHOD write
+  36:00       CALL_METHOD 0
+  59          POP_TOP 
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: []
+simple_name: clamp
+  raw bytecode: 28 23:14:19:31:32:33:80:a5:25:22:25:22:b2:b0:d7:44:42:b0:63:b2:b1:d8:44:42:b1:63:b2:63
+  prelude: (5, 0, 0, 3, 0, 0)
+  args: ['minValue', 'maxValue', 'value']
+  line info: 80:a5:25:22:25:22
+  b2          LOAD_FAST 2 
+  b0          LOAD_FAST 0 
+  d7          BINARY_OP 0 __lt__ 
+  44:42       POP_JUMP_IF_FALSE 2
+  b0          LOAD_FAST 0 
+  63          RETURN_VALUE 
+  b2          LOAD_FAST 2 
+  b1          LOAD_FAST 1 
+  d8          BINARY_OP 1 __gt__ 
+  44:42       POP_JUMP_IF_FALSE 2
+  b1          LOAD_FAST 1 
+  63          RETURN_VALUE 
+  b2          LOAD_FAST 2 
+  63          RETURN_VALUE 
+  children: []
+simple_name: hsl
+  raw bytecode: 284 93:10:60:1a:34:35:36:80:ad:26:26:26:26:2a:2a:39:25:2e:30:2a:22:22:22:25:22:22:25:25:22:22:24:25:22:22:24:25:22:22:24:25:22:22:24:25:22:22:24:2e:24:24:24:12:37:b0:34:01:c0:12:37:b1:34:01:c1:12:37:b2:34:01:c2:b0:22:82:68:f8:c0:12:19:80:22:80:63:b1:34:03:c1:12:19:80:22:80:63:b2:34:03:c2:22:80:64:12:38:82:b2:f4:22:80:64:f3:34:01:f3:b1:f4:88:f0:22:80:ce:10:f6:c3:b0:22:3c:f6:c4:b0:b4:22:3c:f4:f3:22:82:00:f4:22:3c:f6:c5:12:38:b4:82:f8:88:f0:b5:f2:22:82:00:f3:34:01:c6:b3:22:82:00:b6:f3:f4:88:f1:c7:80:c8:80:c9:80:ca:b4:80:d9:44:49:b7:c8:b3:c9:80:ca:42:c1:80:b4:81:d9:44:48:b3:c8:b7:c9:80:ca:42:74:b4:82:d9:44:48:80:c8:b3:c9:b7:ca:42:67:b4:83:d9:44:48:80:c8:b7:c9:b3:ca:42:5a:b4:84:d9:44:48:b7:c8:80:c9:b3:ca:42:4d:b4:85:d9:44:48:b3:c8:80:c9:b7:ca:42:40:b2:82:f4:88:f0:22:80:64:f6:b3:f3:82:f6:cb:b8:bb:f2:cc:b9:bb:f2:cd:ba:bb:f2:ce:12:1b:bc:bd:be:34:03:63
+  prelude: (19, 0, 0, 3, 0, 0)
+  args: ['h', 's', 'l']
+  line info: 80:ad:26:26:26:26:2a:2a:39:25:2e:30:2a:22:22:22:25:22:22:25:25:22:22:24:25:22:22:24:25:22:22:24:25:22:22:24:25:22:22:24:2e:24:24:24
+  12:37       LOAD_GLOBAL round
+  b0          LOAD_FAST 0 
+  34:01       CALL_FUNCTION 1
+  c0          STORE_FAST 0 
+  12:37       LOAD_GLOBAL round
+  b1          LOAD_FAST 1 
+  34:01       CALL_FUNCTION 1
+  c1          STORE_FAST 1 
+  12:37       LOAD_GLOBAL round
+  b2          LOAD_FAST 2 
+  34:01       CALL_FUNCTION 1
+  c2          STORE_FAST 2 
+  b0          LOAD_FAST 0 
+  22:82:68    LOAD_CONST_SMALL_INT 360
+  f8          BINARY_OP 33 __mod__ 
+  c0          STORE_FAST 0 
+  12:19       LOAD_GLOBAL clamp
+  80          LOAD_CONST_SMALL_INT 0 
+  22:80:63    LOAD_CONST_SMALL_INT 99
+  b1          LOAD_FAST 1 
+  34:03       CALL_FUNCTION 3
+  c1          STORE_FAST 1 
+  12:19       LOAD_GLOBAL clamp
+  80          LOAD_CONST_SMALL_INT 0 
+  22:80:63    LOAD_CONST_SMALL_INT 99
+  b2          LOAD_FAST 2 
+  34:03       CALL_FUNCTION 3
+  c2          STORE_FAST 2 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  12:38       LOAD_GLOBAL abs
+  82          LOAD_CONST_SMALL_INT 2 
+  b2          LOAD_FAST 2 
+  f4          BINARY_OP 29 __mul__ 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f3          BINARY_OP 28 __sub__ 
+  34:01       CALL_FUNCTION 1
+  f3          BINARY_OP 28 __sub__ 
+  b1          LOAD_FAST 1 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f0          BINARY_OP 25 __lshift__ 
+  22:80:ce:10 LOAD_CONST_SMALL_INT 10000
+  f6          BINARY_OP 31 __floordiv__ 
+  c3          STORE_FAST 3 
+  b0          LOAD_FAST 0 
+  22:3c       LOAD_CONST_SMALL_INT 60
+  f6          BINARY_OP 31 __floordiv__ 
+  c4          STORE_FAST 4 
+  b0          LOAD_FAST 0 
+  b4          LOAD_FAST 4 
+  22:3c       LOAD_CONST_SMALL_INT 60
+  f4          BINARY_OP 29 __mul__ 
+  f3          BINARY_OP 28 __sub__ 
+  22:82:00    LOAD_CONST_SMALL_INT 256
+  f4          BINARY_OP 29 __mul__ 
+  22:3c       LOAD_CONST_SMALL_INT 60
+  f6          BINARY_OP 31 __floordiv__ 
+  c5          STORE_FAST 5 
+  12:38       LOAD_GLOBAL abs
+  b4          LOAD_FAST 4 
+  82          LOAD_CONST_SMALL_INT 2 
+  f8          BINARY_OP 33 __mod__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f0          BINARY_OP 25 __lshift__ 
+  b5          LOAD_FAST 5 
+  f2          BINARY_OP 27 __add__ 
+  22:82:00    LOAD_CONST_SMALL_INT 256
+  f3          BINARY_OP 28 __sub__ 
+  34:01       CALL_FUNCTION 1
+  c6          STORE_FAST 6 
+  b3          LOAD_FAST 3 
+  22:82:00    LOAD_CONST_SMALL_INT 256
+  b6          LOAD_FAST 6 
+  f3          BINARY_OP 28 __sub__ 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  c7          STORE_FAST 7 
+  80          LOAD_CONST_SMALL_INT 0 
+  c8          STORE_FAST 8 
+  80          LOAD_CONST_SMALL_INT 0 
+  c9          STORE_FAST 9 
+  80          LOAD_CONST_SMALL_INT 0 
+  ca          STORE_FAST 10 
+  b4          LOAD_FAST 4 
+  80          LOAD_CONST_SMALL_INT 0 
+  d9          BINARY_OP 2 __eq__ 
+  44:49       POP_JUMP_IF_FALSE 9
+  b7          LOAD_FAST 7 
+  c8          STORE_FAST 8 
+  b3          LOAD_FAST 3 
+  c9          STORE_FAST 9 
+  80          LOAD_CONST_SMALL_INT 0 
+  ca          STORE_FAST 10 
+  42:c1:80    JUMP 65
+  b4          LOAD_FAST 4 
+  81          LOAD_CONST_SMALL_INT 1 
+  d9          BINARY_OP 2 __eq__ 
+  44:48       POP_JUMP_IF_FALSE 8
+  b3          LOAD_FAST 3 
+  c8          STORE_FAST 8 
+  b7          LOAD_FAST 7 
+  c9          STORE_FAST 9 
+  80          LOAD_CONST_SMALL_INT 0 
+  ca          STORE_FAST 10 
+  42:74       JUMP 52
+  b4          LOAD_FAST 4 
+  82          LOAD_CONST_SMALL_INT 2 
+  d9          BINARY_OP 2 __eq__ 
+  44:48       POP_JUMP_IF_FALSE 8
+  80          LOAD_CONST_SMALL_INT 0 
+  c8          STORE_FAST 8 
+  b3          LOAD_FAST 3 
+  c9          STORE_FAST 9 
+  b7          LOAD_FAST 7 
+  ca          STORE_FAST 10 
+  42:67       JUMP 39
+  b4          LOAD_FAST 4 
+  83          LOAD_CONST_SMALL_INT 3 
+  d9          BINARY_OP 2 __eq__ 
+  44:48       POP_JUMP_IF_FALSE 8
+  80          LOAD_CONST_SMALL_INT 0 
+  c8          STORE_FAST 8 
+  b7          LOAD_FAST 7 
+  c9          STORE_FAST 9 
+  b3          LOAD_FAST 3 
+  ca          STORE_FAST 10 
+  42:5a       JUMP 26
+  b4          LOAD_FAST 4 
+  84          LOAD_CONST_SMALL_INT 4 
+  d9          BINARY_OP 2 __eq__ 
+  44:48       POP_JUMP_IF_FALSE 8
+  b7          LOAD_FAST 7 
+  c8          STORE_FAST 8 
+  80          LOAD_CONST_SMALL_INT 0 
+  c9          STORE_FAST 9 
+  b3          LOAD_FAST 3 
+  ca          STORE_FAST 10 
+  42:4d       JUMP 13
+  b4          LOAD_FAST 4 
+  85          LOAD_CONST_SMALL_INT 5 
+  d9          BINARY_OP 2 __eq__ 
+  44:48       POP_JUMP_IF_FALSE 8
+  b3          LOAD_FAST 3 
+  c8          STORE_FAST 8 
+  80          LOAD_CONST_SMALL_INT 0 
+  c9          STORE_FAST 9 
+  b7          LOAD_FAST 7 
+  ca          STORE_FAST 10 
+  42:40       JUMP 0
+  b2          LOAD_FAST 2 
+  82          LOAD_CONST_SMALL_INT 2 
+  f4          BINARY_OP 29 __mul__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f0          BINARY_OP 25 __lshift__ 
+  22:80:64    LOAD_CONST_SMALL_INT 100
+  f6          BINARY_OP 31 __floordiv__ 
+  b3          LOAD_FAST 3 
+  f3          BINARY_OP 28 __sub__ 
+  82          LOAD_CONST_SMALL_INT 2 
+  f6          BINARY_OP 31 __floordiv__ 
+  cb          STORE_FAST 11 
+  b8          LOAD_FAST 8 
+  bb          LOAD_FAST 11 
+  f2          BINARY_OP 27 __add__ 
+  cc          STORE_FAST 12 
+  b9          LOAD_FAST 9 
+  bb          LOAD_FAST 11 
+  f2          BINARY_OP 27 __add__ 
+  cd          STORE_FAST 13 
+  ba          LOAD_FAST 10 
+  bb          LOAD_FAST 11 
+  f2          BINARY_OP 27 __add__ 
+  ce          STORE_FAST 14 
+  12:1b       LOAD_GLOBAL packRGB
+  bc          LOAD_FAST 12 
+  bd          LOAD_FAST 13 
+  be          LOAD_FAST 14 
+  34:03       CALL_FUNCTION 3
+  63          RETURN_VALUE 
+  children: []
+simple_name: packRGB
+  raw bytecode: 30 2b:0c:1b:28:29:2a:80:db:b0:22:81:7f:ef:90:f0:b1:22:81:7f:ef:88:f0:ed:b2:22:81:7f:ef:ed:63
+  prelude: (6, 0, 0, 3, 0, 0)
+  args: ['r', 'g', 'b']
+  line info: 80:db
+  b0          LOAD_FAST 0 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  90          LOAD_CONST_SMALL_INT 16 
+  f0          BINARY_OP 25 __lshift__ 
+  b1          LOAD_FAST 1 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f0          BINARY_OP 25 __lshift__ 
+  ed          BINARY_OP 22 __or__ 
+  b2          LOAD_FAST 2 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  ed          BINARY_OP 22 __or__ 
+  63          RETURN_VALUE 
+  children: []
+simple_name: packRGBd
+  raw bytecode: 55 4b:12:1c:39:3a:3b:80:df:26:26:26:b0:14:0e:36:00:c3:b1:14:0e:36:00:c4:b2:14:0e:36:00:c5:12:04:b3:22:81:7f:ef:90:f0:b4:22:81:7f:ef:88:f0:ed:b5:22:81:7f:ef:ed:34:01:63
+  prelude: (10, 0, 0, 3, 0, 0)
+  args: ['r_d', 'g_d', 'b_d']
+  line info: 80:df:26:26:26
+  b0          LOAD_FAST 0 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c3          STORE_FAST 3 
+  b1          LOAD_FAST 1 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c4          STORE_FAST 4 
+  b2          LOAD_FAST 2 
+  14:0e       LOAD_METHOD IntValue
+  36:00       CALL_METHOD 0
+  c5          STORE_FAST 5 
+  12:04       LOAD_GLOBAL DataStruct
+  b3          LOAD_FAST 3 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  90          LOAD_CONST_SMALL_INT 16 
+  f0          BINARY_OP 25 __lshift__ 
+  b4          LOAD_FAST 4 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  88          LOAD_CONST_SMALL_INT 8 
+  f0          BINARY_OP 25 __lshift__ 
+  ed          BINARY_OP 22 __or__ 
+  b5          LOAD_FAST 5 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  ed          BINARY_OP 22 __or__ 
+  34:01       CALL_FUNCTION 1
+  63          RETURN_VALUE 
+  children: []
+simple_name: unpackR
+  raw bytecode: 17 19:0a:1d:27:80:e6:28:b0:90:f1:22:81:7f:ef:c1:b1:63
+  prelude: (4, 0, 0, 1, 0, 0)
+  args: ['rgb']
+  line info: 80:e6:28
+  b0          LOAD_FAST 0 
+  90          LOAD_CONST_SMALL_INT 16 
+  f1          BINARY_OP 26 __rshift__ 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  c1          STORE_FAST 1 
+  b1          LOAD_FAST 1 
+  63          RETURN_VALUE 
+  children: []
+simple_name: unpackG
+  raw bytecode: 17 19:0a:1e:27:80:eb:28:b0:88:f1:22:81:7f:ef:c1:b1:63
+  prelude: (4, 0, 0, 1, 0, 0)
+  args: ['rgb']
+  line info: 80:eb:28
+  b0          LOAD_FAST 0 
+  88          LOAD_CONST_SMALL_INT 8 
+  f1          BINARY_OP 26 __rshift__ 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  c1          STORE_FAST 1 
+  b1          LOAD_FAST 1 
+  63          RETURN_VALUE 
+  children: []
+simple_name: unpackB
+  raw bytecode: 15 19:0a:1f:27:80:f0:26:b0:22:81:7f:ef:c1:b1:63
+  prelude: (4, 0, 0, 1, 0, 0)
+  args: ['rgb']
+  line info: 80:f0:26
+  b0          LOAD_FAST 0 
+  22:81:7f    LOAD_CONST_SMALL_INT 255
+  ef          BINARY_OP 24 __and__ 
+  c1          STORE_FAST 1 
+  b1          LOAD_FAST 1 
+  63          RETURN_VALUE 
+  children: []
+simple_name: version
+  raw bytecode: 8 00:06:20:80:f5:23:01:63
+  prelude: (1, 0, 0, 0, 0, 0)
+  args: []
+  line info: 80:f5
+  23:01       LOAD_CONST_OBJ 'v_2020_7_30'
+  63          RETURN_VALUE 
+  children: []

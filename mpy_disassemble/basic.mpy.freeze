@@ -1,0 +1,3541 @@
+#include "py/mpconfig.h"
+#include "py/objint.h"
+#include "py/objstr.h"
+#include "py/emitglue.h"
+#include "py/nativeglue.h"
+
+#if MICROPY_LONGINT_IMPL != 2
+#error "incompatible MICROPY_LONGINT_IMPL"
+#endif
+
+#if MPZ_DIG_SIZE != 16
+#error "incompatible MPZ_DIG_SIZE"
+#endif
+
+#if MICROPY_PY_BUILTINS_FLOAT
+typedef struct _mp_obj_float_t {
+    mp_obj_base_t base;
+    mp_float_t value;
+} mp_obj_float_t;
+#endif
+
+#if MICROPY_PY_BUILTINS_COMPLEX
+typedef struct _mp_obj_complex_t {
+    mp_obj_base_t base;
+    mp_float_t real;
+    mp_float_t imag;
+} mp_obj_complex_t;
+#endif
+
+enum {
+    MP_QSTR__0x0a_ = MP_QSTRnumber_of,
+    MP_QSTR__space_,
+    MP_QSTR__star_,
+    MP_QSTR__slash_,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_utf_hyphen_8,
+    MP_QSTR__dot__backslash_basic_dot_py,
+    MP_QSTR_time,
+    MP_QSTR_random,
+    MP_QSTR_math,
+    MP_QSTR_DataStruct,
+    MP_QSTR_wait_time,
+    MP_QSTR_ticks_ms,
+    MP_QSTR_data_struct_random,
+    MP_QSTR_IsInt,
+    MP_QSTR_IntValue,
+    MP_QSTR_randrange,
+    MP_QSTR_FloatValue,
+    MP_QSTR_data_struct_and,
+    MP_QSTR_BoolValue,
+    MP_QSTR_data_struct_or,
+    MP_QSTR_data_struct_substring,
+    MP_QSTR_SetValue,
+    MP_QSTR_length,
+    MP_QSTR_StringValue,
+    MP_QSTR_data_struct_normalization,
+    MP_QSTR_DegreeToRadian,
+    MP_QSTR_pi,
+    MP_QSTR_RadianToDegree,
+    MP_QSTR_ClampD,
+    MP_QSTR_FindDataInList,
+    MP_QSTR_GetItemFromList,
+    MP_QSTR_version,
+    MP_QSTR_NumberValue,
+    MP_QSTR_floor,
+    MP_QSTR__dot_,
+    MP_QSTR_IsNumber,
+    MP_QSTR___round__,
+    MP_QSTR___add__,
+    MP_QSTR___radd__,
+    MP_QSTR___iadd__,
+    MP_QSTR___sub__,
+    MP_QSTR___mul__,
+    MP_QSTR___truediv__,
+    MP_QSTR___lt__,
+    MP_QSTR___gt__,
+    MP_QSTR___le__,
+    MP_QSTR___ge__,
+    MP_QSTR___eq__,
+    MP_QSTR___ne__,
+    MP_QSTR___mod__,
+    MP_QSTR___abs__,
+    MP_QSTR___ceil__,
+    MP_QSTR_ceil,
+    MP_QSTR___floor__,
+    MP_QSTR_contains,
+    MP_QSTR_time_ms,
+    MP_QSTR_v1,
+    MP_QSTR_v2,
+    MP_QSTR_f,
+    MP_QSTR_start_pos,
+    MP_QSTR_end_pos,
+    MP_QSTR_v,
+    MP_QSTR_min1,
+    MP_QSTR_max1,
+    MP_QSTR_min2,
+    MP_QSTR_max2,
+    MP_QSTR_min_value,
+    MP_QSTR_max_value,
+    MP_QSTR_list_variable,
+    MP_QSTR_data,
+    MP_QSTR_index_data,
+    MP_QSTR_float,
+    MP_QSTR_other,
+    MP_QSTR_n,
+    MP_QSTR_v_2020_7_31,
+};
+
+const qstr_hash_t mp_qstr_frozen_const_hashes[] = {
+    175,
+    133,
+    143,
+    138,
+    189,
+    183,
+    234,
+    240,
+    190,
+    53,
+    2,
+    228,
+    66,
+    57,
+    108,
+    61,
+    163,
+    62,
+    41,
+    224,
+    127,
+    179,
+    236,
+    89,
+    155,
+    159,
+    155,
+    28,
+    219,
+    146,
+    85,
+    50,
+    191,
+    45,
+    125,
+    139,
+    188,
+    103,
+    196,
+    22,
+    109,
+    33,
+    49,
+    136,
+    93,
+    182,
+    204,
+    167,
+    113,
+    14,
+    99,
+    149,
+    198,
+    6,
+    125,
+    6,
+    81,
+    2,
+    1,
+    195,
+    118,
+    57,
+    211,
+    190,
+    224,
+    189,
+    227,
+    59,
+    165,
+    62,
+    21,
+    148,
+    53,
+    161,
+    203,
+    217,
+};
+
+const qstr_len_t mp_qstr_frozen_const_lengths[] = {
+    1,
+    1,
+    1,
+    1,
+    8,
+    5,
+    10,
+    4,
+    6,
+    4,
+    10,
+    9,
+    8,
+    18,
+    5,
+    8,
+    9,
+    10,
+    15,
+    9,
+    14,
+    21,
+    8,
+    6,
+    11,
+    25,
+    14,
+    2,
+    14,
+    6,
+    14,
+    15,
+    7,
+    11,
+    5,
+    1,
+    8,
+    9,
+    7,
+    8,
+    8,
+    7,
+    7,
+    11,
+    6,
+    6,
+    6,
+    6,
+    6,
+    6,
+    7,
+    7,
+    8,
+    4,
+    9,
+    8,
+    7,
+    2,
+    2,
+    1,
+    9,
+    7,
+    1,
+    4,
+    4,
+    4,
+    4,
+    9,
+    9,
+    13,
+    4,
+    10,
+    5,
+    5,
+    1,
+    11,
+};
+
+extern const qstr_pool_t mp_qstr_const_pool;
+const qstr_pool_t mp_qstr_frozen_const_pool = {
+    &mp_qstr_const_pool, // previous pool
+    MP_QSTRnumber_of, // previous pool size
+    10, // allocated entries
+    76, // used entries
+    (qstr_hash_t *)mp_qstr_frozen_const_hashes,
+    (qstr_len_t *)mp_qstr_frozen_const_lengths,
+    {
+        "\x0a",
+        " ",
+        "*",
+        "/",
+        "<module>",
+        "utf-8",
+        "\x2e\x5c\x62\x61\x73\x69\x63\x2e\x70\x79",
+        "time",
+        "random",
+        "math",
+        "DataStruct",
+        "wait_time",
+        "ticks_ms",
+        "data_struct_random",
+        "IsInt",
+        "IntValue",
+        "randrange",
+        "FloatValue",
+        "data_struct_and",
+        "BoolValue",
+        "data_struct_or",
+        "data_struct_substring",
+        "SetValue",
+        "length",
+        "StringValue",
+        "data_struct_normalization",
+        "DegreeToRadian",
+        "pi",
+        "RadianToDegree",
+        "ClampD",
+        "FindDataInList",
+        "GetItemFromList",
+        "version",
+        "NumberValue",
+        "floor",
+        ".",
+        "IsNumber",
+        "__round__",
+        "__add__",
+        "__radd__",
+        "__iadd__",
+        "__sub__",
+        "__mul__",
+        "__truediv__",
+        "__lt__",
+        "__gt__",
+        "__le__",
+        "__ge__",
+        "__eq__",
+        "__ne__",
+        "__mod__",
+        "__abs__",
+        "__ceil__",
+        "ceil",
+        "__floor__",
+        "contains",
+        "time_ms",
+        "v1",
+        "v2",
+        "f",
+        "start_pos",
+        "end_pos",
+        "v",
+        "min1",
+        "max1",
+        "min2",
+        "max2",
+        "min_value",
+        "max_value",
+        "list_variable",
+        "data",
+        "index_data",
+        "float",
+        "other",
+        "n",
+        "v_2020_7_31",
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// frozen module .\basic
+// - original source file: ./rootfs/basic.mpy
+// - frozen file name: .\basic.py
+// - .mpy header: 4d:06:00:1f
+
+// frozen bytecode for file .\basic.py, scope .\basic__lt_module_gt_
+static const byte fun_data_.\basic__lt_module_gt_[107] = {
+    0x10,0x38, // prelude
+    0x01, // names: <module>
+    0x26,0x26,0x66,0x84,0x09,0x89,0xb9,0x84,0x0f,0x64,0x20,0x64,0x60,0x84,0x0a,0x84,0x10,0x64,0x20,0x64,0x20,0x84,0x08,0x84,0x08,0x84,0x07, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x02, // IMPORT_NAME 'time'
+    0x16,0x02, // STORE_NAME 'time'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x03, // IMPORT_NAME 'random'
+    0x16,0x03, // STORE_NAME 'random'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x04, // IMPORT_NAME 'math'
+    0x16,0x04, // STORE_NAME 'math'
+    0x32,0x00, // MAKE_FUNCTION 0
+    0x16,0x06, // STORE_NAME 'wait_time'
+    0x54, // LOAD_BUILD_CLASS
+    0x32,0x01, // MAKE_FUNCTION 1
+    0x10,0x05, // LOAD_CONST_STRING 'DataStruct'
+    0x34,0x02, // CALL_FUNCTION 2
+    0x16,0x05, // STORE_NAME 'DataStruct'
+    0x32,0x02, // MAKE_FUNCTION 2
+    0x16,0x08, // STORE_NAME 'data_struct_random'
+    0x32,0x03, // MAKE_FUNCTION 3
+    0x16,0x0d, // STORE_NAME 'data_struct_and'
+    0x32,0x04, // MAKE_FUNCTION 4
+    0x16,0x0f, // STORE_NAME 'data_struct_or'
+    0x32,0x05, // MAKE_FUNCTION 5
+    0x16,0x10, // STORE_NAME 'data_struct_substring'
+    0x32,0x06, // MAKE_FUNCTION 6
+    0x16,0x14, // STORE_NAME 'data_struct_normalization'
+    0x32,0x07, // MAKE_FUNCTION 7
+    0x16,0x15, // STORE_NAME 'DegreeToRadian'
+    0x32,0x08, // MAKE_FUNCTION 8
+    0x16,0x17, // STORE_NAME 'RadianToDegree'
+    0x32,0x09, // MAKE_FUNCTION 9
+    0x16,0x18, // STORE_NAME 'ClampD'
+    0x32,0x0a, // MAKE_FUNCTION 10
+    0x16,0x19, // STORE_NAME 'FindDataInList'
+    0x32,0x0b, // MAKE_FUNCTION 11
+    0x16,0x1a, // STORE_NAME 'GetItemFromList'
+    0x32,0x0c, // MAKE_FUNCTION 12
+    0x16,0x1c, // STORE_NAME 'version'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_wait_time
+static const byte fun_data_.\basic_wait_time[50] = {
+    0xa1,0x40,0x12, // prelude
+    0x06,0x38, // names: wait_time, time_ms
+    0x60,0x60,0x27,0x27,0x22,0x27,0x2a, // code info
+    0x12,0x02, // LOAD_GLOBAL 'time'
+    0x14,0x07, // LOAD_METHOD 'ticks_ms'
+    0x36,0x00, // CALL_METHOD 0
+    0xc1, // STORE_FAST 1
+    0x12,0x02, // LOAD_GLOBAL 'time'
+    0x14,0x07, // LOAD_METHOD 'ticks_ms'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0x42,0x4a, // JUMP 10
+    0x12,0x02, // LOAD_GLOBAL 'time'
+    0x14,0x07, // LOAD_METHOD 'ticks_ms'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0x52, // LOAD_CONST_TRUE
+    0x67, // YIELD_VALUE
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0xb1, // LOAD_FAST 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xb0, // LOAD_FAST 0
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x2f, // POP_JUMP_IF_TRUE -17
+    0x50, // LOAD_CONST_FALSE
+    0x67, // YIELD_VALUE
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_wait_time = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x01,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_wait_time,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 50,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 1,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 6,
+        .line_info = fun_data_.\basic_wait_time + 5,
+        .opcodes = fun_data_.\basic_wait_time + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct
+static const byte fun_data_.\basic_DataStruct[195] = {
+    0x08,0x70, // prelude
+    0x05, // names: DataStruct
+    0x88,0x0f,0x43,0x64,0x64,0x60,0x84,0x0c,0x84,0x07,0x84,0x07,0x64,0x40,0x84,0x07,0x84,0x14,0x84,0x08,0x64,0x64,0x68,0x64,0x60,0x64,0x60,0x84,0x07,0x64,0x60,0x64,0x60,0x64,0x20,0x64,0x60,0x64,0x60,0x64,0x60,0x64,0x60,0x64,0x60,0x64,0x60,0x64,0x60,0x64,0x40,0x64,0x64,0x64,0x60, // code info
+    0x11,0x39, // LOAD_NAME '__name__'
+    0x16,0x3a, // STORE_NAME '__module__'
+    0x10,0x05, // LOAD_CONST_STRING 'DataStruct'
+    0x16,0x3b, // STORE_NAME '__qualname__'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x16,0x1e, // STORE_NAME 'value'
+    0x32,0x00, // MAKE_FUNCTION 0
+    0x16,0x1d, // STORE_NAME '__init__'
+    0x32,0x01, // MAKE_FUNCTION 1
+    0x16,0x11, // STORE_NAME 'SetValue'
+    0x32,0x02, // MAKE_FUNCTION 2
+    0x16,0x13, // STORE_NAME 'StringValue'
+    0x32,0x03, // MAKE_FUNCTION 3
+    0x16,0x0a, // STORE_NAME 'IntValue'
+    0x32,0x04, // MAKE_FUNCTION 4
+    0x16,0x0c, // STORE_NAME 'FloatValue'
+    0x32,0x05, // MAKE_FUNCTION 5
+    0x16,0x1f, // STORE_NAME 'NumberValue'
+    0x32,0x06, // MAKE_FUNCTION 6
+    0x16,0x0e, // STORE_NAME 'BoolValue'
+    0x32,0x07, // MAKE_FUNCTION 7
+    0x16,0x09, // STORE_NAME 'IsInt'
+    0x32,0x08, // MAKE_FUNCTION 8
+    0x16,0x24, // STORE_NAME 'IsNumber'
+    0x32,0x09, // MAKE_FUNCTION 9
+    0x16,0x12, // STORE_NAME 'length'
+    0x32,0x0a, // MAKE_FUNCTION 10
+    0x16,0x22, // STORE_NAME 'find'
+    0x51, // LOAD_CONST_NONE
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x53, // LOAD_NULL
+    0x33,0x0b, // MAKE_FUNCTION_DEFARGS 11
+    0x16,0x25, // STORE_NAME '__round__'
+    0x32,0x0c, // MAKE_FUNCTION 12
+    0x16,0x26, // STORE_NAME '__add__'
+    0x32,0x0d, // MAKE_FUNCTION 13
+    0x16,0x27, // STORE_NAME '__radd__'
+    0x32,0x0e, // MAKE_FUNCTION 14
+    0x16,0x28, // STORE_NAME '__iadd__'
+    0x32,0x0f, // MAKE_FUNCTION 15
+    0x16,0x29, // STORE_NAME '__sub__'
+    0x32,0x10, // MAKE_FUNCTION 16
+    0x16,0x2a, // STORE_NAME '__mul__'
+    0x32,0x11, // MAKE_FUNCTION 17
+    0x16,0x2b, // STORE_NAME '__truediv__'
+    0x32,0x12, // MAKE_FUNCTION 18
+    0x16,0x2c, // STORE_NAME '__lt__'
+    0x32,0x13, // MAKE_FUNCTION 19
+    0x16,0x2d, // STORE_NAME '__gt__'
+    0x32,0x14, // MAKE_FUNCTION 20
+    0x16,0x2e, // STORE_NAME '__le__'
+    0x32,0x15, // MAKE_FUNCTION 21
+    0x16,0x2f, // STORE_NAME '__ge__'
+    0x32,0x16, // MAKE_FUNCTION 22
+    0x16,0x30, // STORE_NAME '__eq__'
+    0x32,0x17, // MAKE_FUNCTION 23
+    0x16,0x31, // STORE_NAME '__ne__'
+    0x32,0x18, // MAKE_FUNCTION 24
+    0x16,0x32, // STORE_NAME '__mod__'
+    0x32,0x19, // MAKE_FUNCTION 25
+    0x16,0x33, // STORE_NAME '__abs__'
+    0x32,0x1a, // MAKE_FUNCTION 26
+    0x16,0x34, // STORE_NAME '__ceil__'
+    0x32,0x1b, // MAKE_FUNCTION 27
+    0x16,0x36, // STORE_NAME '__floor__'
+    0x32,0x1c, // MAKE_FUNCTION 28
+    0x16,0x37, // STORE_NAME 'contains'
+    0x32,0x1d, // MAKE_FUNCTION 29
+    0x16,0x12, // STORE_NAME 'length'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___init__
+static const byte fun_data_.\basic_DataStruct___init__[16] = {
+    0x22,0x0a, // prelude
+    0x1d,0x4c,0x41, // names: __init__, self, v
+    0x80,0x12, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x11, // LOAD_METHOD 'SetValue'
+    0xb1, // LOAD_FAST 1
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___init__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___init__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 16,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 29,
+        .line_info = fun_data_.\basic_DataStruct___init__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___init__ + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_SetValue
+static const byte fun_data_.\basic_DataStruct_SetValue[33] = {
+    0x1a,0x0e, // prelude
+    0x11,0x4c,0x41, // names: SetValue, self, v
+    0x80,0x15,0x2a,0x48, // code info
+    0x12,0x4d, // LOAD_GLOBAL 'type'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb1, // LOAD_FAST 1
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0xb0, // LOAD_FAST 0
+    0x18,0x1e, // STORE_ATTR 'value'
+    0x42,0x44, // JUMP 4
+    0xb1, // LOAD_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x1e, // STORE_ATTR 'value'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_SetValue = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct_SetValue,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 33,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 17,
+        .line_info = fun_data_.\basic_DataStruct_SetValue + 5,
+        .opcodes = fun_data_.\basic_DataStruct_SetValue + 9,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_StringValue
+static const byte fun_data_.\basic_DataStruct_StringValue[69] = {
+    0x3d,0x16, // prelude
+    0x13,0x4c, // names: StringValue, self
+    0x80,0x1b,0x23,0x22,0x2c,0x26,0x27,0x4c,0x49, // code info
+    0x10,0x1b, // LOAD_CONST_STRING ''
+    0xc1, // STORE_FAST 1
+    0x49,0x2e, // SETUP_FINALLY 46
+    0x12,0x4d, // LOAD_GLOBAL 'type'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x4e, // LOAD_GLOBAL 'str'
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x46, // POP_JUMP_IF_FALSE 6
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0xc1, // STORE_FAST 1
+    0x42,0x5b, // JUMP 27
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x4c, // POP_JUMP_IF_FALSE 12
+    0x12,0x4e, // LOAD_GLOBAL 'str'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0x42,0x48, // JUMP 8
+    0x12,0x4e, // LOAD_GLOBAL 'str'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0x51, // LOAD_CONST_NONE
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0x5d, // END_FINALLY
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_StringValue = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_StringValue,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 69,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 1,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 19,
+        .line_info = fun_data_.\basic_DataStruct_StringValue + 4,
+        .opcodes = fun_data_.\basic_DataStruct_StringValue + 13,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_IntValue
+static const byte fun_data_.\basic_DataStruct_IntValue[27] = {
+    0x35,0x0e, // prelude
+    0x0a,0x4c, // names: IntValue, self
+    0x80,0x27,0x22,0x22,0x49, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc1, // STORE_FAST 1
+    0x49,0x09, // SETUP_FINALLY 9
+    0x12,0x4f, // LOAD_GLOBAL 'int'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0x51, // LOAD_CONST_NONE
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0x5d, // END_FINALLY
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_IntValue = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_IntValue,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 27,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 1,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 10,
+        .line_info = fun_data_.\basic_DataStruct_IntValue + 4,
+        .opcodes = fun_data_.\basic_DataStruct_IntValue + 9,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_FloatValue
+static const byte fun_data_.\basic_DataStruct_FloatValue[28] = {
+    0x35,0x0e, // prelude
+    0x0c,0x4c, // names: FloatValue, self
+    0x80,0x2e,0x23,0x22,0x49, // code info
+    0x23,0x02, // LOAD_CONST_OBJ 2
+    0xc1, // STORE_FAST 1
+    0x49,0x09, // SETUP_FINALLY 9
+    0x12,0x50, // LOAD_GLOBAL 'float'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0x51, // LOAD_CONST_NONE
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0x5d, // END_FINALLY
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_FloatValue = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_FloatValue,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 28,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 1,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 12,
+        .line_info = fun_data_.\basic_DataStruct_FloatValue + 4,
+        .opcodes = fun_data_.\basic_DataStruct_FloatValue + 9,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_NumberValue
+static const byte fun_data_.\basic_DataStruct_NumberValue[27] = {
+    0x11,0x0c, // prelude
+    0x1f,0x4c, // names: NumberValue, self
+    0x80,0x35,0x27,0x26, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x46, // POP_JUMP_IF_FALSE 6
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_NumberValue = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_NumberValue,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 27,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 31,
+        .line_info = fun_data_.\basic_DataStruct_NumberValue + 4,
+        .opcodes = fun_data_.\basic_DataStruct_NumberValue + 8,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_BoolValue
+static const byte fun_data_.\basic_DataStruct_BoolValue[27] = {
+    0x35,0x0e, // prelude
+    0x0e,0x4c, // names: BoolValue, self
+    0x80,0x3a,0x22,0x22,0x49, // code info
+    0x50, // LOAD_CONST_FALSE
+    0xc1, // STORE_FAST 1
+    0x49,0x09, // SETUP_FINALLY 9
+    0x12,0x51, // LOAD_GLOBAL 'bool'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0x51, // LOAD_CONST_NONE
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0x5d, // END_FINALLY
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_BoolValue = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_BoolValue,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 27,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 1,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 14,
+        .line_info = fun_data_.\basic_DataStruct_BoolValue + 4,
+        .opcodes = fun_data_.\basic_DataStruct_BoolValue + 9,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_IsInt
+static const byte fun_data_.\basic_DataStruct_IsInt[146] = {
+    0x45,0x26, // prelude
+    0x09,0x4c, // names: IsInt, self
+    0x80,0x41,0x2c,0x22,0x2c,0x28,0x2c,0x22,0x2c,0x38,0x28,0x2b,0x42,0x22,0x22,0x28,0x43, // code info
+    0x12,0x4d, // LOAD_GLOBAL 'type'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x4f, // LOAD_GLOBAL 'int'
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x52, // LOAD_CONST_TRUE
+    0x63, // RETURN_VALUE
+    0x12,0x4d, // LOAD_GLOBAL 'type'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x4e, // LOAD_GLOBAL 'str'
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x14,0x20, // LOAD_METHOD 'isdigit'
+    0x36,0x00, // CALL_METHOD 0
+    0x63, // RETURN_VALUE
+    0x12,0x4d, // LOAD_GLOBAL 'type'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x51, // LOAD_GLOBAL 'bool'
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x52, // LOAD_CONST_TRUE
+    0x63, // RETURN_VALUE
+    0x12,0x4d, // LOAD_GLOBAL 'type'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x50, // LOAD_GLOBAL 'float'
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x58, // POP_JUMP_IF_FALSE 24
+    0x12,0x52, // LOAD_GLOBAL 'abs'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x12,0x04, // LOAD_GLOBAL 'math'
+    0x14,0x21, // LOAD_METHOD 'floor'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x23,0x03, // LOAD_CONST_OBJ 3
+    0xf2, // BINARY_OP 27 __add__
+    0x36,0x01, // CALL_METHOD 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x23,0x04, // LOAD_CONST_OBJ 4
+    0xd7, // BINARY_OP 0 __lt__
+    0x63, // RETURN_VALUE
+    0x12,0x4e, // LOAD_GLOBAL 'str'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x14,0x22, // LOAD_METHOD 'find'
+    0x10,0x23, // LOAD_CONST_STRING '.'
+    0x36,0x01, // CALL_METHOD 1
+    0x7f, // LOAD_CONST_SMALL_INT -1
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x50, // LOAD_CONST_FALSE
+    0x63, // RETURN_VALUE
+    0x50, // LOAD_CONST_FALSE
+    0xc2, // STORE_FAST 2
+    0x49,0x0b, // SETUP_FINALLY 11
+    0x12,0x4f, // LOAD_GLOBAL 'int'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x52, // LOAD_CONST_TRUE
+    0xc2, // STORE_FAST 2
+    0x51, // LOAD_CONST_NONE
+    0xb2, // LOAD_FAST 2
+    0x63, // RETURN_VALUE
+    0x5d, // END_FINALLY
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_IsInt = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_IsInt,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 146,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 9,
+        .n_exc_stack = 1,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 9,
+        .line_info = fun_data_.\basic_DataStruct_IsInt + 4,
+        .opcodes = fun_data_.\basic_DataStruct_IsInt + 21,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_IsNumber
+static const byte fun_data_.\basic_DataStruct_IsNumber[30] = {
+    0x35,0x10, // prelude
+    0x24,0x4c, // names: IsNumber, self
+    0x80,0x55,0x22,0x22,0x28,0x43, // code info
+    0x50, // LOAD_CONST_FALSE
+    0xc1, // STORE_FAST 1
+    0x49,0x0b, // SETUP_FINALLY 11
+    0x12,0x50, // LOAD_GLOBAL 'float'
+    0xb0, // LOAD_FAST 0
+    0x13,0x1e, // LOAD_ATTR 'value'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x52, // LOAD_CONST_TRUE
+    0xc1, // STORE_FAST 1
+    0x51, // LOAD_CONST_NONE
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0x5d, // END_FINALLY
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_IsNumber = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_IsNumber,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 30,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 1,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 36,
+        .line_info = fun_data_.\basic_DataStruct_IsNumber + 4,
+        .opcodes = fun_data_.\basic_DataStruct_IsNumber + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_length
+static const byte fun_data_.\basic_DataStruct_length[20] = {
+    0x21,0x08, // prelude
+    0x12,0x4c, // names: length, self
+    0x80,0x5d, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x12,0x4a, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_length = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_length,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 20,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 18,
+        .line_info = fun_data_.\basic_DataStruct_length + 4,
+        .opcodes = fun_data_.\basic_DataStruct_length + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_find
+static const byte fun_data_.\basic_DataStruct_find[22] = {
+    0x2a,0x0a, // prelude
+    0x22,0x4c,0x53, // names: find, self, other
+    0x80,0x60, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x14,0x22, // LOAD_METHOD 'find'
+    0xb1, // LOAD_FAST 1
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x36,0x01, // CALL_METHOD 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_find = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct_find,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 22,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 34,
+        .line_info = fun_data_.\basic_DataStruct_find + 5,
+        .opcodes = fun_data_.\basic_DataStruct_find + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___round__
+static const byte fun_data_.\basic_DataStruct___round__[18] = {
+    0xa2,0x01,0x0a, // prelude
+    0x25,0x4c,0x54, // names: __round__, self, n
+    0x80,0x63, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___round__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___round__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 18,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 1,
+        .qstr_block_name_idx = 37,
+        .line_info = fun_data_.\basic_DataStruct___round__ + 6,
+        .opcodes = fun_data_.\basic_DataStruct___round__ + 8,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___add__
+static const byte fun_data_.\basic_DataStruct___add__[62] = {
+    0x32,0x10, // prelude
+    0x26,0x4c,0x53, // names: __add__, self, other
+    0x80,0x66,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf2, // BINARY_OP 27 __add__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf2, // BINARY_OP 27 __add__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___add__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___add__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 38,
+        .line_info = fun_data_.\basic_DataStruct___add__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___add__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___radd__
+static const byte fun_data_.\basic_DataStruct___radd__[62] = {
+    0x32,0x10, // prelude
+    0x27,0x4c,0x53, // names: __radd__, self, other
+    0x80,0x6c,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf2, // BINARY_OP 27 __add__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf2, // BINARY_OP 27 __add__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___radd__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___radd__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 39,
+        .line_info = fun_data_.\basic_DataStruct___radd__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___radd__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___iadd__
+static const byte fun_data_.\basic_DataStruct___iadd__[63] = {
+    0x32,0x12, // prelude
+    0x28,0x4c,0x53, // names: __iadd__, self, other
+    0x80,0x72,0x26,0x2e,0x30,0x2e, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf2, // BINARY_OP 27 __add__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf2, // BINARY_OP 27 __add__
+    0xb0, // LOAD_FAST 0
+    0x18,0x1e, // STORE_ATTR 'value'
+    0xb0, // LOAD_FAST 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___iadd__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___iadd__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 63,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 40,
+        .line_info = fun_data_.\basic_DataStruct___iadd__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___iadd__ + 11,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___sub__
+static const byte fun_data_.\basic_DataStruct___sub__[62] = {
+    0x32,0x10, // prelude
+    0x29,0x4c,0x53, // names: __sub__, self, other
+    0x80,0x79,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___sub__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___sub__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 41,
+        .line_info = fun_data_.\basic_DataStruct___sub__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___sub__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___mul__
+static const byte fun_data_.\basic_DataStruct___mul__[62] = {
+    0x32,0x10, // prelude
+    0x2a,0x4c,0x53, // names: __mul__, self, other
+    0x80,0x7f,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf4, // BINARY_OP 29 __mul__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf4, // BINARY_OP 29 __mul__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___mul__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___mul__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 42,
+        .line_info = fun_data_.\basic_DataStruct___mul__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___mul__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___truediv__
+static const byte fun_data_.\basic_DataStruct___truediv__[30] = {
+    0x32,0x0c, // prelude
+    0x2b,0x4c,0x53, // names: __truediv__, self, other
+    0x80,0x85,0x26, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf7, // BINARY_OP 32 __truediv__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___truediv__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___truediv__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 30,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 43,
+        .line_info = fun_data_.\basic_DataStruct___truediv__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___truediv__ + 8,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___lt__
+static const byte fun_data_.\basic_DataStruct___lt__[62] = {
+    0x32,0x10, // prelude
+    0x2c,0x4c,0x53, // names: __lt__, self, other
+    0x80,0x89,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xd7, // BINARY_OP 0 __lt__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xd7, // BINARY_OP 0 __lt__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___lt__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___lt__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 44,
+        .line_info = fun_data_.\basic_DataStruct___lt__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___lt__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___gt__
+static const byte fun_data_.\basic_DataStruct___gt__[62] = {
+    0x32,0x10, // prelude
+    0x2d,0x4c,0x53, // names: __gt__, self, other
+    0x80,0x8f,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___gt__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___gt__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 45,
+        .line_info = fun_data_.\basic_DataStruct___gt__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___gt__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___le__
+static const byte fun_data_.\basic_DataStruct___le__[62] = {
+    0x32,0x10, // prelude
+    0x2e,0x4c,0x53, // names: __le__, self, other
+    0x80,0x95,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xda, // BINARY_OP 3 __le__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xda, // BINARY_OP 3 __le__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___le__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___le__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 46,
+        .line_info = fun_data_.\basic_DataStruct___le__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___le__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___ge__
+static const byte fun_data_.\basic_DataStruct___ge__[62] = {
+    0x32,0x10, // prelude
+    0x2f,0x4c,0x53, // names: __ge__, self, other
+    0x80,0x9b,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xdb, // BINARY_OP 4 __ge__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xdb, // BINARY_OP 4 __ge__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___ge__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___ge__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 47,
+        .line_info = fun_data_.\basic_DataStruct___ge__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___ge__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___eq__
+static const byte fun_data_.\basic_DataStruct___eq__[62] = {
+    0x32,0x10, // prelude
+    0x30,0x4c,0x53, // names: __eq__, self, other
+    0x80,0xa1,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___eq__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___eq__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 48,
+        .line_info = fun_data_.\basic_DataStruct___eq__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___eq__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___ne__
+static const byte fun_data_.\basic_DataStruct___ne__[62] = {
+    0x32,0x10, // prelude
+    0x31,0x4c,0x53, // names: __ne__, self, other
+    0x80,0xa7,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x24, // LOAD_METHOD 'IsNumber'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xdc, // BINARY_OP 5 __ne__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xdc, // BINARY_OP 5 __ne__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___ne__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___ne__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 49,
+        .line_info = fun_data_.\basic_DataStruct___ne__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___ne__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___mod__
+static const byte fun_data_.\basic_DataStruct___mod__[62] = {
+    0x32,0x10, // prelude
+    0x32,0x4c,0x53, // names: __mod__, self, other
+    0x80,0xad,0x26,0x2e,0x30, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb2, // LOAD_FAST 2
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf8, // BINARY_OP 33 __mod__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf8, // BINARY_OP 33 __mod__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___mod__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct___mod__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 50,
+        .line_info = fun_data_.\basic_DataStruct___mod__ + 5,
+        .opcodes = fun_data_.\basic_DataStruct___mod__ + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___abs__
+static const byte fun_data_.\basic_DataStruct___abs__[43] = {
+    0x21,0x0c, // prelude
+    0x33,0x4c, // names: __abs__, self
+    0x80,0xb3,0x27,0x2e, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x4e, // POP_JUMP_IF_FALSE 14
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x12,0x52, // LOAD_GLOBAL 'abs'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x12,0x52, // LOAD_GLOBAL 'abs'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___abs__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct___abs__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 43,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 51,
+        .line_info = fun_data_.\basic_DataStruct___abs__ + 4,
+        .opcodes = fun_data_.\basic_DataStruct___abs__ + 8,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___ceil__
+static const byte fun_data_.\basic_DataStruct___ceil__[22] = {
+    0x29,0x08, // prelude
+    0x34,0x4c, // names: __ceil__, self
+    0x80,0xb8, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x12,0x04, // LOAD_GLOBAL 'math'
+    0x14,0x35, // LOAD_METHOD 'ceil'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x36,0x01, // CALL_METHOD 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___ceil__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct___ceil__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 22,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 52,
+        .line_info = fun_data_.\basic_DataStruct___ceil__ + 4,
+        .opcodes = fun_data_.\basic_DataStruct___ceil__ + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct___floor__
+static const byte fun_data_.\basic_DataStruct___floor__[22] = {
+    0x29,0x08, // prelude
+    0x36,0x4c, // names: __floor__, self
+    0x80,0xbb, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x12,0x04, // LOAD_GLOBAL 'math'
+    0x14,0x21, // LOAD_METHOD 'floor'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x36,0x01, // CALL_METHOD 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct___floor__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct___floor__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 22,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 54,
+        .line_info = fun_data_.\basic_DataStruct___floor__ + 4,
+        .opcodes = fun_data_.\basic_DataStruct___floor__ + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_contains
+static const byte fun_data_.\basic_DataStruct_contains[41] = {
+    0x42,0x10, // prelude
+    0x37,0x4c,0x53, // names: contains, self, other
+    0x80,0xbe,0x26,0x26,0x26, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc3, // STORE_FAST 3
+    0xb2, // LOAD_FAST 2
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc4, // STORE_FAST 4
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb3, // LOAD_FAST 3
+    0x14,0x22, // LOAD_METHOD 'find'
+    0xb4, // LOAD_FAST 4
+    0x36,0x01, // CALL_METHOD 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xdb, // BINARY_OP 4 __ge__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_contains = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_DataStruct_contains,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 41,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 9,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 55,
+        .line_info = fun_data_.\basic_DataStruct_contains + 5,
+        .opcodes = fun_data_.\basic_DataStruct_contains + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic_DataStruct
+// frozen bytecode for file .\basic.py, scope .\basic_DataStruct_length2
+static const byte fun_data_.\basic_DataStruct_length2[20] = {
+    0x21,0x08, // prelude
+    0x12,0x4c, // names: length, self
+    0x80,0xc4, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x12,0x4a, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DataStruct_length2 = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DataStruct_length2,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 20,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 18,
+        .line_info = fun_data_.\basic_DataStruct_length2 + 4,
+        .opcodes = fun_data_.\basic_DataStruct_length2 + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const mp_raw_code_t *const children_.\basic_DataStruct[] = {
+    &raw_code_.\basic_DataStruct___init__,
+    &raw_code_.\basic_DataStruct_SetValue,
+    &raw_code_.\basic_DataStruct_StringValue,
+    &raw_code_.\basic_DataStruct_IntValue,
+    &raw_code_.\basic_DataStruct_FloatValue,
+    &raw_code_.\basic_DataStruct_NumberValue,
+    &raw_code_.\basic_DataStruct_BoolValue,
+    &raw_code_.\basic_DataStruct_IsInt,
+    &raw_code_.\basic_DataStruct_IsNumber,
+    &raw_code_.\basic_DataStruct_length,
+    &raw_code_.\basic_DataStruct_find,
+    &raw_code_.\basic_DataStruct___round__,
+    &raw_code_.\basic_DataStruct___add__,
+    &raw_code_.\basic_DataStruct___radd__,
+    &raw_code_.\basic_DataStruct___iadd__,
+    &raw_code_.\basic_DataStruct___sub__,
+    &raw_code_.\basic_DataStruct___mul__,
+    &raw_code_.\basic_DataStruct___truediv__,
+    &raw_code_.\basic_DataStruct___lt__,
+    &raw_code_.\basic_DataStruct___gt__,
+    &raw_code_.\basic_DataStruct___le__,
+    &raw_code_.\basic_DataStruct___ge__,
+    &raw_code_.\basic_DataStruct___eq__,
+    &raw_code_.\basic_DataStruct___ne__,
+    &raw_code_.\basic_DataStruct___mod__,
+    &raw_code_.\basic_DataStruct___abs__,
+    &raw_code_.\basic_DataStruct___ceil__,
+    &raw_code_.\basic_DataStruct___floor__,
+    &raw_code_.\basic_DataStruct_contains,
+    &raw_code_.\basic_DataStruct_length2,
+};
+
+static const mp_raw_code_t raw_code_.\basic_DataStruct = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\basic_DataStruct,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 195,
+    #endif
+    .children = (void *)&children_.\basic_DataStruct,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 30,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 2,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 5,
+        .line_info = fun_data_.\basic_DataStruct + 3,
+        .opcodes = fun_data_.\basic_DataStruct + 58,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_data_struct_random
+static const byte fun_data_.\basic_data_struct_random[114] = {
+    0x5a,0x20, // prelude
+    0x08,0x3c,0x3d, // names: data_struct_random, v1, v2
+    0x80,0xc8,0x2e,0x26,0x26,0x25,0x28,0x2d,0x26,0x26,0x25,0x28,0x27, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x6d, // POP_JUMP_IF_FALSE 45
+    0xb1, // LOAD_FAST 1
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x66, // POP_JUMP_IF_FALSE 38
+    0xb0, // LOAD_FAST 0
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0xb1, // LOAD_FAST 1
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc3, // STORE_FAST 3
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb3, // LOAD_FAST 3
+    0xb2, // LOAD_FAST 2
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x30,0x02, // UNPACK_SEQUENCE 2
+    0xc2, // STORE_FAST 2
+    0xc3, // STORE_FAST 3
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x12,0x03, // LOAD_GLOBAL 'random'
+    0x14,0x0b, // LOAD_METHOD 'randrange'
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0x36,0x02, // CALL_METHOD 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc4, // STORE_FAST 4
+    0xb1, // LOAD_FAST 1
+    0x14,0x0c, // LOAD_METHOD 'FloatValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc5, // STORE_FAST 5
+    0xb4, // LOAD_FAST 4
+    0xb5, // LOAD_FAST 5
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb5, // LOAD_FAST 5
+    0xb4, // LOAD_FAST 4
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x30,0x02, // UNPACK_SEQUENCE 2
+    0xc4, // STORE_FAST 4
+    0xc5, // STORE_FAST 5
+    0x12,0x03, // LOAD_GLOBAL 'random'
+    0x14,0x03, // LOAD_METHOD 'random'
+    0x36,0x00, // CALL_METHOD 0
+    0xc6, // STORE_FAST 6
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb6, // LOAD_FAST 6
+    0xb5, // LOAD_FAST 5
+    0xb4, // LOAD_FAST 4
+    0xf3, // BINARY_OP 28 __sub__
+    0xf4, // BINARY_OP 29 __mul__
+    0xb4, // LOAD_FAST 4
+    0xf2, // BINARY_OP 27 __add__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_data_struct_random = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_data_struct_random,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 114,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 12,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 8,
+        .line_info = fun_data_.\basic_data_struct_random + 5,
+        .opcodes = fun_data_.\basic_data_struct_random + 18,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_data_struct_and
+static const byte fun_data_.\basic_data_struct_and[24] = {
+    0x22,0x0a, // prelude
+    0x0d,0x3c,0x3d, // names: data_struct_and, v1, v2
+    0x80,0xd7, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x0e, // LOAD_METHOD 'BoolValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x46,0x05, // JUMP_IF_FALSE_OR_POP 5
+    0xb1, // LOAD_FAST 1
+    0x14,0x0e, // LOAD_METHOD 'BoolValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_data_struct_and = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_data_struct_and,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 24,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 13,
+        .line_info = fun_data_.\basic_data_struct_and + 5,
+        .opcodes = fun_data_.\basic_data_struct_and + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_data_struct_or
+static const byte fun_data_.\basic_data_struct_or[38] = {
+    0x32,0x0e, // prelude
+    0x0f,0x3c,0x3d, // names: data_struct_or, v1, v2
+    0x80,0xdb,0x26,0x26, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc3, // STORE_FAST 3
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb2, // LOAD_FAST 2
+    0x14,0x0e, // LOAD_METHOD 'BoolValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x45,0x05, // JUMP_IF_TRUE_OR_POP 5
+    0xb3, // LOAD_FAST 3
+    0x14,0x0e, // LOAD_METHOD 'BoolValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_data_struct_or = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_data_struct_or,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 38,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 15,
+        .line_info = fun_data_.\basic_data_struct_or + 5,
+        .opcodes = fun_data_.\basic_data_struct_or + 9,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_data_struct_substring
+static const byte fun_data_.\basic_data_struct_substring[99] = {
+    0xc8,0x04,0x1a, // prelude
+    0x10,0x3c,0x3e,0x3f,0x40, // names: data_struct_substring, v1, f, start_pos, end_pos
+    0x80,0xe1,0x25,0x28,0x25,0x26,0x33,0x2f, // code info
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb3, // LOAD_FAST 3
+    0xb2, // LOAD_FAST 2
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x30,0x02, // UNPACK_SEQUENCE 2
+    0xc2, // STORE_FAST 2
+    0xc3, // STORE_FAST 3
+    0xb1, // LOAD_FAST 1
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x68, // POP_JUMP_IF_FALSE 40
+    0xb2, // LOAD_FAST 2
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc4, // STORE_FAST 4
+    0xb2, // LOAD_FAST 2
+    0x14,0x11, // LOAD_METHOD 'SetValue'
+    0xb0, // LOAD_FAST 0
+    0x14,0x12, // LOAD_METHOD 'length'
+    0x36,0x00, // CALL_METHOD 0
+    0xb3, // LOAD_FAST 3
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xf3, // BINARY_OP 28 __sub__
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb3, // LOAD_FAST 3
+    0x14,0x11, // LOAD_METHOD 'SetValue'
+    0xb0, // LOAD_FAST 0
+    0x14,0x12, // LOAD_METHOD 'length'
+    0x36,0x00, // CALL_METHOD 0
+    0xb4, // LOAD_FAST 4
+    0xf3, // BINARY_OP 28 __sub__
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0x13,0x0a, // LOAD_ATTR 'IntValue'
+    0xb3, // LOAD_FAST 3
+    0xb2, // LOAD_FAST 2
+    0xf3, // BINARY_OP 28 __sub__
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf2, // BINARY_OP 27 __add__
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x2e,0x02, // BUILD_SLICE 2
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_data_struct_substring = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 4,
+    .fun_data = fun_data_.\basic_data_struct_substring,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 99,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 10,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 4,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 16,
+        .line_info = fun_data_.\basic_data_struct_substring + 8,
+        .opcodes = fun_data_.\basic_data_struct_substring + 16,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_data_struct_normalization
+static const byte fun_data_.\basic_data_struct_normalization[127] = {
+    0xc9,0x04,0x2a, // prelude
+    0x14,0x41,0x42,0x43,0x44,0x45, // names: data_struct_normalization, v, min1, max1, min2, max2
+    0x80,0xeb,0x1f,0x23,0x25,0x28,0x25,0x28,0x25,0x22,0x25,0x22,0x2e,0x23,0x2a, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x46,0x1a, // JUMP_IF_FALSE_OR_POP 26
+    0xb1, // LOAD_FAST 1
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x46,0x13, // JUMP_IF_FALSE_OR_POP 19
+    0xb2, // LOAD_FAST 2
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x46,0x0c, // JUMP_IF_FALSE_OR_POP 12
+    0xb3, // LOAD_FAST 3
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0x46,0x05, // JUMP_IF_FALSE_OR_POP 5
+    0xb4, // LOAD_FAST 4
+    0x14,0x09, // LOAD_METHOD 'IsInt'
+    0x36,0x00, // CALL_METHOD 0
+    0xc5, // STORE_FAST 5
+    0xb1, // LOAD_FAST 1
+    0xb2, // LOAD_FAST 2
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb2, // LOAD_FAST 2
+    0xb1, // LOAD_FAST 1
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x30,0x02, // UNPACK_SEQUENCE 2
+    0xc1, // STORE_FAST 1
+    0xc2, // STORE_FAST 2
+    0xb3, // LOAD_FAST 3
+    0xb4, // LOAD_FAST 4
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb4, // LOAD_FAST 4
+    0xb3, // LOAD_FAST 3
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x30,0x02, // UNPACK_SEQUENCE 2
+    0xc3, // STORE_FAST 3
+    0xc4, // STORE_FAST 4
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb3, // LOAD_FAST 3
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb4, // LOAD_FAST 4
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xb2, // LOAD_FAST 2
+    0xb1, // LOAD_FAST 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xf7, // BINARY_OP 32 __truediv__
+    0xb4, // LOAD_FAST 4
+    0xb3, // LOAD_FAST 3
+    0xf3, // BINARY_OP 28 __sub__
+    0xf4, // BINARY_OP 29 __mul__
+    0xb3, // LOAD_FAST 3
+    0xf2, // BINARY_OP 27 __add__
+    0xc6, // STORE_FAST 6
+    0xb5, // LOAD_FAST 5
+    0x44,0x4a, // POP_JUMP_IF_FALSE 10
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb6, // LOAD_FAST 6
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0xb6, // LOAD_FAST 6
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_data_struct_normalization = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 5,
+    .fun_data = fun_data_.\basic_data_struct_normalization,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 127,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 10,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 5,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 20,
+        .line_info = fun_data_.\basic_data_struct_normalization + 9,
+        .opcodes = fun_data_.\basic_data_struct_normalization + 24,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_DegreeToRadian
+static const byte fun_data_.\basic_DegreeToRadian[20] = {
+    0x19,0x08, // prelude
+    0x15,0x41, // names: DegreeToRadian, v
+    0x80,0xfb, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x12,0x04, // LOAD_GLOBAL 'math'
+    0x13,0x16, // LOAD_ATTR 'pi'
+    0xf4, // BINARY_OP 29 __mul__
+    0x23,0x00, // LOAD_CONST_OBJ 0
+    0xf7, // BINARY_OP 32 __truediv__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_DegreeToRadian = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_DegreeToRadian,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 20,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 21,
+        .line_info = fun_data_.\basic_DegreeToRadian + 4,
+        .opcodes = fun_data_.\basic_DegreeToRadian + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_RadianToDegree
+static const byte fun_data_.\basic_RadianToDegree[20] = {
+    0x19,0x08, // prelude
+    0x17,0x41, // names: RadianToDegree, v
+    0x80,0xff, // code info
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0xb0, // LOAD_FAST 0
+    0x23,0x00, // LOAD_CONST_OBJ 0
+    0xf4, // BINARY_OP 29 __mul__
+    0x12,0x04, // LOAD_GLOBAL 'math'
+    0x13,0x16, // LOAD_ATTR 'pi'
+    0xf7, // BINARY_OP 32 __truediv__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_RadianToDegree = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\basic_RadianToDegree,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 20,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 23,
+        .line_info = fun_data_.\basic_RadianToDegree + 4,
+        .opcodes = fun_data_.\basic_RadianToDegree + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_ClampD
+static const byte fun_data_.\basic_ClampD[28] = {
+    0x23,0x14, // prelude
+    0x18,0x1e,0x46,0x47, // names: ClampD, value, min_value, max_value
+    0x90,0x03,0x25,0x22,0x25,0x22, // code info
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb2, // LOAD_FAST 2
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_ClampD = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 3,
+    .fun_data = fun_data_.\basic_ClampD,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 28,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 3,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 24,
+        .line_info = fun_data_.\basic_ClampD + 6,
+        .opcodes = fun_data_.\basic_ClampD + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_FindDataInList
+static const byte fun_data_.\basic_FindDataInList[51] = {
+    0x3a,0x12, // prelude
+    0x19,0x48,0x49, // names: FindDataInList, list_variable, data
+    0x90,0x0b,0x26,0x2a,0x2b,0x2b, // code info
+    0xb1, // LOAD_FAST 1
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0x12,0x4a, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x51, // JUMP 17
+    0x57, // DUP_TOP
+    0xc3, // STORE_FAST 3
+    0xb0, // LOAD_FAST 0
+    0xb3, // LOAD_FAST 3
+    0x55, // LOAD_SUBSCR
+    0x14,0x13, // LOAD_METHOD 'StringValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xb2, // LOAD_FAST 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb3, // LOAD_FAST 3
+    0x63, // RETURN_VALUE
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x2a, // POP_JUMP_IF_TRUE -22
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x7f, // LOAD_CONST_SMALL_INT -1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_FindDataInList = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_FindDataInList,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 51,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 25,
+        .line_info = fun_data_.\basic_FindDataInList + 5,
+        .opcodes = fun_data_.\basic_FindDataInList + 11,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_GetItemFromList
+static const byte fun_data_.\basic_GetItemFromList[41] = {
+    0x2a,0x10, // prelude
+    0x1a,0x48,0x4b, // names: GetItemFromList, list_variable, index_data
+    0x90,0x13,0x26,0x2e,0x27, // code info
+    0xb1, // LOAD_FAST 1
+    0x14,0x0a, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x49, // POP_JUMP_IF_TRUE 9
+    0xb2, // LOAD_FAST 2
+    0x12,0x4a, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xdb, // BINARY_OP 4 __ge__
+    0x44,0x47, // POP_JUMP_IF_FALSE 7
+    0x12,0x05, // LOAD_GLOBAL 'DataStruct'
+    0x10,0x1b, // LOAD_CONST_STRING ''
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x55, // LOAD_SUBSCR
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_GetItemFromList = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\basic_GetItemFromList,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 41,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 26,
+        .line_info = fun_data_.\basic_GetItemFromList + 5,
+        .opcodes = fun_data_.\basic_GetItemFromList + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\basic__lt_module_gt_
+// frozen bytecode for file .\basic.py, scope .\basic_version
+static const byte fun_data_.\basic_version[8] = {
+    0x00,0x06, // prelude
+    0x1c, // names: version
+    0x90,0x1a, // code info
+    0x23,0x01, // LOAD_CONST_OBJ 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\basic_version = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\basic_version,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 8,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 1,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 28,
+        .line_info = fun_data_.\basic_version + 3,
+        .opcodes = fun_data_.\basic_version + 5,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const mp_raw_code_t *const children_.\basic__lt_module_gt_[] = {
+    &raw_code_.\basic_wait_time,
+    &raw_code_.\basic_DataStruct,
+    &raw_code_.\basic_data_struct_random,
+    &raw_code_.\basic_data_struct_and,
+    &raw_code_.\basic_data_struct_or,
+    &raw_code_.\basic_data_struct_substring,
+    &raw_code_.\basic_data_struct_normalization,
+    &raw_code_.\basic_DegreeToRadian,
+    &raw_code_.\basic_RadianToDegree,
+    &raw_code_.\basic_ClampD,
+    &raw_code_.\basic_FindDataInList,
+    &raw_code_.\basic_GetItemFromList,
+    &raw_code_.\basic_version,
+};
+
+static const mp_raw_code_t raw_code_.\basic__lt_module_gt_ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\basic__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 107,
+    #endif
+    .children = (void *)&children_.\basic__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 13,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 1,
+        .line_info = fun_data_.\basic__lt_module_gt_ + 3,
+        .opcodes = fun_data_.\basic__lt_module_gt_ + 30,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const qstr_short_t const_qstr_table_data_.\basic[85] = {
+    MP_QSTR__dot__backslash_basic_dot_py,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_time,
+    MP_QSTR_random,
+    MP_QSTR_math,
+    MP_QSTR_DataStruct,
+    MP_QSTR_wait_time,
+    MP_QSTR_ticks_ms,
+    MP_QSTR_data_struct_random,
+    MP_QSTR_IsInt,
+    MP_QSTR_IntValue,
+    MP_QSTR_randrange,
+    MP_QSTR_FloatValue,
+    MP_QSTR_data_struct_and,
+    MP_QSTR_BoolValue,
+    MP_QSTR_data_struct_or,
+    MP_QSTR_data_struct_substring,
+    MP_QSTR_SetValue,
+    MP_QSTR_length,
+    MP_QSTR_StringValue,
+    MP_QSTR_data_struct_normalization,
+    MP_QSTR_DegreeToRadian,
+    MP_QSTR_pi,
+    MP_QSTR_RadianToDegree,
+    MP_QSTR_ClampD,
+    MP_QSTR_FindDataInList,
+    MP_QSTR_GetItemFromList,
+    MP_QSTR_,
+    MP_QSTR_version,
+    MP_QSTR___init__,
+    MP_QSTR_value,
+    MP_QSTR_NumberValue,
+    MP_QSTR_isdigit,
+    MP_QSTR_floor,
+    MP_QSTR_find,
+    MP_QSTR__dot_,
+    MP_QSTR_IsNumber,
+    MP_QSTR___round__,
+    MP_QSTR___add__,
+    MP_QSTR___radd__,
+    MP_QSTR___iadd__,
+    MP_QSTR___sub__,
+    MP_QSTR___mul__,
+    MP_QSTR___truediv__,
+    MP_QSTR___lt__,
+    MP_QSTR___gt__,
+    MP_QSTR___le__,
+    MP_QSTR___ge__,
+    MP_QSTR___eq__,
+    MP_QSTR___ne__,
+    MP_QSTR___mod__,
+    MP_QSTR___abs__,
+    MP_QSTR___ceil__,
+    MP_QSTR_ceil,
+    MP_QSTR___floor__,
+    MP_QSTR_contains,
+    MP_QSTR_time_ms,
+    MP_QSTR___name__,
+    MP_QSTR___module__,
+    MP_QSTR___qualname__,
+    MP_QSTR_v1,
+    MP_QSTR_v2,
+    MP_QSTR_f,
+    MP_QSTR_start_pos,
+    MP_QSTR_end_pos,
+    MP_QSTR_v,
+    MP_QSTR_min1,
+    MP_QSTR_max1,
+    MP_QSTR_min2,
+    MP_QSTR_max2,
+    MP_QSTR_min_value,
+    MP_QSTR_max_value,
+    MP_QSTR_list_variable,
+    MP_QSTR_data,
+    MP_QSTR_len,
+    MP_QSTR_index_data,
+    MP_QSTR_self,
+    MP_QSTR_type,
+    MP_QSTR_str,
+    MP_QSTR_int,
+    MP_QSTR_float,
+    MP_QSTR_bool,
+    MP_QSTR_abs,
+    MP_QSTR_other,
+    MP_QSTR_n,
+};
+
+// constants
+#if MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_A || MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_B
+static const mp_obj_float_t const_obj_.\basic_0 = {{&mp_type_float}, (mp_float_t)180};
+#define const_obj_.\basic_0_macro MP_ROM_PTR(&const_obj_.\basic_0)
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_C
+#define const_obj_.\basic_0_macro ((mp_rom_obj_t)(0xc3b40002))
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_D
+#define const_obj_.\basic_0_macro ((mp_rom_obj_t)(0xc06a800000000000))
+#endif
+#if MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_A || MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_B
+static const mp_obj_float_t const_obj_.\basic_2 = {{&mp_type_float}, (mp_float_t)0};
+#define const_obj_.\basic_2_macro MP_ROM_PTR(&const_obj_.\basic_2)
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_C
+#define const_obj_.\basic_2_macro ((mp_rom_obj_t)(0x80800002))
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_D
+#define const_obj_.\basic_2_macro ((mp_rom_obj_t)(0x8004000000000000))
+#endif
+#if MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_A || MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_B
+static const mp_obj_float_t const_obj_.\basic_3 = {{&mp_type_float}, (mp_float_t)0.5};
+#define const_obj_.\basic_3_macro MP_ROM_PTR(&const_obj_.\basic_3)
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_C
+#define const_obj_.\basic_3_macro ((mp_rom_obj_t)(0xbf800002))
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_D
+#define const_obj_.\basic_3_macro ((mp_rom_obj_t)(0xbfe4000000000000))
+#endif
+#if MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_A || MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_B
+static const mp_obj_float_t const_obj_.\basic_4 = {{&mp_type_float}, (mp_float_t)1.401298e-07};
+#define const_obj_.\basic_4_macro MP_ROM_PTR(&const_obj_.\basic_4)
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_C
+#define const_obj_.\basic_4_macro ((mp_rom_obj_t)(0xb4967696))
+#elif MICROPY_OBJ_REPR == MICROPY_OBJ_REPR_D
+#define const_obj_.\basic_4_macro ((mp_rom_obj_t)(0xbe86ced2c18820d6))
+#endif
+
+// constant table
+static const mp_rom_obj_t const_obj_table_data_.\basic[5] = {
+    const_obj_.\basic_0_macro,
+    MP_ROM_QSTR(MP_QSTR_v_2020_7_31),
+    const_obj_.\basic_2_macro,
+    const_obj_.\basic_3_macro,
+    const_obj_.\basic_4_macro,
+};
+
+static const mp_frozen_module_t frozen_module_.\basic = {
+    .constants = {
+        .qstr_table = (qstr_short_t *)&const_qstr_table_data_.\basic,
+        .obj_table = (mp_obj_t *)&const_obj_table_data_.\basic,
+    },
+    .rc = &raw_code_.\basic__lt_module_gt_,
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// collection of all frozen modules
+
+const char mp_frozen_names[] = {
+    #ifdef MP_FROZEN_STR_NAMES
+    MP_FROZEN_STR_NAMES
+    #endif
+    ".\basic.py\0"
+    "\0"
+};
+
+const mp_frozen_module_t *const mp_frozen_mpy_content[] = {
+    &frozen_module_.\basic,
+};
+
+#ifdef MICROPY_FROZEN_LIST_ITEM
+MICROPY_FROZEN_LIST_ITEM(".\basic", ".\basic.py")
+#endif
+
+/*
+byte sizes:
+qstr content: 76 unique, 800 bytes
+bc content: 2308
+const str content: 0
+const int content: 0
+const obj content: 48
+const table qstr content: 0 entries, 0 bytes
+const table ptr content: 5 entries, 20 bytes
+raw code content: 44 * 4 = 704
+mp_frozen_mpy_names_content: 12
+mp_frozen_mpy_content_size: 4
+total: 3896
+*/

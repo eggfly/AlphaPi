@@ -1,0 +1,70 @@
+mpy_source_file: ./rootfs/sensor_infrared.mpy
+source_file: .\sensor_infrared.py
+header: 4d:06:00:1f
+qstr_table[11]:
+    .\sensor_infrared.py
+    <module>
+    Pin
+    machine
+    pin_map
+    control_board_v1
+    read_infrared_sensor
+    IN
+    value
+    version
+    pin_port
+obj_table: ['v_2020_7_30']
+simple_name: <module>
+  raw bytecode: 41 08:0a:01:2c:6c:64:40:80:10:02:2a:01:1b:03:1c:02:16:02:59:80:10:04:2a:01:1b:05:1c:04:16:04:59:32:00:16:06:32:01:16:09:51:63
+  prelude: (2, 0, 0, 0, 0, 0)
+  args: []
+  line info: 2c:6c:64:40
+  80          LOAD_CONST_SMALL_INT 0 
+  10:02       LOAD_CONST_STRING Pin
+  2a:01       BUILD_TUPLE 1
+  1b:03       IMPORT_NAME machine
+  1c:02       IMPORT_FROM Pin
+  16:02       STORE_NAME Pin
+  59          POP_TOP 
+  80          LOAD_CONST_SMALL_INT 0 
+  10:04       LOAD_CONST_STRING pin_map
+  2a:01       BUILD_TUPLE 1
+  1b:05       IMPORT_NAME control_board_v1
+  1c:04       IMPORT_FROM pin_map
+  16:04       STORE_NAME pin_map
+  59          POP_TOP 
+  32:00       MAKE_FUNCTION 0
+  16:06       STORE_NAME read_infrared_sensor
+  32:01       MAKE_FUNCTION 1
+  16:09       STORE_NAME version
+  51          LOAD_CONST_NONE 
+  63          RETURN_VALUE 
+  children: ['read_infrared_sensor', 'version']
+simple_name: read_infrared_sensor
+  raw bytecode: 29 19:0a:06:0a:60:40:2d:12:02:b0:12:02:13:07:34:02:12:04:b0:56:12:04:b0:55:14:08:36:00:63
+  prelude: (4, 0, 0, 1, 0, 0)
+  args: ['pin_port']
+  line info: 60:40:2d
+  12:02       LOAD_GLOBAL Pin
+  b0          LOAD_FAST 0 
+  12:02       LOAD_GLOBAL Pin
+  13:07       LOAD_ATTR IN
+  34:02       CALL_FUNCTION 2
+  12:04       LOAD_GLOBAL pin_map
+  b0          LOAD_FAST 0 
+  56          STORE_SUBSCR 
+  12:04       LOAD_GLOBAL pin_map
+  b0          LOAD_FAST 0 
+  55          LOAD_SUBSCR 
+  14:08       LOAD_METHOD value
+  36:00       CALL_METHOD 0
+  63          RETURN_VALUE 
+  children: []
+simple_name: version
+  raw bytecode: 8 00:06:09:80:0a:23:00:63
+  prelude: (1, 0, 0, 0, 0, 0)
+  args: []
+  line info: 80:0a
+  23:00       LOAD_CONST_OBJ 'v_2020_7_30'
+  63          RETURN_VALUE 
+  children: []

@@ -1,0 +1,6203 @@
+#include "py/mpconfig.h"
+#include "py/objint.h"
+#include "py/objstr.h"
+#include "py/emitglue.h"
+#include "py/nativeglue.h"
+
+#if MICROPY_LONGINT_IMPL != 2
+#error "incompatible MICROPY_LONGINT_IMPL"
+#endif
+
+#if MPZ_DIG_SIZE != 16
+#error "incompatible MPZ_DIG_SIZE"
+#endif
+
+#if MICROPY_PY_BUILTINS_FLOAT
+typedef struct _mp_obj_float_t {
+    mp_obj_base_t base;
+    mp_float_t value;
+} mp_obj_float_t;
+#endif
+
+#if MICROPY_PY_BUILTINS_COMPLEX
+typedef struct _mp_obj_complex_t {
+    mp_obj_base_t base;
+    mp_float_t real;
+    mp_float_t imag;
+} mp_obj_complex_t;
+#endif
+
+enum {
+    MP_QSTR__0x0a_ = MP_QSTRnumber_of,
+    MP_QSTR__space_,
+    MP_QSTR__star_,
+    MP_QSTR__slash_,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_utf_hyphen_8,
+    MP_QSTR__dot__backslash_control_board_v1_dot_py,
+    MP_QSTR_ADC,
+    MP_QSTR_machine,
+    MP_QSTR_PWM,
+    MP_QSTR_Pin,
+    MP_QSTR_SoftI2C,
+    MP_QSTR_gc,
+    MP_QSTR_time,
+    MP_QSTR_math,
+    MP_QSTR_os,
+    MP_QSTR_scl,
+    MP_QSTR_sda,
+    MP_QSTR_freq,
+    MP_QSTR_scan,
+    MP_QSTR_writeto_mem,
+    MP_QSTR_mode,
+    MP_QSTR_OUT,
+    MP_QSTR_IN,
+    MP_QSTR_PULL_DOWN,
+    MP_QSTR_UART,
+    MP_QSTR_tx,
+    MP_QSTR_rx,
+    MP_QSTR_timeout,
+    MP_QSTR_PlayRecordMission,
+    MP_QSTR_test,
+    MP_QSTR_0,
+    MP_QSTR_1,
+    MP_QSTR_2,
+    MP_QSTR_3,
+    MP_QSTR_4,
+    MP_QSTR_5,
+    MP_QSTR_6,
+    MP_QSTR_7,
+    MP_QSTR_8,
+    MP_QSTR_9,
+    MP_QSTR_a,
+    MP_QSTR_b,
+    MP_QSTR_c,
+    MP_QSTR_d,
+    MP_QSTR_e,
+    MP_QSTR_f,
+    MP_QSTR_g,
+    MP_QSTR_h,
+    MP_QSTR_i,
+    MP_QSTR_j,
+    MP_QSTR_k,
+    MP_QSTR_l,
+    MP_QSTR_m,
+    MP_QSTR_n,
+    MP_QSTR_o,
+    MP_QSTR_p,
+    MP_QSTR_q,
+    MP_QSTR_r,
+    MP_QSTR_s,
+    MP_QSTR_t,
+    MP_QSTR_u,
+    MP_QSTR_v,
+    MP_QSTR_w,
+    MP_QSTR_x,
+    MP_QSTR_y,
+    MP_QSTR_z,
+    MP_QSTR_A,
+    MP_QSTR_B,
+    MP_QSTR_C,
+    MP_QSTR_D,
+    MP_QSTR_E,
+    MP_QSTR_F,
+    MP_QSTR_G,
+    MP_QSTR_H,
+    MP_QSTR_I,
+    MP_QSTR_J,
+    MP_QSTR_K,
+    MP_QSTR_L,
+    MP_QSTR_M,
+    MP_QSTR_N,
+    MP_QSTR_O,
+    MP_QSTR_P,
+    MP_QSTR_Q,
+    MP_QSTR_R,
+    MP_QSTR_S,
+    MP_QSTR_T,
+    MP_QSTR_U,
+    MP_QSTR_V,
+    MP_QSTR_W,
+    MP_QSTR_X,
+    MP_QSTR_Y,
+    MP_QSTR_Z,
+    MP_QSTR__0x60_,
+    MP_QSTR__tilde_,
+    MP_QSTR__bang_,
+    MP_QSTR__at_sign_,
+    MP_QSTR__hash_,
+    MP_QSTR__dollar_,
+    MP_QSTR__percent_,
+    MP_QSTR__caret_,
+    MP_QSTR__amp_,
+    MP_QSTR__paren_open_,
+    MP_QSTR__paren_close_,
+    MP_QSTR__equals_,
+    MP_QSTR__bracket_open_,
+    MP_QSTR__bracket_close_,
+    MP_QSTR__brace_open_,
+    MP_QSTR__brace_close_,
+    MP_QSTR__backslash_,
+    MP_QSTR__pipe_,
+    MP_QSTR__semicolon_,
+    MP_QSTR__colon_,
+    MP_QSTR__squot_,
+    MP_QSTR__quot_,
+    MP_QSTR__comma_,
+    MP_QSTR__dot_,
+    MP_QSTR__lt_,
+    MP_QSTR__gt_,
+    MP_QSTR__question_,
+    MP_QSTR__plus_,
+    MP_QSTR__hyphen_,
+    MP_QSTR_calc_checksum,
+    MP_QSTR_uart_read_buf,
+    MP_QSTR_collect,
+    MP_QSTR_uart_read,
+    MP_QSTR_uart_write,
+    MP_QSTR_uart_write_buf,
+    MP_QSTR_sleep_ms,
+    MP_QSTR_Clamp,
+    MP_QSTR_average,
+    MP_QSTR_GetSysTime,
+    MP_QSTR_ticks_ms,
+    MP_QSTR_GetAccelerationRaw,
+    MP_QSTR_readfrom_mem,
+    MP_QSTR_GetAcceleration,
+    MP_QSTR_sqrt,
+    MP_QSTR_ReadPin,
+    MP_QSTR_WritePin,
+    MP_QSTR_ReadAdc,
+    MP_QSTR_atten,
+    MP_QSTR_ATTN_11DB,
+    MP_QSTR_read_u16,
+    MP_QSTR_WritePwm,
+    MP_QSTR_deinit,
+    MP_QSTR_duty,
+    MP_QSTR_UpdateButtonStatus,
+    MP_QSTR_GetLastPinStatus,
+    MP_QSTR_PushPlayRecordMission,
+    MP_QSTR_interrupt,
+    MP_QSTR_play_record_loop,
+    MP_QSTR_isFinish,
+    MP_QSTR_tickStep,
+    MP_QSTR_playAsync,
+    MP_QSTR_listdir,
+    MP_QSTR_playUntilDone,
+    MP_QSTR_play,
+    MP_QSTR_recAsync,
+    MP_QSTR_recUntilDone,
+    MP_QSTR_stopRecord,
+    MP_QSTR_isRecord,
+    MP_QSTR_rec,
+    MP_QSTR_err1,
+    MP_QSTR_err2,
+    MP_QSTR_led_show_bytes_async,
+    MP_QSTR_led_show_bytes,
+    MP_QSTR_led_show_string,
+    MP_QSTR_led_show_string_async,
+    MP_QSTR_read_volume,
+    MP_QSTR_CheckForward,
+    MP_QSTR_IsForward,
+    MP_QSTR_voidCommand,
+    MP_QSTR_version,
+    MP_QSTR_fileName,
+    MP_QSTR_currentFileName,
+    MP_QSTR_recordSec,
+    MP_QSTR_read_len,
+    MP_QSTR_playing_buf,
+    MP_QSTR_file,
+    MP_QSTR_recordingBufCnt,
+    MP_QSTR_recordingUartReadLen,
+    MP_QSTR_byte_read,
+    MP_QSTR_uart_buf,
+    MP_QSTR_byte_to_write,
+    MP_QSTR_rec_buf,
+    MP_QSTR_already_write,
+    MP_QSTR___stop,
+    MP_QSTR___tickRecord,
+    MP_QSTR___tickPlay,
+    MP_QSTR_i2c,
+    MP_QSTR_addr,
+    MP_QSTR_pin_map,
+    MP_QSTR_uart,
+    MP_QSTR_pa_last_status,
+    MP_QSTR_pb_last_status,
+    MP_QSTR_pc_last_status,
+    MP_QSTR_nextMission,
+    MP_QSTR_currentMission,
+    MP_QSTR_charPointMap,
+    MP_QSTR_defaultCharPointMap,
+    MP_QSTR_showIndex,
+    MP_QSTR_data,
+    MP_QSTR_min_value,
+    MP_QSTR_max_value,
+    MP_QSTR_nums,
+    MP_QSTR_axial,
+    MP_QSTR_pin_port,
+    MP_QSTR_is_record,
+    MP_QSTR_file_name,
+    MP_QSTR_sec,
+    MP_QSTR_path,
+    MP_QSTR_show_bytes,
+    MP_QSTR_show_string,
+    MP_QSTR_min,
+    MP_QSTR_acc,
+    MP_QSTR_x_mid,
+    MP_QSTR_y_mid,
+    MP_QSTR_z_mid,
+    MP_QSTR_margin,
+    MP_QSTR_forward,
+    MP_QSTR_is_recording,
+    MP_QSTR_checksum_space_error,
+    MP_QSTR_write_space_error_colon__space_,
+    MP_QSTR_record_start_dot_dat,
+    MP_QSTR_record_end_dot_dat,
+    MP_QSTR_v_2020_7_31,
+};
+
+const qstr_hash_t mp_qstr_frozen_const_hashes[] = {
+    175,
+    133,
+    143,
+    138,
+    189,
+    183,
+    170,
+    99,
+    96,
+    79,
+    18,
+    19,
+    97,
+    240,
+    53,
+    121,
+    249,
+    83,
+    229,
+    26,
+    121,
+    38,
+    11,
+    34,
+    173,
+    183,
+    137,
+    207,
+    62,
+    160,
+    51,
+    149,
+    148,
+    151,
+    150,
+    145,
+    144,
+    147,
+    146,
+    157,
+    156,
+    196,
+    199,
+    198,
+    193,
+    192,
+    195,
+    194,
+    205,
+    204,
+    207,
+    206,
+    201,
+    200,
+    203,
+    202,
+    213,
+    212,
+    215,
+    214,
+    209,
+    208,
+    211,
+    210,
+    221,
+    220,
+    223,
+    228,
+    231,
+    230,
+    225,
+    224,
+    227,
+    226,
+    237,
+    236,
+    239,
+    238,
+    233,
+    232,
+    235,
+    234,
+    245,
+    244,
+    247,
+    246,
+    241,
+    240,
+    243,
+    242,
+    253,
+    252,
+    255,
+    197,
+    219,
+    132,
+    229,
+    134,
+    129,
+    128,
+    251,
+    131,
+    141,
+    140,
+    152,
+    254,
+    248,
+    222,
+    216,
+    249,
+    217,
+    158,
+    159,
+    130,
+    135,
+    137,
+    139,
+    153,
+    155,
+    154,
+    142,
+    136,
+    122,
+    20,
+    155,
+    250,
+    53,
+    27,
+    11,
+    22,
+    102,
+    31,
+    66,
+    21,
+    59,
+    145,
+    33,
+    64,
+    207,
+    177,
+    175,
+    19,
+    218,
+    18,
+    158,
+    25,
+    150,
+    154,
+    254,
+    34,
+    112,
+    172,
+    66,
+    103,
+    152,
+    11,
+    33,
+    55,
+    219,
+    144,
+    242,
+    113,
+    177,
+    178,
+    11,
+    50,
+    94,
+    103,
+    224,
+    184,
+    100,
+    86,
+    191,
+    196,
+    205,
+    29,
+    15,
+    79,
+    195,
+    192,
+    111,
+    66,
+    217,
+    169,
+    95,
+    225,
+    253,
+    29,
+    148,
+    93,
+    182,
+    81,
+    119,
+    106,
+    105,
+    104,
+    174,
+    64,
+    13,
+    166,
+    120,
+    21,
+    59,
+    165,
+    160,
+    248,
+    180,
+    173,
+    91,
+    48,
+    136,
+    192,
+    108,
+    175,
+    100,
+    34,
+    227,
+    160,
+    91,
+    30,
+    109,
+    48,
+    58,
+    8,
+    199,
+    217,
+};
+
+const qstr_len_t mp_qstr_frozen_const_lengths[] = {
+    1,
+    1,
+    1,
+    1,
+    8,
+    5,
+    21,
+    3,
+    7,
+    3,
+    3,
+    7,
+    2,
+    4,
+    4,
+    2,
+    3,
+    3,
+    4,
+    4,
+    11,
+    4,
+    3,
+    2,
+    9,
+    4,
+    2,
+    2,
+    7,
+    17,
+    4,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    13,
+    13,
+    7,
+    9,
+    10,
+    14,
+    8,
+    5,
+    7,
+    10,
+    8,
+    18,
+    12,
+    15,
+    4,
+    7,
+    8,
+    7,
+    5,
+    9,
+    8,
+    8,
+    6,
+    4,
+    18,
+    16,
+    21,
+    9,
+    16,
+    8,
+    8,
+    9,
+    7,
+    13,
+    4,
+    8,
+    12,
+    10,
+    8,
+    3,
+    4,
+    4,
+    20,
+    14,
+    15,
+    21,
+    11,
+    12,
+    9,
+    11,
+    7,
+    8,
+    15,
+    9,
+    8,
+    11,
+    4,
+    15,
+    20,
+    9,
+    8,
+    13,
+    7,
+    13,
+    6,
+    12,
+    10,
+    3,
+    4,
+    7,
+    4,
+    14,
+    14,
+    14,
+    11,
+    14,
+    12,
+    19,
+    9,
+    4,
+    9,
+    9,
+    4,
+    5,
+    8,
+    9,
+    9,
+    3,
+    4,
+    10,
+    11,
+    3,
+    3,
+    5,
+    5,
+    5,
+    6,
+    7,
+    12,
+    14,
+    13,
+    16,
+    14,
+    11,
+};
+
+extern const qstr_pool_t mp_qstr_const_pool;
+const qstr_pool_t mp_qstr_frozen_const_pool = {
+    &mp_qstr_const_pool, // previous pool
+    MP_QSTRnumber_of, // previous pool size
+    10, // allocated entries
+    226, // used entries
+    (qstr_hash_t *)mp_qstr_frozen_const_hashes,
+    (qstr_len_t *)mp_qstr_frozen_const_lengths,
+    {
+        "\x0a",
+        " ",
+        "*",
+        "/",
+        "<module>",
+        "utf-8",
+        "\x2e\x5c\x63\x6f\x6e\x74\x72\x6f\x6c\x5f\x62\x6f\x61\x72\x64\x5f\x76\x31\x2e\x70\x79",
+        "ADC",
+        "machine",
+        "PWM",
+        "Pin",
+        "SoftI2C",
+        "gc",
+        "time",
+        "math",
+        "os",
+        "scl",
+        "sda",
+        "freq",
+        "scan",
+        "writeto_mem",
+        "mode",
+        "OUT",
+        "IN",
+        "PULL_DOWN",
+        "UART",
+        "tx",
+        "rx",
+        "timeout",
+        "PlayRecordMission",
+        "test",
+        "0",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+        "A",
+        "B",
+        "C",
+        "D",
+        "E",
+        "F",
+        "G",
+        "H",
+        "I",
+        "J",
+        "K",
+        "L",
+        "M",
+        "N",
+        "O",
+        "P",
+        "Q",
+        "R",
+        "S",
+        "T",
+        "U",
+        "V",
+        "W",
+        "X",
+        "Y",
+        "Z",
+        "`",
+        "~",
+        "!",
+        "@",
+        "#",
+        "$",
+        "%",
+        "^",
+        "&",
+        "(",
+        ")",
+        "=",
+        "[",
+        "]",
+        "{",
+        "}",
+        "\x5c",
+        "|",
+        ";",
+        ":",
+        "'",
+        "\x22",
+        ",",
+        ".",
+        "<",
+        ">",
+        "?",
+        "+",
+        "-",
+        "calc_checksum",
+        "uart_read_buf",
+        "collect",
+        "uart_read",
+        "uart_write",
+        "uart_write_buf",
+        "sleep_ms",
+        "Clamp",
+        "average",
+        "GetSysTime",
+        "ticks_ms",
+        "GetAccelerationRaw",
+        "readfrom_mem",
+        "GetAcceleration",
+        "sqrt",
+        "ReadPin",
+        "WritePin",
+        "ReadAdc",
+        "atten",
+        "ATTN_11DB",
+        "read_u16",
+        "WritePwm",
+        "deinit",
+        "duty",
+        "UpdateButtonStatus",
+        "GetLastPinStatus",
+        "PushPlayRecordMission",
+        "interrupt",
+        "play_record_loop",
+        "isFinish",
+        "tickStep",
+        "playAsync",
+        "listdir",
+        "playUntilDone",
+        "play",
+        "recAsync",
+        "recUntilDone",
+        "stopRecord",
+        "isRecord",
+        "rec",
+        "err1",
+        "err2",
+        "led_show_bytes_async",
+        "led_show_bytes",
+        "led_show_string",
+        "led_show_string_async",
+        "read_volume",
+        "CheckForward",
+        "IsForward",
+        "voidCommand",
+        "version",
+        "fileName",
+        "currentFileName",
+        "recordSec",
+        "read_len",
+        "playing_buf",
+        "file",
+        "recordingBufCnt",
+        "recordingUartReadLen",
+        "byte_read",
+        "uart_buf",
+        "byte_to_write",
+        "rec_buf",
+        "already_write",
+        "__stop",
+        "__tickRecord",
+        "__tickPlay",
+        "i2c",
+        "addr",
+        "pin_map",
+        "uart",
+        "pa_last_status",
+        "pb_last_status",
+        "pc_last_status",
+        "nextMission",
+        "currentMission",
+        "charPointMap",
+        "defaultCharPointMap",
+        "showIndex",
+        "data",
+        "min_value",
+        "max_value",
+        "nums",
+        "axial",
+        "pin_port",
+        "is_record",
+        "file_name",
+        "sec",
+        "path",
+        "show_bytes",
+        "show_string",
+        "min",
+        "acc",
+        "x_mid",
+        "y_mid",
+        "z_mid",
+        "margin",
+        "forward",
+        "is_recording",
+        "checksum error",
+        "write error: ",
+        "record_start.dat",
+        "record_end.dat",
+        "v_2020_7_31",
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// frozen module .\control_board_v1
+// - original source file: ./rootfs/control_board_v1.mpy
+// - frozen file name: .\control_board_v1.py
+// - .mpy header: 4d:06:00:1f
+
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1__lt_module_gt_
+static const byte fun_data_.\control_board_v1__lt_module_gt_[2642] = {
+    0x48,0x80,0x06, // prelude
+    0x01, // names: <module>
+    0x2c,0x2c,0x2c,0x2c,0x26,0x26,0x26,0x26,0x46,0x3c,0x2c,0x27,0x2e,0x27,0x4e,0x22,0x31,0x2f,0x2f,0x72,0x7a,0x84,0x07,0x84,0x14,0x84,0x0e,0x85,0x12,0x85,0x09,0x85,0x08,0x85,0x08,0x65,0x20,0x85,0x15,0x85,0x08,0x65,0x40,0x65,0x40,0x85,0x09,0x85,0x0a,0x24,0x24,0x64,0x85,0x0a,0x85,0x0f,0x89,0x8e,0x24,0x64,0x89,0x0d,0x85,0x10,0x6a,0x60,0x8a,0x09,0x8a,0x10,0x6b,0x20,0x8b,0x07,0x65,0x60,0x8b,0x27,0x85,0x07,0x85,0x09,0x22,0x37,0x33,0x37,0x37,0x36,0x39,0x33,0x39,0x39,0x59,0x36,0x31,0x36,0x31,0x37,0x35,0x37,0x31,0x31,0x31,0x33,0x31,0x37,0x36,0x35,0x35,0x35,0x36,0x33,0x31,0x33,0x33,0x33,0x35,0x33,0x57,0x37,0x37,0x37,0x37,0x37,0x37,0x38,0x33,0x35,0x39,0x35,0x31,0x37,0x35,0x37,0x37,0x37,0x37,0x37,0x39,0x33,0x33,0x33,0x33,0x38,0x57,0x33,0x2f,0x31,0x39,0x39,0x39,0x37,0x35,0x37,0x33,0x33,0x2f,0x35,0x35,0x35,0x33,0x33,0x33,0x31,0x31,0x31,0x31,0x33,0x2f,0x2f,0x33,0x33,0x39,0x31,0x2f,0x33,0x76,0x4f,0x64,0x85,0x09,0x85,0x15,0x65,0x20,0x65,0x20,0x85,0x10,0x65,0x20, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x10,0x02, // LOAD_CONST_STRING 'ADC'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x1b,0x03, // IMPORT_NAME 'machine'
+    0x1c,0x02, // IMPORT_FROM 'ADC'
+    0x16,0x02, // STORE_NAME 'ADC'
+    0x59, // POP_TOP
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x10,0x04, // LOAD_CONST_STRING 'PWM'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x1b,0x03, // IMPORT_NAME 'machine'
+    0x1c,0x04, // IMPORT_FROM 'PWM'
+    0x16,0x04, // STORE_NAME 'PWM'
+    0x59, // POP_TOP
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x10,0x05, // LOAD_CONST_STRING 'Pin'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x1b,0x03, // IMPORT_NAME 'machine'
+    0x1c,0x05, // IMPORT_FROM 'Pin'
+    0x16,0x05, // STORE_NAME 'Pin'
+    0x59, // POP_TOP
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x10,0x06, // LOAD_CONST_STRING 'SoftI2C'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x1b,0x03, // IMPORT_NAME 'machine'
+    0x1c,0x06, // IMPORT_FROM 'SoftI2C'
+    0x16,0x06, // STORE_NAME 'SoftI2C'
+    0x59, // POP_TOP
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x03, // IMPORT_NAME 'machine'
+    0x16,0x03, // STORE_NAME 'machine'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x07, // IMPORT_NAME 'gc'
+    0x16,0x07, // STORE_NAME 'gc'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x08, // IMPORT_NAME 'time'
+    0x16,0x08, // STORE_NAME 'time'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x09, // IMPORT_NAME 'math'
+    0x16,0x09, // STORE_NAME 'math'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x0a, // IMPORT_NAME 'os'
+    0x16,0x0a, // STORE_NAME 'os'
+    0x11,0x06, // LOAD_NAME 'SoftI2C'
+    0x10,0x0b, // LOAD_CONST_STRING 'scl'
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x87, // LOAD_CONST_SMALL_INT 7
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x0c, // LOAD_CONST_STRING 'sda'
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x0d, // LOAD_CONST_STRING 'freq'
+    0x22,0x98,0xb5,0x00, // LOAD_CONST_SMALL_INT 400000
+    0x34,0x86,0x00, // CALL_FUNCTION 768
+    0x16,0x81,0x45, // STORE_NAME 'i2c'
+    0x11,0x81,0x45, // LOAD_NAME 'i2c'
+    0x14,0x0e, // LOAD_METHOD 'scan'
+    0x36,0x00, // CALL_METHOD 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0x16,0x81,0x46, // STORE_NAME 'addr'
+    0x11,0x81,0x46, // LOAD_NAME 'addr'
+    0x92, // LOAD_CONST_SMALL_INT 18
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4e, // POP_JUMP_IF_FALSE 14
+    0x11,0x81,0x45, // LOAD_NAME 'i2c'
+    0x14,0x0f, // LOAD_METHOD 'writeto_mem'
+    0x92, // LOAD_CONST_SMALL_INT 18
+    0x91, // LOAD_CONST_SMALL_INT 17
+    0x23,0x00, // LOAD_CONST_OBJ 0
+    0x36,0x03, // CALL_METHOD 3
+    0x59, // POP_TOP
+    0x42,0x55, // JUMP 21
+    0x11,0x81,0x46, // LOAD_NAME 'addr'
+    0x98, // LOAD_CONST_SMALL_INT 24
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4e, // POP_JUMP_IF_FALSE 14
+    0x11,0x81,0x45, // LOAD_NAME 'i2c'
+    0x14,0x0f, // LOAD_METHOD 'writeto_mem'
+    0x98, // LOAD_CONST_SMALL_INT 24
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x23,0x01, // LOAD_CONST_OBJ 1
+    0x36,0x03, // CALL_METHOD 3
+    0x59, // POP_TOP
+    0x42,0x40, // JUMP 0
+    0x2c,0x04, // BUILD_MAP 4
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x10,0x10, // LOAD_CONST_STRING 'mode'
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x13,0x11, // LOAD_ATTR 'OUT'
+    0x10,0x12, // LOAD_CONST_STRING 'value'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x34,0x84,0x01, // CALL_FUNCTION 513
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x62, // STORE_MAP
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x13,0x13, // LOAD_ATTR 'IN'
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x13,0x14, // LOAD_ATTR 'PULL_DOWN'
+    0x34,0x03, // CALL_FUNCTION 3
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x62, // STORE_MAP
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x13,0x13, // LOAD_ATTR 'IN'
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x13,0x14, // LOAD_ATTR 'PULL_DOWN'
+    0x34,0x03, // CALL_FUNCTION 3
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0x62, // STORE_MAP
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x95, // LOAD_CONST_SMALL_INT 21
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x13,0x13, // LOAD_ATTR 'IN'
+    0x11,0x05, // LOAD_NAME 'Pin'
+    0x13,0x14, // LOAD_ATTR 'PULL_DOWN'
+    0x34,0x03, // CALL_FUNCTION 3
+    0x95, // LOAD_CONST_SMALL_INT 21
+    0x62, // STORE_MAP
+    0x16,0x81,0x47, // STORE_NAME 'pin_map'
+    0x11,0x03, // LOAD_NAME 'machine'
+    0x14,0x15, // LOAD_METHOD 'UART'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x22,0x9c,0x90,0x00, // LOAD_CONST_SMALL_INT 460800
+    0x10,0x16, // LOAD_CONST_STRING 'tx'
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x10,0x17, // LOAD_CONST_STRING 'rx'
+    0x89, // LOAD_CONST_SMALL_INT 9
+    0x10,0x18, // LOAD_CONST_STRING 'timeout'
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0x36,0x86,0x02, // CALL_METHOD 770
+    0x16,0x81,0x48, // STORE_NAME 'uart'
+    0x32,0x00, // MAKE_FUNCTION 0
+    0x16,0x79, // STORE_NAME 'calc_checksum'
+    0x32,0x01, // MAKE_FUNCTION 1
+    0x16,0x7a, // STORE_NAME 'uart_read_buf'
+    0x32,0x02, // MAKE_FUNCTION 2
+    0x16,0x7f, // STORE_NAME 'uart_read'
+    0x32,0x03, // MAKE_FUNCTION 3
+    0x16,0x81,0x00, // STORE_NAME 'uart_write'
+    0x32,0x04, // MAKE_FUNCTION 4
+    0x16,0x81,0x03, // STORE_NAME 'uart_write_buf'
+    0x32,0x05, // MAKE_FUNCTION 5
+    0x16,0x81,0x05, // STORE_NAME 'Clamp'
+    0x32,0x06, // MAKE_FUNCTION 6
+    0x16,0x81,0x06, // STORE_NAME 'average'
+    0x32,0x07, // MAKE_FUNCTION 7
+    0x16,0x81,0x07, // STORE_NAME 'GetSysTime'
+    0x32,0x08, // MAKE_FUNCTION 8
+    0x16,0x81,0x09, // STORE_NAME 'GetAccelerationRaw'
+    0x32,0x09, // MAKE_FUNCTION 9
+    0x16,0x81,0x0b, // STORE_NAME 'GetAcceleration'
+    0x32,0x0a, // MAKE_FUNCTION 10
+    0x16,0x81,0x0d, // STORE_NAME 'ReadPin'
+    0x32,0x0b, // MAKE_FUNCTION 11
+    0x16,0x81,0x0e, // STORE_NAME 'WritePin'
+    0x32,0x0c, // MAKE_FUNCTION 12
+    0x16,0x81,0x0f, // STORE_NAME 'ReadAdc'
+    0x32,0x0d, // MAKE_FUNCTION 13
+    0x16,0x81,0x13, // STORE_NAME 'WritePwm'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x17,0x81,0x49, // STORE_GLOBAL 'pa_last_status'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x17,0x81,0x4a, // STORE_GLOBAL 'pb_last_status'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x17,0x81,0x4b, // STORE_GLOBAL 'pc_last_status'
+    0x32,0x0e, // MAKE_FUNCTION 14
+    0x16,0x81,0x16, // STORE_NAME 'UpdateButtonStatus'
+    0x32,0x0f, // MAKE_FUNCTION 15
+    0x16,0x81,0x17, // STORE_NAME 'GetLastPinStatus'
+    0x54, // LOAD_BUILD_CLASS
+    0x32,0x10, // MAKE_FUNCTION 16
+    0x10,0x19, // LOAD_CONST_STRING 'PlayRecordMission'
+    0x34,0x02, // CALL_FUNCTION 2
+    0x16,0x19, // STORE_NAME 'PlayRecordMission'
+    0x51, // LOAD_CONST_NONE
+    0x17,0x81,0x4c, // STORE_GLOBAL 'nextMission'
+    0x51, // LOAD_CONST_NONE
+    0x17,0x81,0x4d, // STORE_GLOBAL 'currentMission'
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x53, // LOAD_NULL
+    0x33,0x11, // MAKE_FUNCTION_DEFARGS 17
+    0x16,0x81,0x18, // STORE_NAME 'PushPlayRecordMission'
+    0x32,0x12, // MAKE_FUNCTION 18
+    0x16,0x81,0x1a, // STORE_NAME 'play_record_loop'
+    0x10,0x1a, // LOAD_CONST_STRING 'test'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x53, // LOAD_NULL
+    0x33,0x13, // MAKE_FUNCTION_DEFARGS 19
+    0x16,0x81,0x1d, // STORE_NAME 'playAsync'
+    0x10,0x1a, // LOAD_CONST_STRING 'test'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x53, // LOAD_NULL
+    0x33,0x14, // MAKE_FUNCTION_DEFARGS 20
+    0x16,0x81,0x1f, // STORE_NAME 'playUntilDone'
+    0x10,0x1a, // LOAD_CONST_STRING 'test'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x53, // LOAD_NULL
+    0x33,0x15, // MAKE_FUNCTION_DEFARGS 21
+    0x16,0x81,0x20, // STORE_NAME 'play'
+    0x10,0x1a, // LOAD_CONST_STRING 'test'
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x53, // LOAD_NULL
+    0x33,0x16, // MAKE_FUNCTION_DEFARGS 22
+    0x16,0x81,0x22, // STORE_NAME 'recAsync'
+    0x10,0x1a, // LOAD_CONST_STRING 'test'
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x53, // LOAD_NULL
+    0x33,0x17, // MAKE_FUNCTION_DEFARGS 23
+    0x16,0x81,0x23, // STORE_NAME 'recUntilDone'
+    0x32,0x18, // MAKE_FUNCTION 24
+    0x16,0x81,0x24, // STORE_NAME 'stopRecord'
+    0x10,0x1a, // LOAD_CONST_STRING 'test'
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x2a,0x02, // BUILD_TUPLE 2
+    0x53, // LOAD_NULL
+    0x33,0x19, // MAKE_FUNCTION_DEFARGS 25
+    0x16,0x81,0x26, // STORE_NAME 'rec'
+    0x32,0x1a, // MAKE_FUNCTION 26
+    0x16,0x81,0x29, // STORE_NAME 'led_show_bytes_async'
+    0x32,0x1b, // MAKE_FUNCTION 27
+    0x16,0x81,0x2a, // STORE_NAME 'led_show_bytes'
+    0x2c,0x5e, // BUILD_MAP 94
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x1b, // LOAD_CONST_STRING '0'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x1c, // LOAD_CONST_STRING '1'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x18, // LOAD_CONST_SMALL_INT 152
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x1d, // LOAD_CONST_STRING '2'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x50, // LOAD_CONST_SMALL_INT 208
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x1e, // LOAD_CONST_STRING '3'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x1f, // LOAD_CONST_STRING '4'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x68, // LOAD_CONST_SMALL_INT 232
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x20, // LOAD_CONST_STRING '5'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0x22,0x80,0x68, // LOAD_CONST_SMALL_INT 104
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x21, // LOAD_CONST_STRING '6'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x81,0x40, // LOAD_CONST_SMALL_INT 192
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x22, // LOAD_CONST_STRING '7'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x23, // LOAD_CONST_STRING '8'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x30, // LOAD_CONST_SMALL_INT 176
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x24, // LOAD_CONST_STRING '9'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x25, // LOAD_CONST_STRING 'a'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x26, // LOAD_CONST_STRING 'b'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x27, // LOAD_CONST_STRING 'c'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x28, // LOAD_CONST_STRING 'd'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x29, // LOAD_CONST_STRING 'e'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x2a, // LOAD_CONST_STRING 'f'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x70, // LOAD_CONST_SMALL_INT 240
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x2b, // LOAD_CONST_STRING 'g'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x98, // LOAD_CONST_SMALL_INT 24
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x2c, // LOAD_CONST_STRING 'h'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x38, // LOAD_CONST_SMALL_INT 184
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x2d, // LOAD_CONST_STRING 'i'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x22,0x81,0x30, // LOAD_CONST_SMALL_INT 176
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x2e, // LOAD_CONST_STRING 'j'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x2f, // LOAD_CONST_STRING 'k'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x70, // LOAD_CONST_SMALL_INT 240
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x30, // LOAD_CONST_STRING 'l'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x31, // LOAD_CONST_STRING 'm'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x38, // LOAD_CONST_SMALL_INT 56
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x32, // LOAD_CONST_STRING 'n'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x33, // LOAD_CONST_STRING 'o'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x34, // LOAD_CONST_STRING 'p'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x35, // LOAD_CONST_STRING 'q'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x38, // LOAD_CONST_SMALL_INT 56
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x36, // LOAD_CONST_STRING 'r'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x37, // LOAD_CONST_STRING 's'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x70, // LOAD_CONST_SMALL_INT 240
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x38, // LOAD_CONST_STRING 't'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x39, // LOAD_CONST_STRING 'u'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x60, // LOAD_CONST_SMALL_INT 96
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x22,0x80,0x60, // LOAD_CONST_SMALL_INT 96
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x3a, // LOAD_CONST_STRING 'v'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x3b, // LOAD_CONST_STRING 'w'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x3c, // LOAD_CONST_STRING 'x'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0xa8, // LOAD_CONST_SMALL_INT 40
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x3d, // LOAD_CONST_STRING 'y'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x80,0x58, // LOAD_CONST_SMALL_INT 88
+    0x22,0x80,0x68, // LOAD_CONST_SMALL_INT 104
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x3e, // LOAD_CONST_STRING 'z'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x80,0x78, // LOAD_CONST_SMALL_INT 120
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x3f, // LOAD_CONST_STRING 'A'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x40, // LOAD_CONST_STRING 'B'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x41, // LOAD_CONST_STRING 'C'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x42, // LOAD_CONST_STRING 'D'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x43, // LOAD_CONST_STRING 'E'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x44, // LOAD_CONST_STRING 'F'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x30, // LOAD_CONST_SMALL_INT 48
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x45, // LOAD_CONST_STRING 'G'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x46, // LOAD_CONST_STRING 'H'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x47, // LOAD_CONST_STRING 'I'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x70, // LOAD_CONST_SMALL_INT 240
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x48, // LOAD_CONST_STRING 'J'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x49, // LOAD_CONST_STRING 'K'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x4a, // LOAD_CONST_STRING 'L'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x4b, // LOAD_CONST_STRING 'M'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x4c, // LOAD_CONST_STRING 'N'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x4d, // LOAD_CONST_STRING 'O'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x4e, // LOAD_CONST_STRING 'P'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x60, // LOAD_CONST_SMALL_INT 96
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x22,0x81,0x18, // LOAD_CONST_SMALL_INT 152
+    0x22,0x80,0x68, // LOAD_CONST_SMALL_INT 104
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x4f, // LOAD_CONST_STRING 'Q'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x50, // LOAD_CONST_STRING 'R'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x51, // LOAD_CONST_STRING 'S'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x52, // LOAD_CONST_STRING 'T'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x70, // LOAD_CONST_SMALL_INT 240
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x22,0x81,0x70, // LOAD_CONST_SMALL_INT 240
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x53, // LOAD_CONST_STRING 'U'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x60, // LOAD_CONST_SMALL_INT 224
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x22,0x81,0x60, // LOAD_CONST_SMALL_INT 224
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x54, // LOAD_CONST_STRING 'V'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x55, // LOAD_CONST_STRING 'W'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x58, // LOAD_CONST_SMALL_INT 216
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x81,0x58, // LOAD_CONST_SMALL_INT 216
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x56, // LOAD_CONST_STRING 'X'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x38, // LOAD_CONST_SMALL_INT 56
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x57, // LOAD_CONST_STRING 'Y'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x18, // LOAD_CONST_SMALL_INT 152
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x58, // LOAD_CONST_STRING 'Z'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x59, // LOAD_CONST_STRING '`'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x5a, // LOAD_CONST_STRING '~'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x68, // LOAD_CONST_SMALL_INT 232
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x5b, // LOAD_CONST_STRING '!'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x5c, // LOAD_CONST_STRING '@'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x5d, // LOAD_CONST_STRING '#'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x68, // LOAD_CONST_SMALL_INT 232
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x38, // LOAD_CONST_SMALL_INT 184
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x5e, // LOAD_CONST_STRING '$'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0x22,0x81,0x10, // LOAD_CONST_SMALL_INT 144
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x48, // LOAD_CONST_SMALL_INT 72
+    0x22,0x80,0x58, // LOAD_CONST_SMALL_INT 88
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x5f, // LOAD_CONST_STRING '%'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x60, // LOAD_CONST_STRING '^'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x61, // LOAD_CONST_STRING '&'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x62, // LOAD_CONST_STRING '('
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x63, // LOAD_CONST_STRING ')'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x64, // LOAD_CONST_STRING '_'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x65, // LOAD_CONST_STRING '='
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x66, // LOAD_CONST_STRING '['
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x67, // LOAD_CONST_STRING ']'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x68, // LOAD_CONST_STRING '{'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x69, // LOAD_CONST_STRING '}'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x6a, // LOAD_CONST_STRING '\\'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x78, // LOAD_CONST_SMALL_INT 248
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x6b, // LOAD_CONST_STRING '|'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x6c, // LOAD_CONST_STRING ';'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x6d, // LOAD_CONST_STRING ':'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x40, // LOAD_CONST_SMALL_INT 192
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x6e, // LOAD_CONST_STRING "'"
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x40, // LOAD_CONST_SMALL_INT 192
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x40, // LOAD_CONST_SMALL_INT 192
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x6f, // LOAD_CONST_STRING '"'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x70, // LOAD_CONST_STRING ','
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x71, // LOAD_CONST_STRING '.'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x72, // LOAD_CONST_STRING '<'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x81,0x08, // LOAD_CONST_SMALL_INT 136
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x73, // LOAD_CONST_STRING '>'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x22,0x81,0x20, // LOAD_CONST_SMALL_INT 160
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x74, // LOAD_CONST_STRING '?'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x70, // LOAD_CONST_SMALL_INT 112
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x75, // LOAD_CONST_STRING '+'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x76, // LOAD_CONST_STRING '-'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x50, // LOAD_CONST_SMALL_INT 80
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x77, // LOAD_CONST_STRING '*'
+    0x62, // STORE_MAP
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xa0, // LOAD_CONST_SMALL_INT 32
+    0x22,0x80,0x40, // LOAD_CONST_SMALL_INT 64
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x78, // LOAD_CONST_STRING '/'
+    0x62, // STORE_MAP
+    0x16,0x81,0x4f, // STORE_NAME 'charPointMap'
+    0x11,0x81,0x4e, // LOAD_NAME 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x05, // BUILD_LIST 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0x16,0x81,0x50, // STORE_NAME 'defaultCharPointMap'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x17,0x81,0x51, // STORE_GLOBAL 'showIndex'
+    0x32,0x1c, // MAKE_FUNCTION 28
+    0x16,0x81,0x2b, // STORE_NAME 'led_show_string'
+    0x32,0x1d, // MAKE_FUNCTION 29
+    0x16,0x81,0x2c, // STORE_NAME 'led_show_string_async'
+    0x32,0x1e, // MAKE_FUNCTION 30
+    0x16,0x81,0x2d, // STORE_NAME 'read_volume'
+    0x32,0x1f, // MAKE_FUNCTION 31
+    0x16,0x81,0x2e, // STORE_NAME 'CheckForward'
+    0x32,0x20, // MAKE_FUNCTION 32
+    0x16,0x81,0x2f, // STORE_NAME 'IsForward'
+    0x32,0x21, // MAKE_FUNCTION 33
+    0x16,0x81,0x30, // STORE_NAME 'voidCommand'
+    0x32,0x22, // MAKE_FUNCTION 34
+    0x16,0x81,0x31, // STORE_NAME 'version'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_calc_checksum
+static const byte fun_data_.\control_board_v1_calc_checksum[46] = {
+    0x39,0x10, // prelude
+    0x79,0x81,0x52, // names: calc_checksum, data
+    0x80,0x1c,0x22,0x2d,0x2f, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc1, // STORE_FAST 1
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x4a, // JUMP 10
+    0x57, // DUP_TOP
+    0xc2, // STORE_FAST 2
+    0xb1, // LOAD_FAST 1
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x55, // LOAD_SUBSCR
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc1, // STORE_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x31, // POP_JUMP_IF_TRUE -15
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0xb1, // LOAD_FAST 1
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_calc_checksum = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_calc_checksum,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 46,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 121,
+        .line_info = fun_data_.\control_board_v1_calc_checksum + 5,
+        .opcodes = fun_data_.\control_board_v1_calc_checksum + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_uart_read_buf
+static const byte fun_data_.\control_board_v1_uart_read_buf[137] = {
+    0x5a,0x2e, // prelude
+    0x7a,0x81,0x46,0x81,0x37, // names: uart_read_buf, addr, count
+    0x80,0x23,0x27,0x27,0x29,0x23,0x24,0x25,0x22,0x28,0x24,0x24,0x29,0x2a,0x24,0x2c,0x2c,0x2a, // code info
+    0x12,0x07, // LOAD_GLOBAL 'gc'
+    0x14,0x7b, // LOAD_METHOD 'collect'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x22,0x81,0x4d, // LOAD_CONST_SMALL_INT 205
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc3, // STORE_FAST 3
+    0x42,0xce,0x80, // JUMP 78
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0xc4, // STORE_FAST 4
+    0xb1, // LOAD_FAST 1
+    0xb4, // LOAD_FAST 4
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb1, // LOAD_FAST 1
+    0xc4, // STORE_FAST 4
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x23,0x02, // LOAD_CONST_OBJ 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc5, // STORE_FAST 5
+    0xb0, // LOAD_FAST 0
+    0xb5, // LOAD_FAST 5
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x56, // STORE_SUBSCR
+    0xb4, // LOAD_FAST 4
+    0xb5, // LOAD_FAST 5
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x56, // STORE_SUBSCR
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7c, // LOAD_METHOD 'write'
+    0xb5, // LOAD_FAST 5
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb3, // LOAD_FAST 3
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x36,0x02, // CALL_METHOD 2
+    0x59, // POP_TOP
+    0xb3, // LOAD_FAST 3
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xc6, // STORE_FAST 6
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb3, // LOAD_FAST 3
+    0xb6, // LOAD_FAST 6
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf2, // BINARY_OP 27 __add__
+    0x36,0x02, // CALL_METHOD 2
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x14,0x7e, // LOAD_METHOD 'extend'
+    0xb3, // LOAD_FAST 3
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xb6, // LOAD_FAST 6
+    0x2e,0x02, // BUILD_SLICE 2
+    0x55, // LOAD_SUBSCR
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb1, // LOAD_FAST 1
+    0xb6, // LOAD_FAST 6
+    0xf3, // BINARY_OP 28 __sub__
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x43,0xac,0x7f, // POP_JUMP_IF_TRUE -84
+    0xb2, // LOAD_FAST 2
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_uart_read_buf = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_uart_read_buf,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 137,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 12,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 122,
+        .line_info = fun_data_.\control_board_v1_uart_read_buf + 7,
+        .opcodes = fun_data_.\control_board_v1_uart_read_buf + 25,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_uart_read
+static const byte fun_data_.\control_board_v1_uart_read[100] = {
+    0x32,0x22, // prelude
+    0x7f,0x81,0x46,0x81,0x37, // names: uart_read, addr, count
+    0x80,0x37,0x28,0x24,0x24,0x29,0x29,0x29,0x2d,0x28,0x27,0x28, // code info
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x23,0x02, // LOAD_CONST_OBJ 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0xb2, // LOAD_FAST 2
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x56, // STORE_SUBSCR
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7c, // LOAD_METHOD 'write'
+    0xb2, // LOAD_FAST 2
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0xb1, // LOAD_FAST 1
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xf2, // BINARY_OP 27 __add__
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb2, // LOAD_FAST 2
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x79, // LOAD_GLOBAL 'calc_checksum'
+    0xb2, // LOAD_FAST 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb2, // LOAD_FAST 2
+    0xb1, // LOAD_FAST 1
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xf2, // BINARY_OP 27 __add__
+    0x55, // LOAD_SUBSCR
+    0xdc, // BINARY_OP 5 __ne__
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0x12,0x81,0x54, // LOAD_GLOBAL 'print'
+    0x23,0x03, // LOAD_CONST_OBJ 3
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x12,0x81,0x54, // LOAD_GLOBAL 'print'
+    0xb2, // LOAD_FAST 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x23,0x04, // LOAD_CONST_OBJ 4
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0xb2, // LOAD_FAST 2
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_uart_read = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_uart_read,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 100,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 127,
+        .line_info = fun_data_.\control_board_v1_uart_read + 7,
+        .opcodes = fun_data_.\control_board_v1_uart_read + 19,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_uart_write
+static const byte fun_data_.\control_board_v1_uart_write[140] = {
+    0x3a,0x2a, // prelude
+    0x81,0x00,0x81,0x46,0x81,0x52, // names: uart_write, addr, data
+    0x80,0x45,0x2a,0x22,0x28,0x28,0x2d,0x27,0x28,0x2f,0x29,0x2a,0x2a,0x44,0x29, // code info
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x50, // LOAD_CONST_FALSE
+    0x63, // RETURN_VALUE
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x23,0x05, // LOAD_CONST_OBJ 5
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x14,0x81,0x01, // LOAD_METHOD 'append'
+    0xb0, // LOAD_FAST 0
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x14,0x81,0x01, // LOAD_METHOD 'append'
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x14,0x7e, // LOAD_METHOD 'extend'
+    0xb1, // LOAD_FAST 1
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x14,0x81,0x01, // LOAD_METHOD 'append'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x79, // LOAD_GLOBAL 'calc_checksum'
+    0xb2, // LOAD_FAST 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb2, // LOAD_FAST 2
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb2, // LOAD_FAST 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x56, // STORE_SUBSCR
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7c, // LOAD_METHOD 'write'
+    0xb2, // LOAD_FAST 2
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x81,0x02, // LOAD_METHOD 'read'
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x36,0x01, // CALL_METHOD 1
+    0xc3, // STORE_FAST 3
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb3, // LOAD_FAST 3
+    0x34,0x01, // CALL_FUNCTION 1
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x44, // POP_JUMP_IF_FALSE 4
+    0xb3, // LOAD_FAST 3
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0x63, // RETURN_VALUE
+    0x12,0x81,0x54, // LOAD_GLOBAL 'print'
+    0x23,0x06, // LOAD_CONST_OBJ 6
+    0xb3, // LOAD_FAST 3
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x50, // LOAD_CONST_FALSE
+    0x63, // RETURN_VALUE
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_uart_write = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_uart_write,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 140,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 128,
+        .line_info = fun_data_.\control_board_v1_uart_write + 8,
+        .opcodes = fun_data_.\control_board_v1_uart_write + 23,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_uart_write_buf
+static const byte fun_data_.\control_board_v1_uart_write_buf[73] = {
+    0x42,0x1a, // prelude
+    0x81,0x03,0x81,0x46,0x81,0x52, // names: uart_write_buf, addr, data
+    0x80,0x57,0x2a,0x22,0x28,0x22,0x29, // code info
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x50, // LOAD_CONST_FALSE
+    0x63, // RETURN_VALUE
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0xc2, // STORE_FAST 2
+    0x42,0x58, // JUMP 24
+    0x12,0x08, // LOAD_GLOBAL 'time'
+    0x14,0x81,0x04, // LOAD_METHOD 'sleep_ms'
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xb2, // LOAD_FAST 2
+    0x51, // LOAD_CONST_NONE
+    0x2e,0x02, // BUILD_SLICE 2
+    0x55, // LOAD_SUBSCR
+    0x34,0x02, // CALL_FUNCTION 2
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x1e, // POP_JUMP_IF_TRUE -34
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_uart_write_buf = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_uart_write_buf,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 73,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 9,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 131,
+        .line_info = fun_data_.\control_board_v1_uart_write_buf + 8,
+        .opcodes = fun_data_.\control_board_v1_uart_write_buf + 15,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_Clamp
+static const byte fun_data_.\control_board_v1_Clamp[31] = {
+    0x23,0x1a, // prelude
+    0x81,0x05,0x12,0x81,0x55,0x81,0x56, // names: Clamp, value, min_value, max_value
+    0x80,0x60,0x25,0x22,0x25,0x22, // code info
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb2, // LOAD_FAST 2
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_Clamp = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 3,
+    .fun_data = fun_data_.\control_board_v1_Clamp,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 31,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 3,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 133,
+        .line_info = fun_data_.\control_board_v1_Clamp + 9,
+        .opcodes = fun_data_.\control_board_v1_Clamp + 15,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_average
+static const byte fun_data_.\control_board_v1_average[46] = {
+    0x39,0x14, // prelude
+    0x81,0x06,0x81,0x57, // names: average, nums
+    0x80,0x68,0x22,0x26,0x2f,0x29, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x4a, // JUMP 10
+    0x57, // DUP_TOP
+    0xc2, // STORE_FAST 2
+    0xb1, // LOAD_FAST 1
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x55, // LOAD_SUBSCR
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc1, // STORE_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x31, // POP_JUMP_IF_TRUE -15
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0xb1, // LOAD_FAST 1
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xf7, // BINARY_OP 32 __truediv__
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_average = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_average,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 46,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 134,
+        .line_info = fun_data_.\control_board_v1_average + 6,
+        .opcodes = fun_data_.\control_board_v1_average + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_GetSysTime
+static const byte fun_data_.\control_board_v1_GetSysTime[14] = {
+    0x08,0x08, // prelude
+    0x81,0x07, // names: GetSysTime
+    0x80,0x70, // code info
+    0x12,0x08, // LOAD_GLOBAL 'time'
+    0x14,0x81,0x08, // LOAD_METHOD 'ticks_ms'
+    0x36,0x00, // CALL_METHOD 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_GetSysTime = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_GetSysTime,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 14,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 2,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 135,
+        .line_info = fun_data_.\control_board_v1_GetSysTime + 4,
+        .opcodes = fun_data_.\control_board_v1_GetSysTime + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_GetAccelerationRaw
+static const byte fun_data_.\control_board_v1_GetAccelerationRaw[220] = {
+    0x38,0x28, // prelude
+    0x81,0x09, // names: GetAccelerationRaw
+    0x80,0x74,0x26,0x27,0x2c,0x2e,0x2e,0x31,0x28,0x2e,0x33,0x2e,0x30,0x25,0x2a,0x33,0x25,0x30, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x01, // BUILD_LIST 1
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xf4, // BINARY_OP 29 __mul__
+    0xc0, // STORE_FAST 0
+    0x12,0x81,0x46, // LOAD_GLOBAL 'addr'
+    0x92, // LOAD_CONST_SMALL_INT 18
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x79, // POP_JUMP_IF_FALSE 57
+    0x12,0x81,0x45, // LOAD_GLOBAL 'i2c'
+    0x14,0x81,0x0a, // LOAD_METHOD 'readfrom_mem'
+    0x92, // LOAD_CONST_SMALL_INT 18
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0x36,0x03, // CALL_METHOD 3
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf4, // BINARY_OP 29 __mul__
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0xf2, // BINARY_OP 27 __add__
+    0xb0, // LOAD_FAST 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x55, // LOAD_SUBSCR
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf4, // BINARY_OP 29 __mul__
+    0xb1, // LOAD_FAST 1
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xf2, // BINARY_OP 27 __add__
+    0xb0, // LOAD_FAST 0
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x55, // LOAD_SUBSCR
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf4, // BINARY_OP 29 __mul__
+    0xb1, // LOAD_FAST 1
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0x55, // LOAD_SUBSCR
+    0xf2, // BINARY_OP 27 __add__
+    0xb0, // LOAD_FAST 0
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x56, // STORE_SUBSCR
+    0x42,0xc7,0x80, // JUMP 71
+    0x12,0x81,0x46, // LOAD_GLOBAL 'addr'
+    0x98, // LOAD_CONST_SMALL_INT 24
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0xbf,0x80, // POP_JUMP_IF_FALSE 63
+    0x12,0x81,0x45, // LOAD_GLOBAL 'i2c'
+    0x14,0x81,0x0a, // LOAD_METHOD 'readfrom_mem'
+    0x98, // LOAD_CONST_SMALL_INT 24
+    0x22,0x81,0x28, // LOAD_CONST_SMALL_INT 168
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0x36,0x03, // CALL_METHOD 3
+    0xc1, // STORE_FAST 1
+    0x22,0x84,0x80,0x00, // LOAD_CONST_SMALL_INT 65536
+    0xb1, // LOAD_FAST 1
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x55, // LOAD_SUBSCR
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf4, // BINARY_OP 29 __mul__
+    0xf3, // BINARY_OP 28 __sub__
+    0xb1, // LOAD_FAST 1
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xf3, // BINARY_OP 28 __sub__
+    0xb0, // LOAD_FAST 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf4, // BINARY_OP 29 __mul__
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0xf2, // BINARY_OP 27 __add__
+    0xb0, // LOAD_FAST 0
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x55, // LOAD_SUBSCR
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf4, // BINARY_OP 29 __mul__
+    0xb1, // LOAD_FAST 1
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0x55, // LOAD_SUBSCR
+    0xf2, // BINARY_OP 27 __add__
+    0xb0, // LOAD_FAST 0
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x56, // STORE_SUBSCR
+    0x42,0x40, // JUMP 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x59, // JUMP 25
+    0x57, // DUP_TOP
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x55, // LOAD_SUBSCR
+    0x22,0x81,0xff,0x7f, // LOAD_CONST_SMALL_INT 32767
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x4b, // POP_JUMP_IF_FALSE 11
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x55, // LOAD_SUBSCR
+    0x22,0x84,0x80,0x00, // LOAD_CONST_SMALL_INT 65536
+    0xf3, // BINARY_OP 28 __sub__
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x56, // STORE_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x57, // DUP_TOP
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x22, // POP_JUMP_IF_TRUE -30
+    0x59, // POP_TOP
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x4c, // JUMP 12
+    0x57, // DUP_TOP
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x55, // LOAD_SUBSCR
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xf1, // BINARY_OP 26 __rshift__
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0x56, // STORE_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x57, // DUP_TOP
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x2f, // POP_JUMP_IF_TRUE -17
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_GetAccelerationRaw = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_GetAccelerationRaw,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 220,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 137,
+        .line_info = fun_data_.\control_board_v1_GetAccelerationRaw + 4,
+        .opcodes = fun_data_.\control_board_v1_GetAccelerationRaw + 22,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_GetAcceleration
+static const byte fun_data_.\control_board_v1_GetAcceleration[64] = {
+    0x41,0x12, // prelude
+    0x81,0x0b,0x81,0x58, // names: GetAcceleration, axial
+    0x80,0x89,0x26,0x25,0x44, // code info
+    0x12,0x81,0x09, // LOAD_GLOBAL 'GetAccelerationRaw'
+    0x34,0x00, // CALL_FUNCTION 0
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x44, // POP_JUMP_IF_FALSE 4
+    0xb1, // LOAD_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x55, // LOAD_SUBSCR
+    0x63, // RETURN_VALUE
+    0x12,0x81,0x59, // LOAD_GLOBAL 'round'
+    0x12,0x09, // LOAD_GLOBAL 'math'
+    0x14,0x81,0x0c, // LOAD_METHOD 'sqrt'
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0xf4, // BINARY_OP 29 __mul__
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0xf4, // BINARY_OP 29 __mul__
+    0xf2, // BINARY_OP 27 __add__
+    0xb1, // LOAD_FAST 1
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xf4, // BINARY_OP 29 __mul__
+    0xf2, // BINARY_OP 27 __add__
+    0x36,0x01, // CALL_METHOD 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_GetAcceleration = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_GetAcceleration,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 64,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 9,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 139,
+        .line_info = fun_data_.\control_board_v1_GetAcceleration + 6,
+        .opcodes = fun_data_.\control_board_v1_GetAcceleration + 11,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_ReadPin
+static const byte fun_data_.\control_board_v1_ReadPin[33] = {
+    0x19,0x0e, // prelude
+    0x81,0x0d,0x81,0x5a, // names: ReadPin, pin_port
+    0x80,0x91,0x2e, // code info
+    0x12,0x05, // LOAD_GLOBAL 'Pin'
+    0xb0, // LOAD_FAST 0
+    0x12,0x05, // LOAD_GLOBAL 'Pin'
+    0x13,0x13, // LOAD_ATTR 'IN'
+    0x34,0x02, // CALL_FUNCTION 2
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x56, // STORE_SUBSCR
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x55, // LOAD_SUBSCR
+    0x14,0x12, // LOAD_METHOD 'value'
+    0x36,0x00, // CALL_METHOD 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_ReadPin = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_ReadPin,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 33,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 141,
+        .line_info = fun_data_.\control_board_v1_ReadPin + 6,
+        .opcodes = fun_data_.\control_board_v1_ReadPin + 9,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_WritePin
+static const byte fun_data_.\control_board_v1_WritePin[37] = {
+    0x22,0x10, // prelude
+    0x81,0x0e,0x81,0x5a,0x12, // names: WritePin, pin_port, value
+    0x80,0x96,0x2e, // code info
+    0x12,0x05, // LOAD_GLOBAL 'Pin'
+    0xb0, // LOAD_FAST 0
+    0x12,0x05, // LOAD_GLOBAL 'Pin'
+    0x13,0x11, // LOAD_ATTR 'OUT'
+    0x34,0x02, // CALL_FUNCTION 2
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x56, // STORE_SUBSCR
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x55, // LOAD_SUBSCR
+    0x14,0x12, // LOAD_METHOD 'value'
+    0xb1, // LOAD_FAST 1
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_WritePin = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_WritePin,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 37,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 142,
+        .line_info = fun_data_.\control_board_v1_WritePin + 7,
+        .opcodes = fun_data_.\control_board_v1_WritePin + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_ReadAdc
+static const byte fun_data_.\control_board_v1_ReadAdc[58] = {
+    0x29,0x16, // prelude
+    0x81,0x0f,0x81,0x5a, // names: ReadAdc, pin_port
+    0x80,0x9b,0x2a,0x2a,0x2c,0x27,0x24, // code info
+    0x12,0x05, // LOAD_GLOBAL 'Pin'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x56, // STORE_SUBSCR
+    0x12,0x02, // LOAD_GLOBAL 'ADC'
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x14,0x81,0x10, // LOAD_METHOD 'atten'
+    0x12,0x02, // LOAD_GLOBAL 'ADC'
+    0x13,0x81,0x11, // LOAD_ATTR 'ATTN_11DB'
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb1, // LOAD_FAST 1
+    0x14,0x81,0x12, // LOAD_METHOD 'read_u16'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_ReadAdc = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_ReadAdc,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 58,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 143,
+        .line_info = fun_data_.\control_board_v1_ReadAdc + 6,
+        .opcodes = fun_data_.\control_board_v1_ReadAdc + 13,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_WritePwm
+static const byte fun_data_.\control_board_v1_WritePwm[82] = {
+    0x32,0x1a, // prelude
+    0x81,0x13,0x81,0x5a,0x12, // names: WritePwm, pin_port, value
+    0x80,0xa4,0x2a,0x2a,0x27,0x2a,0x29,0x2b, // code info
+    0x12,0x05, // LOAD_GLOBAL 'Pin'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x56, // STORE_SUBSCR
+    0x12,0x04, // LOAD_GLOBAL 'PWM'
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x14,0x81,0x14, // LOAD_METHOD 'deinit'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x12,0x04, // LOAD_GLOBAL 'PWM'
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x14,0x0d, // LOAD_METHOD 'freq'
+    0x22,0x87,0x68, // LOAD_CONST_SMALL_INT 1000
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x81,0x05, // LOAD_GLOBAL 'Clamp'
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x87,0x7f, // LOAD_CONST_SMALL_INT 1023
+    0x34,0x03, // CALL_FUNCTION 3
+    0xc1, // STORE_FAST 1
+    0xb2, // LOAD_FAST 2
+    0x14,0x81,0x15, // LOAD_METHOD 'duty'
+    0xb1, // LOAD_FAST 1
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_WritePwm = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_WritePwm,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 82,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 147,
+        .line_info = fun_data_.\control_board_v1_WritePwm + 7,
+        .opcodes = fun_data_.\control_board_v1_WritePwm + 15,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_UpdateButtonStatus
+static const byte fun_data_.\control_board_v1_UpdateButtonStatus[81] = {
+    0x10,0x14, // prelude
+    0x81,0x16, // names: UpdateButtonStatus
+    0x80,0xb3,0x20,0x20,0x20,0x2c,0x2c,0x2c, // code info
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x55, // LOAD_SUBSCR
+    0x14,0x12, // LOAD_METHOD 'value'
+    0x36,0x00, // CALL_METHOD 0
+    0x17,0x81,0x49, // STORE_GLOBAL 'pa_last_status'
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0x55, // LOAD_SUBSCR
+    0x14,0x12, // LOAD_METHOD 'value'
+    0x36,0x00, // CALL_METHOD 0
+    0x17,0x81,0x4a, // STORE_GLOBAL 'pb_last_status'
+    0x12,0x81,0x47, // LOAD_GLOBAL 'pin_map'
+    0x95, // LOAD_CONST_SMALL_INT 21
+    0x55, // LOAD_SUBSCR
+    0x14,0x12, // LOAD_METHOD 'value'
+    0x36,0x00, // CALL_METHOD 0
+    0x17,0x81,0x4b, // STORE_GLOBAL 'pc_last_status'
+    0x12,0x81,0x5b, // LOAD_GLOBAL 'str'
+    0x12,0x81,0x49, // LOAD_GLOBAL 'pa_last_status'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x10,0x64, // LOAD_CONST_STRING '_'
+    0xf2, // BINARY_OP 27 __add__
+    0x12,0x81,0x5b, // LOAD_GLOBAL 'str'
+    0x12,0x81,0x4a, // LOAD_GLOBAL 'pb_last_status'
+    0x34,0x01, // CALL_FUNCTION 1
+    0xf2, // BINARY_OP 27 __add__
+    0x10,0x64, // LOAD_CONST_STRING '_'
+    0xf2, // BINARY_OP 27 __add__
+    0x12,0x81,0x5b, // LOAD_GLOBAL 'str'
+    0x12,0x81,0x4b, // LOAD_GLOBAL 'pc_last_status'
+    0x34,0x01, // CALL_FUNCTION 1
+    0xf2, // BINARY_OP 27 __add__
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_UpdateButtonStatus = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_UpdateButtonStatus,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 81,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 150,
+        .line_info = fun_data_.\control_board_v1_UpdateButtonStatus + 4,
+        .opcodes = fun_data_.\control_board_v1_UpdateButtonStatus + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_GetLastPinStatus
+static const byte fun_data_.\control_board_v1_GetLastPinStatus[43] = {
+    0x11,0x18, // prelude
+    0x81,0x17,0x81,0x5a, // names: GetLastPinStatus, pin_port
+    0x80,0xbd,0x25,0x24,0x25,0x24,0x25,0x24, // code info
+    0xb0, // LOAD_FAST 0
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x44, // POP_JUMP_IF_FALSE 4
+    0x12,0x81,0x49, // LOAD_GLOBAL 'pa_last_status'
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x44, // POP_JUMP_IF_FALSE 4
+    0x12,0x81,0x4a, // LOAD_GLOBAL 'pb_last_status'
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x95, // LOAD_CONST_SMALL_INT 21
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x44, // POP_JUMP_IF_FALSE 4
+    0x12,0x81,0x4b, // LOAD_GLOBAL 'pc_last_status'
+    0x63, // RETURN_VALUE
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_GetLastPinStatus = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_GetLastPinStatus,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 43,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 151,
+        .line_info = fun_data_.\control_board_v1_GetLastPinStatus + 6,
+        .opcodes = fun_data_.\control_board_v1_GetLastPinStatus + 14,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission
+static const byte fun_data_.\control_board_v1_PlayRecordMission[68] = {
+    0x08,0x1c, // prelude
+    0x19, // names: PlayRecordMission
+    0x8b,0xcd,0x89,0x16,0x65,0x85,0x0e,0x85,0x2c,0x85,0x19,0x85,0x07, // code info
+    0x11,0x81,0x5c, // LOAD_NAME '__name__'
+    0x16,0x81,0x5d, // STORE_NAME '__module__'
+    0x10,0x19, // LOAD_CONST_STRING 'PlayRecordMission'
+    0x16,0x81,0x5e, // STORE_NAME '__qualname__'
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x53, // LOAD_NULL
+    0x33,0x00, // MAKE_FUNCTION_DEFARGS 0
+    0x16,0x81,0x32, // STORE_NAME '__init__'
+    0x32,0x01, // MAKE_FUNCTION 1
+    0x16,0x81,0x1b, // STORE_NAME 'isFinish'
+    0x32,0x02, // MAKE_FUNCTION 2
+    0x16,0x81,0x19, // STORE_NAME 'interrupt'
+    0x32,0x03, // MAKE_FUNCTION 3
+    0x16,0x81,0x43, // STORE_NAME '__tickRecord'
+    0x32,0x04, // MAKE_FUNCTION 4
+    0x16,0x81,0x44, // STORE_NAME '__tickPlay'
+    0x32,0x05, // MAKE_FUNCTION 5
+    0x16,0x81,0x42, // STORE_NAME '__stop'
+    0x32,0x06, // MAKE_FUNCTION 6
+    0x16,0x81,0x1c, // STORE_NAME 'tickStep'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+// child of .\control_board_v1_PlayRecordMission
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission___init__
+static const byte fun_data_.\control_board_v1_PlayRecordMission___init__[169] = {
+    0xa8,0x05,0x3c, // prelude
+    0x81,0x32,0x81,0x6e,0x81,0x6f,0x81,0x60,0x81,0x61, // names: __init__, self, is_recording, file_name, sec
+    0x80,0xce,0x25,0x25,0x25,0x25,0x47,0x25,0x25,0x27,0x25,0x2c,0x25,0x26,0x27,0x25,0x2a,0x2c,0x2b,0x2c, // code info
+    0xb1, // LOAD_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x25, // STORE_ATTR 'isRecord'
+    0xb2, // LOAD_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x33, // STORE_ATTR 'fileName'
+    0xb2, // LOAD_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x34, // STORE_ATTR 'currentFileName'
+    0xb3, // LOAD_FAST 3
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x47, // POP_JUMP_IF_FALSE 7
+    0xb3, // LOAD_FAST 3
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x35, // STORE_ATTR 'recordSec'
+    0x42,0x45, // JUMP 5
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x35, // STORE_ATTR 'recordSec'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x37, // STORE_ATTR 'count'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x38, // STORE_ATTR 'read_len'
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x39, // STORE_ATTR 'playing_buf'
+    0x51, // LOAD_CONST_NONE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3a, // STORE_ATTR 'file'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x25, // LOAD_ATTR 'isRecord'
+    0x44,0x7e, // POP_JUMP_IF_FALSE 62
+    0xb3, // LOAD_FAST 3
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0xf4, // BINARY_OP 29 __mul__
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3b, // STORE_ATTR 'recordingBufCnt'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3c, // STORE_ATTR 'recordingUartReadLen'
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3d, // STORE_ATTR 'byte_read'
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x22,0x81,0x4a, // LOAD_CONST_SMALL_INT 202
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3e, // STORE_ATTR 'uart_buf'
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x23,0x08, // LOAD_CONST_OBJ 8
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3f, // STORE_ATTR 'byte_to_write'
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x40, // STORE_ATTR 'rec_buf'
+    0x50, // LOAD_CONST_FALSE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x41, // STORE_ATTR 'already_write'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission___init__ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 4,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission___init__,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 169,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 4,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 1,
+        .qstr_block_name_idx = 178,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission___init__ + 13,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission___init__ + 33,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1_PlayRecordMission
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission_isFinish
+static const byte fun_data_.\control_board_v1_PlayRecordMission_isFinish[15] = {
+    0x11,0x0c, // prelude
+    0x81,0x1b,0x81,0x6e, // names: isFinish, self
+    0x80,0xe4, // code info
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xd9, // BINARY_OP 2 __eq__
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission_isFinish = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission_isFinish,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 15,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 155,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission_isFinish + 6,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission_isFinish + 8,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1_PlayRecordMission
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission_interrupt
+static const byte fun_data_.\control_board_v1_PlayRecordMission_interrupt[99] = {
+    0x11,0x20, // prelude
+    0x81,0x19,0x81,0x6e, // names: interrupt, self
+    0x80,0xe7,0x27,0x28,0x25,0x22,0x26,0x28,0x27,0x30,0x25,0x4a, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x81,0x42, // LOAD_METHOD '__stop'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x47, // POP_JUMP_IF_FALSE 7
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x25, // LOAD_ATTR 'isRecord'
+    0x44,0x6e, // POP_JUMP_IF_FALSE 46
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x47, // POP_JUMP_IF_FALSE 7
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x42,0x5d, // JUMP 29
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x43,0x48, // POP_JUMP_IF_TRUE 8
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4d, // POP_JUMP_IF_FALSE 13
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x23,0x09, // LOAD_CONST_OBJ 9
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x34, // STORE_ATTR 'currentFileName'
+    0x42,0x40, // JUMP 0
+    0x42,0x45, // JUMP 5
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission_interrupt = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission_interrupt,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 99,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 153,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission_interrupt + 6,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission_interrupt + 18,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1_PlayRecordMission
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission___tickRecord
+static const byte fun_data_.\control_board_v1_PlayRecordMission___tickRecord[439] = {
+    0x39,0x5e, // prelude
+    0x81,0x43,0x81,0x6e, // names: __tickRecord, self
+    0x80,0xf5,0x28,0x2f,0x2f,0x31,0x35,0x2a,0x27,0x26,0x2d,0x25,0x23,0x24,0x28,0x25,0x27,0x2c,0x2c,0x25,0x29,0x36,0x2a,0x29,0x20,0x1f,0x23,0x25,0x22,0x2a,0x28,0x2e,0x30,0x2f,0x2a,0x25,0x25,0x22,0x42,0x2f,0x2a,0x25,0x25, // code info
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x5e, // POP_JUMP_IF_FALSE 30
+    0x12,0x81,0x63, // LOAD_GLOBAL 'open'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x34, // LOAD_ATTR 'currentFileName'
+    0x10,0x3b, // LOAD_CONST_STRING 'w'
+    0x34,0x02, // CALL_FUNCTION 2
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3a, // STORE_ATTR 'file'
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x2b,0x01, // BUILD_LIST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3b, // LOAD_ATTR 'recordingBufCnt'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x43,0x49, // POP_JUMP_IF_TRUE 9
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0xa8,0x82, // POP_JUMP_IF_FALSE 296
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x57, // DUP_TOP
+    0x5b, // ROT_THREE
+    0xda, // BINARY_OP 3 __le__
+    0x46,0x07, // JUMP_IF_FALSE_OR_POP 7
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3b, // LOAD_ATTR 'recordingBufCnt'
+    0xd7, // BINARY_OP 0 __lt__
+    0x42,0x42, // JUMP 2
+    0x5a, // ROT_TWO
+    0x59, // POP_TOP
+    0x44,0x69, // POP_JUMP_IF_FALSE 41
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3b, // LOAD_ATTR 'recordingBufCnt'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3b, // STORE_ATTR 'recordingBufCnt'
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3c, // STORE_ATTR 'recordingUartReadLen'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x41, // LOAD_ATTR 'already_write'
+    0x44,0x4d, // POP_JUMP_IF_FALSE 13
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x14,0x7c, // LOAD_METHOD 'write'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x40, // LOAD_ATTR 'rec_buf'
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x50, // LOAD_CONST_FALSE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x41, // STORE_ATTR 'already_write'
+    0x42,0xa7,0x81, // JUMP 167
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0xb1, // LOAD_FAST 1
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x45, // POP_JUMP_IF_FALSE 5
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3f, // LOAD_ATTR 'byte_to_write'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x56, // STORE_SUBSCR
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7c, // LOAD_METHOD 'write'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3f, // LOAD_ATTR 'byte_to_write'
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3d, // LOAD_ATTR 'byte_read'
+    0x36,0x01, // CALL_METHOD 1
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xdc, // BINARY_OP 5 __ne__
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x81,0x54, // LOAD_GLOBAL 'print'
+    0x10,0x81,0x27, // LOAD_CONST_STRING 'err1'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3e, // LOAD_ATTR 'uart_buf'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3d, // LOAD_ATTR 'byte_read'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf2, // BINARY_OP 27 __add__
+    0x36,0x02, // CALL_METHOD 2
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3d, // LOAD_ATTR 'byte_read'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xdc, // BINARY_OP 5 __ne__
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x81,0x54, // LOAD_GLOBAL 'print'
+    0x10,0x81,0x28, // LOAD_CONST_STRING 'err2'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3e, // LOAD_ATTR 'uart_buf'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xb2, // LOAD_FAST 2
+    0x2e,0x02, // BUILD_SLICE 2
+    0x55, // LOAD_SUBSCR
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x40, // LOAD_ATTR 'rec_buf'
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0xf3, // BINARY_OP 28 __sub__
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0xf3, // BINARY_OP 28 __sub__
+    0xb2, // LOAD_FAST 2
+    0xf2, // BINARY_OP 27 __add__
+    0x2e,0x02, // BUILD_SLICE 2
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0xb2, // LOAD_FAST 2
+    0xdc, // BINARY_OP 5 __ne__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x42,0x60, // JUMP 32
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0xb2, // LOAD_FAST 2
+    0xf3, // BINARY_OP 28 __sub__
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3c, // STORE_ATTR 'recordingUartReadLen'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xda, // BINARY_OP 3 __le__
+    0x44,0x45, // POP_JUMP_IF_FALSE 5
+    0x52, // LOAD_CONST_TRUE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x41, // STORE_ATTR 'already_write'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x43,0xd0,0x7e, // POP_JUMP_IF_TRUE -176
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3c, // LOAD_ATTR 'recordingUartReadLen'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xda, // BINARY_OP 3 __le__
+    0x44,0x6d, // POP_JUMP_IF_FALSE 45
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3b, // LOAD_ATTR 'recordingBufCnt'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xda, // BINARY_OP 3 __le__
+    0x44,0x65, // POP_JUMP_IF_FALSE 37
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x01, // BUILD_LIST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x14,0x81,0x21, // LOAD_METHOD 'close'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3a, // STORE_ATTR 'file'
+    0x50, // LOAD_CONST_FALSE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x41, // STORE_ATTR 'already_write'
+    0x52, // LOAD_CONST_TRUE
+    0x63, // RETURN_VALUE
+    0x50, // LOAD_CONST_FALSE
+    0x63, // RETURN_VALUE
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x01, // BUILD_LIST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x14,0x81,0x21, // LOAD_METHOD 'close'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3a, // STORE_ATTR 'file'
+    0x50, // LOAD_CONST_FALSE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x41, // STORE_ATTR 'already_write'
+    0x52, // LOAD_CONST_TRUE
+    0x63, // RETURN_VALUE
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission___tickRecord = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission___tickRecord,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 439,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 195,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission___tickRecord + 6,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission___tickRecord + 49,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1_PlayRecordMission
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission___tickPlay
+static const byte fun_data_.\control_board_v1_PlayRecordMission___tickPlay[237] = {
+    0x41,0x36, // prelude
+    0x81,0x44,0x81,0x6e, // names: __tickPlay, self
+    0x90,0x21,0x28,0x2f,0x2f,0x22,0x2b,0x3c,0x2b,0x22,0x23,0x30,0x22,0x2e,0x2b,0x44,0x3b,0x28,0x2a,0x25,0x27,0x25,0x22, // code info
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0x44,0x5e, // POP_JUMP_IF_FALSE 30
+    0x12,0x81,0x63, // LOAD_GLOBAL 'open'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x34, // LOAD_ATTR 'currentFileName'
+    0x10,0x36, // LOAD_CONST_STRING 'r'
+    0x34,0x02, // CALL_FUNCTION 2
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3a, // STORE_ATTR 'file'
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x01, // BUILD_LIST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x52, // LOAD_CONST_TRUE
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x37, // LOAD_ATTR 'count'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x38, // LOAD_ATTR 'read_len'
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x69, // POP_JUMP_IF_FALSE 41
+    0xb0, // LOAD_FAST 0
+    0x57, // DUP_TOP
+    0x13,0x81,0x37, // LOAD_ATTR 'count'
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x95, // LOAD_CONST_SMALL_INT 21
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x39, // LOAD_ATTR 'playing_buf'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x37, // LOAD_ATTR 'count'
+    0x51, // LOAD_CONST_NONE
+    0x2e,0x02, // BUILD_SLICE 2
+    0x55, // LOAD_SUBSCR
+    0x34,0x02, // CALL_FUNCTION 2
+    0xe5, // BINARY_OP 14 __iadd__
+    0x5a, // ROT_TWO
+    0x18,0x81,0x37, // STORE_ATTR 'count'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x37, // LOAD_ATTR 'count'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x38, // LOAD_ATTR 'read_len'
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x50, // LOAD_CONST_FALSE
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x44,0x50, // POP_JUMP_IF_FALSE 16
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x39, // LOAD_ATTR 'playing_buf'
+    0x36,0x01, // CALL_METHOD 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x38, // STORE_ATTR 'read_len'
+    0x42,0x6d, // JUMP 45
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x95, // LOAD_CONST_SMALL_INT 21
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x39, // LOAD_ATTR 'playing_buf'
+    0x34,0x02, // CALL_FUNCTION 2
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x37, // STORE_ATTR 'count'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x37, // LOAD_ATTR 'count'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x38, // LOAD_ATTR 'read_len'
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x44, // POP_JUMP_IF_FALSE 4
+    0x50, // LOAD_CONST_FALSE
+    0xc1, // STORE_FAST 1
+    0x42,0x50, // JUMP 16
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x39, // LOAD_ATTR 'playing_buf'
+    0x36,0x01, // CALL_METHOD 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x38, // STORE_ATTR 'read_len'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x38, // LOAD_ATTR 'read_len'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x43, // POP_JUMP_IF_FALSE 3
+    0xb1, // LOAD_FAST 1
+    0x43,0x08, // POP_JUMP_IF_TRUE -56
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x38, // LOAD_ATTR 'read_len'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xda, // BINARY_OP 3 __le__
+    0x44,0x5d, // POP_JUMP_IF_FALSE 29
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x14,0x81,0x21, // LOAD_METHOD 'close'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3a, // STORE_ATTR 'file'
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x37, // STORE_ATTR 'count'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x38, // STORE_ATTR 'read_len'
+    0x52, // LOAD_CONST_TRUE
+    0x63, // RETURN_VALUE
+    0x50, // LOAD_CONST_FALSE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission___tickPlay = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission___tickPlay,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 237,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 9,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 196,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission___tickPlay + 6,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission___tickPlay + 29,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1_PlayRecordMission
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission___stop
+static const byte fun_data_.\control_board_v1_PlayRecordMission___stop[67] = {
+    0x21,0x14, // prelude
+    0x81,0x42,0x81,0x6e, // names: __stop, self
+    0x90,0x3a,0x2e,0x2f,0x29,0x2a, // code info
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x25, // LOAD_ATTR 'isRecord'
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4f, // POP_JUMP_IF_FALSE 15
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x01, // BUILD_LIST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0xd3, // UNARY_OP 3 <not>
+    0x44,0x4f, // POP_JUMP_IF_FALSE 15
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x3a, // LOAD_ATTR 'file'
+    0x14,0x81,0x21, // LOAD_METHOD 'close'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x3a, // STORE_ATTR 'file'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission___stop = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission___stop,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 67,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 194,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission___stop + 6,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission___stop + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1_PlayRecordMission
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PlayRecordMission_tickStep
+static const byte fun_data_.\control_board_v1_PlayRecordMission_tickStep[190] = {
+    0x11,0x34, // prelude
+    0x81,0x1c,0x81,0x6e, // names: tickStep, self
+    0x90,0x41,0x27,0x28,0x25,0x29,0x28,0x28,0x25,0x2a,0x28,0x28,0x25,0x28,0x28,0x28,0x49,0x28,0x25,0x2a,0x28,0x28, // code info
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x25, // LOAD_ATTR 'isRecord'
+    0x44,0xeb,0x80, // POP_JUMP_IF_FALSE 107
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4e, // POP_JUMP_IF_FALSE 14
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x23,0x07, // LOAD_CONST_OBJ 7
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x34, // STORE_ATTR 'currentFileName'
+    0x42,0xd3,0x80, // JUMP 83
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0xb0, // LOAD_FAST 0
+    0x14,0x81,0x44, // LOAD_METHOD '__tickPlay'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x4d, // POP_JUMP_IF_FALSE 13
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x33, // LOAD_ATTR 'fileName'
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x34, // STORE_ATTR 'currentFileName'
+    0x42,0x74, // JUMP 52
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x55, // POP_JUMP_IF_FALSE 21
+    0xb0, // LOAD_FAST 0
+    0x14,0x81,0x43, // LOAD_METHOD '__tickRecord'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x4b, // POP_JUMP_IF_FALSE 11
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x23,0x09, // LOAD_CONST_OBJ 9
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x34, // STORE_ATTR 'currentFileName'
+    0x42,0x57, // JUMP 23
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4f, // POP_JUMP_IF_FALSE 15
+    0xb0, // LOAD_FAST 0
+    0x14,0x81,0x44, // LOAD_METHOD '__tickPlay'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x45, // POP_JUMP_IF_FALSE 5
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x42,0x40, // JUMP 0
+    0x42,0x6e, // JUMP 46
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4f, // POP_JUMP_IF_FALSE 15
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x33, // LOAD_ATTR 'fileName'
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x34, // STORE_ATTR 'currentFileName'
+    0x42,0x57, // JUMP 23
+    0xb0, // LOAD_FAST 0
+    0x13,0x81,0x36, // LOAD_ATTR 'step'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x4f, // POP_JUMP_IF_FALSE 15
+    0xb0, // LOAD_FAST 0
+    0x14,0x81,0x44, // LOAD_METHOD '__tickPlay'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x45, // POP_JUMP_IF_FALSE 5
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xb0, // LOAD_FAST 0
+    0x18,0x81,0x36, // STORE_ATTR 'step'
+    0x42,0x40, // JUMP 0
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission_tickStep = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission_tickStep,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 190,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 156,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission_tickStep + 6,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission_tickStep + 28,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const mp_raw_code_t *const children_.\control_board_v1_PlayRecordMission[] = {
+    &raw_code_.\control_board_v1_PlayRecordMission___init__,
+    &raw_code_.\control_board_v1_PlayRecordMission_isFinish,
+    &raw_code_.\control_board_v1_PlayRecordMission_interrupt,
+    &raw_code_.\control_board_v1_PlayRecordMission___tickRecord,
+    &raw_code_.\control_board_v1_PlayRecordMission___tickPlay,
+    &raw_code_.\control_board_v1_PlayRecordMission___stop,
+    &raw_code_.\control_board_v1_PlayRecordMission_tickStep,
+};
+
+static const mp_raw_code_t raw_code_.\control_board_v1_PlayRecordMission = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_PlayRecordMission,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 68,
+    #endif
+    .children = (void *)&children_.\control_board_v1_PlayRecordMission,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 7,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 2,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 25,
+        .line_info = fun_data_.\control_board_v1_PlayRecordMission + 3,
+        .opcodes = fun_data_.\control_board_v1_PlayRecordMission + 16,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_PushPlayRecordMission
+static const byte fun_data_.\control_board_v1_PushPlayRecordMission[74] = {
+    0xbb,0x01,0x26, // prelude
+    0x81,0x18,0x81,0x5f,0x81,0x60,0x81,0x61, // names: PushPlayRecordMission, is_record, file_name, sec
+    0x90,0x5e,0x28,0x20,0x20,0x28,0x29,0x24,0x28,0x29,0x24, // code info
+    0x12,0x19, // LOAD_GLOBAL 'PlayRecordMission'
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xb2, // LOAD_FAST 2
+    0x34,0x03, // CALL_FUNCTION 3
+    0xc3, // STORE_FAST 3
+    0x12,0x81,0x4c, // LOAD_GLOBAL 'nextMission'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0xd3, // UNARY_OP 3 <not>
+    0x44,0x4d, // POP_JUMP_IF_FALSE 13
+    0x12,0x81,0x4c, // LOAD_GLOBAL 'nextMission'
+    0x14,0x81,0x19, // LOAD_METHOD 'interrupt'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x17,0x81,0x4c, // STORE_GLOBAL 'nextMission'
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0xd3, // UNARY_OP 3 <not>
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x14,0x81,0x19, // LOAD_METHOD 'interrupt'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0xb3, // LOAD_FAST 3
+    0x17,0x81,0x4c, // STORE_GLOBAL 'nextMission'
+    0xb3, // LOAD_FAST 3
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_PushPlayRecordMission = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 3,
+    .fun_data = fun_data_.\control_board_v1_PushPlayRecordMission,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 74,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 3,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 1,
+        .qstr_block_name_idx = 152,
+        .line_info = fun_data_.\control_board_v1_PushPlayRecordMission + 11,
+        .opcodes = fun_data_.\control_board_v1_PushPlayRecordMission + 22,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_play_record_loop
+static const byte fun_data_.\control_board_v1_play_record_loop[82] = {
+    0x88,0x40,0x1e, // prelude
+    0x81,0x1a, // names: play_record_loop
+    0x90,0x6b,0x20,0x20,0x20,0x28,0x2a,0x26,0x46,0x26,0x24,0x28,0x29, // code info
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0xd3, // UNARY_OP 3 <not>
+    0x44,0x56, // POP_JUMP_IF_FALSE 22
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x14,0x81,0x1b, // LOAD_METHOD 'isFinish'
+    0x36,0x00, // CALL_METHOD 0
+    0x44,0x4a, // POP_JUMP_IF_FALSE 10
+    0x12,0x81,0x4c, // LOAD_GLOBAL 'nextMission'
+    0x17,0x81,0x4d, // STORE_GLOBAL 'currentMission'
+    0x51, // LOAD_CONST_NONE
+    0x17,0x81,0x4c, // STORE_GLOBAL 'nextMission'
+    0x42,0x4a, // JUMP 10
+    0x12,0x81,0x4c, // LOAD_GLOBAL 'nextMission'
+    0x17,0x81,0x4d, // STORE_GLOBAL 'currentMission'
+    0x51, // LOAD_CONST_NONE
+    0x17,0x81,0x4c, // STORE_GLOBAL 'nextMission'
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0xd3, // UNARY_OP 3 <not>
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x14,0x81,0x1c, // LOAD_METHOD 'tickStep'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x52, // LOAD_CONST_TRUE
+    0x67, // YIELD_VALUE
+    0x59, // POP_TOP
+    0x42,0x02, // JUMP -62
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_play_record_loop = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x01,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_play_record_loop,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 82,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 2,
+        .n_exc_stack = 0,
+        .scope_flags = 1,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 154,
+        .line_info = fun_data_.\control_board_v1_play_record_loop + 5,
+        .opcodes = fun_data_.\control_board_v1_play_record_loop + 18,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_playAsync
+static const byte fun_data_.\control_board_v1_playAsync[34] = {
+    0xa1,0x01,0x10, // prelude
+    0x81,0x1d,0x81,0x62, // names: playAsync, path
+    0x90,0x7b,0x28,0x25, // code info
+    0x12,0x0a, // LOAD_GLOBAL 'os'
+    0x14,0x81,0x1e, // LOAD_METHOD 'listdir'
+    0x36,0x00, // CALL_METHOD 0
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xdd, // BINARY_OP 6 <in>
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0x12,0x81,0x18, // LOAD_GLOBAL 'PushPlayRecordMission'
+    0x50, // LOAD_CONST_FALSE
+    0xb0, // LOAD_FAST 0
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_playAsync = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_playAsync,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 34,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 1,
+        .qstr_block_name_idx = 157,
+        .line_info = fun_data_.\control_board_v1_playAsync + 7,
+        .opcodes = fun_data_.\control_board_v1_playAsync + 11,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_playUntilDone
+static const byte fun_data_.\control_board_v1_playUntilDone[55] = {
+    0xa9,0x41,0x16, // prelude
+    0x81,0x1f,0x81,0x62, // names: playUntilDone, path
+    0x90,0x81,0x28,0x25,0x28,0x22,0x2d, // code info
+    0x12,0x0a, // LOAD_GLOBAL 'os'
+    0x14,0x81,0x1e, // LOAD_METHOD 'listdir'
+    0x36,0x00, // CALL_METHOD 0
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xdd, // BINARY_OP 6 <in>
+    0x44,0x57, // POP_JUMP_IF_FALSE 23
+    0x12,0x81,0x18, // LOAD_GLOBAL 'PushPlayRecordMission'
+    0x50, // LOAD_CONST_FALSE
+    0xb0, // LOAD_FAST 0
+    0x34,0x02, // CALL_FUNCTION 2
+    0xc2, // STORE_FAST 2
+    0x42,0x43, // JUMP 3
+    0x52, // LOAD_CONST_TRUE
+    0x67, // YIELD_VALUE
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x14,0x81,0x1b, // LOAD_METHOD 'isFinish'
+    0x36,0x00, // CALL_METHOD 0
+    0x50, // LOAD_CONST_FALSE
+    0xde, // BINARY_OP 7 <is>
+    0x43,0x33, // POP_JUMP_IF_TRUE -13
+    0x50, // LOAD_CONST_FALSE
+    0x67, // YIELD_VALUE
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_playUntilDone = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x01,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_playUntilDone,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 55,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 1,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 1,
+        .qstr_block_name_idx = 159,
+        .line_info = fun_data_.\control_board_v1_playUntilDone + 7,
+        .opcodes = fun_data_.\control_board_v1_playUntilDone + 14,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_play
+static const byte fun_data_.\control_board_v1_play[92] = {
+    0xc1,0x01,0x22, // prelude
+    0x81,0x20,0x81,0x62, // names: play, path
+    0x90,0x8a,0x28,0x25,0x29,0x29,0x22,0x20,0x27,0x24,0x25,0x4a,0x24, // code info
+    0x12,0x0a, // LOAD_GLOBAL 'os'
+    0x14,0x81,0x1e, // LOAD_METHOD 'listdir'
+    0x36,0x00, // CALL_METHOD 0
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0xdd, // BINARY_OP 6 <in>
+    0x44,0x79, // POP_JUMP_IF_FALSE 57
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0x12,0x81,0x63, // LOAD_GLOBAL 'open'
+    0xb0, // LOAD_FAST 0
+    0x10,0x36, // LOAD_CONST_STRING 'r'
+    0x34,0x02, // CALL_FUNCTION 2
+    0xc3, // STORE_FAST 3
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc4, // STORE_FAST 4
+    0xb3, // LOAD_FAST 3
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb2, // LOAD_FAST 2
+    0x36,0x01, // CALL_METHOD 1
+    0xc5, // STORE_FAST 5
+    0xb4, // LOAD_FAST 4
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc4, // STORE_FAST 4
+    0xb5, // LOAD_FAST 5
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x4a, // POP_JUMP_IF_FALSE 10
+    0x12,0x81,0x03, // LOAD_GLOBAL 'uart_write_buf'
+    0x95, // LOAD_CONST_SMALL_INT 21
+    0xb2, // LOAD_FAST 2
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x42,0x42, // JUMP 2
+    0x42,0x42, // JUMP 2
+    0x42,0x22, // JUMP -30
+    0xb3, // LOAD_FAST 3
+    0x14,0x81,0x21, // LOAD_METHOD 'close'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_play = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_play,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 92,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 9,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 1,
+        .qstr_block_name_idx = 160,
+        .line_info = fun_data_.\control_board_v1_play + 7,
+        .opcodes = fun_data_.\control_board_v1_play + 20,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_recAsync
+static const byte fun_data_.\control_board_v1_recAsync[23] = {
+    0xaa,0x80,0x01,0x10, // prelude
+    0x81,0x22,0x81,0x62,0x81,0x61, // names: recAsync, path, sec
+    0x90,0x9a, // code info
+    0x12,0x81,0x18, // LOAD_GLOBAL 'PushPlayRecordMission'
+    0x52, // LOAD_CONST_TRUE
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0x34,0x03, // CALL_FUNCTION 3
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_recAsync = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_recAsync,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 23,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 2,
+        .qstr_block_name_idx = 162,
+        .line_info = fun_data_.\control_board_v1_recAsync + 10,
+        .opcodes = fun_data_.\control_board_v1_recAsync + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_recUntilDone
+static const byte fun_data_.\control_board_v1_recUntilDone[44] = {
+    0xb2,0xc0,0x01,0x16, // prelude
+    0x81,0x23,0x81,0x62,0x81,0x61, // names: recUntilDone, path, sec
+    0x90,0x9e,0x29,0x22,0x2d, // code info
+    0x12,0x81,0x18, // LOAD_GLOBAL 'PushPlayRecordMission'
+    0x52, // LOAD_CONST_TRUE
+    0xb0, // LOAD_FAST 0
+    0xb1, // LOAD_FAST 1
+    0x34,0x03, // CALL_FUNCTION 3
+    0xc2, // STORE_FAST 2
+    0x42,0x43, // JUMP 3
+    0x52, // LOAD_CONST_TRUE
+    0x67, // YIELD_VALUE
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x14,0x81,0x1b, // LOAD_METHOD 'isFinish'
+    0x36,0x00, // CALL_METHOD 0
+    0x50, // LOAD_CONST_FALSE
+    0xde, // BINARY_OP 7 <is>
+    0x43,0x33, // POP_JUMP_IF_TRUE -13
+    0x50, // LOAD_CONST_FALSE
+    0x67, // YIELD_VALUE
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_recUntilDone = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x01,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_recUntilDone,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 44,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 7,
+        .n_exc_stack = 0,
+        .scope_flags = 1,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 2,
+        .qstr_block_name_idx = 163,
+        .line_info = fun_data_.\control_board_v1_recUntilDone + 10,
+        .opcodes = fun_data_.\control_board_v1_recUntilDone + 15,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_stopRecord
+static const byte fun_data_.\control_board_v1_stopRecord[34] = {
+    0x08,0x0a, // prelude
+    0x81,0x24, // names: stopRecord
+    0x90,0xa5,0x30, // code info
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x51, // LOAD_CONST_NONE
+    0xde, // BINARY_OP 7 <is>
+    0xd3, // UNARY_OP 3 <not>
+    0x44,0x51, // POP_JUMP_IF_FALSE 17
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x13,0x81,0x25, // LOAD_ATTR 'isRecord'
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x81,0x4d, // LOAD_GLOBAL 'currentMission'
+    0x14,0x81,0x19, // LOAD_METHOD 'interrupt'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_stopRecord = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_stopRecord,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 34,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 2,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 164,
+        .line_info = fun_data_.\control_board_v1_stopRecord + 4,
+        .opcodes = fun_data_.\control_board_v1_stopRecord + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_rec
+static const byte fun_data_.\control_board_v1_rec[304] = {
+    0xfa,0x80,0x01,0x50, // prelude
+    0x81,0x26,0x81,0x62,0x81,0x61, // names: rec, path, sec
+    0x90,0xab,0x25,0x22,0x28,0x24,0x29,0x29,0x4f,0x27,0x29,0x48,0x23,0x24,0x44,0x23,0x24,0x25,0x22,0x24,0x29,0x29,0x25,0x29,0x30,0x27,0x29,0x36,0x25,0x29,0x2a,0x2d,0x27,0x2f, // code info
+    0xb1, // LOAD_FAST 1
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x94, // LOAD_CONST_SMALL_INT 20
+    0xc1, // STORE_FAST 1
+    0x12,0x81,0x20, // LOAD_GLOBAL 'play'
+    0x23,0x07, // LOAD_CONST_OBJ 7
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0xb1, // LOAD_FAST 1
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0xf4, // BINARY_OP 29 __mul__
+    0xc2, // STORE_FAST 2
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc3, // STORE_FAST 3
+    0x12,0x81,0x63, // LOAD_GLOBAL 'open'
+    0xb0, // LOAD_FAST 0
+    0x10,0x3b, // LOAD_CONST_STRING 'w'
+    0x34,0x02, // CALL_FUNCTION 2
+    0xc4, // STORE_FAST 4
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x2b,0x01, // BUILD_LIST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc5, // STORE_FAST 5
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x22,0x81,0x4a, // LOAD_CONST_SMALL_INT 202
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc6, // STORE_FAST 6
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x23,0x08, // LOAD_CONST_OBJ 8
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc7, // STORE_FAST 7
+    0x42,0x8f,0x81, // JUMP 143
+    0xb2, // LOAD_FAST 2
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xc2, // STORE_FAST 2
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0xc8, // STORE_FAST 8
+    0x42,0xf7,0x80, // JUMP 119
+    0x22,0x81,0x48, // LOAD_CONST_SMALL_INT 200
+    0xc9, // STORE_FAST 9
+    0xb8, // LOAD_FAST 8
+    0xb9, // LOAD_FAST 9
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb8, // LOAD_FAST 8
+    0xc9, // STORE_FAST 9
+    0xb9, // LOAD_FAST 9
+    0xb7, // LOAD_FAST 7
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x56, // STORE_SUBSCR
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7c, // LOAD_METHOD 'write'
+    0xb7, // LOAD_FAST 7
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb5, // LOAD_FAST 5
+    0x36,0x01, // CALL_METHOD 1
+    0xca, // STORE_FAST 10
+    0xba, // LOAD_FAST 10
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xdc, // BINARY_OP 5 __ne__
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x81,0x54, // LOAD_GLOBAL 'print'
+    0x10,0x81,0x27, // LOAD_CONST_STRING 'err1'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x12,0x81,0x48, // LOAD_GLOBAL 'uart'
+    0x14,0x7d, // LOAD_METHOD 'readinto'
+    0xb6, // LOAD_FAST 6
+    0xb5, // LOAD_FAST 5
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf2, // BINARY_OP 27 __add__
+    0x36,0x02, // CALL_METHOD 2
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xca, // STORE_FAST 10
+    0xba, // LOAD_FAST 10
+    0xb5, // LOAD_FAST 5
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xdc, // BINARY_OP 5 __ne__
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x81,0x54, // LOAD_GLOBAL 'print'
+    0x10,0x81,0x28, // LOAD_CONST_STRING 'err2'
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0xb6, // LOAD_FAST 6
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xba, // LOAD_FAST 10
+    0x2e,0x02, // BUILD_SLICE 2
+    0x55, // LOAD_SUBSCR
+    0xb3, // LOAD_FAST 3
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0xb8, // LOAD_FAST 8
+    0xf3, // BINARY_OP 28 __sub__
+    0x22,0xa0,0x00, // LOAD_CONST_SMALL_INT 4096
+    0xb8, // LOAD_FAST 8
+    0xf3, // BINARY_OP 28 __sub__
+    0xba, // LOAD_FAST 10
+    0xf2, // BINARY_OP 27 __add__
+    0x2e,0x02, // BUILD_SLICE 2
+    0x56, // STORE_SUBSCR
+    0xb9, // LOAD_FAST 9
+    0xba, // LOAD_FAST 10
+    0xdc, // BINARY_OP 5 __ne__
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0x12,0x08, // LOAD_GLOBAL 'time'
+    0x14,0x81,0x04, // LOAD_METHOD 'sleep_ms'
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb8, // LOAD_FAST 8
+    0xba, // LOAD_FAST 10
+    0xf3, // BINARY_OP 28 __sub__
+    0xc8, // STORE_FAST 8
+    0xb8, // LOAD_FAST 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x43,0x83,0x7f, // POP_JUMP_IF_TRUE -125
+    0xb4, // LOAD_FAST 4
+    0x14,0x7c, // LOAD_METHOD 'write'
+    0xb3, // LOAD_FAST 3
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x43,0xeb,0x7e, // POP_JUMP_IF_TRUE -149
+    0xb4, // LOAD_FAST 4
+    0x14,0x81,0x21, // LOAD_METHOD 'close'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x2b,0x01, // BUILD_LIST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x12,0x81,0x20, // LOAD_GLOBAL 'play'
+    0x23,0x09, // LOAD_CONST_OBJ 9
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_rec = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\control_board_v1_rec,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 304,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 16,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 2,
+        .qstr_block_name_idx = 166,
+        .line_info = fun_data_.\control_board_v1_rec + 10,
+        .opcodes = fun_data_.\control_board_v1_rec + 44,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_led_show_bytes_async
+static const byte fun_data_.\control_board_v1_led_show_bytes_async[29] = {
+    0x19,0x12, // prelude
+    0x81,0x29,0x81,0x64, // names: led_show_bytes_async, show_bytes
+    0x90,0xd2,0x28,0x20,0x28, // code info
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xb0, // LOAD_FAST 0
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x12,0x81,0x51, // LOAD_GLOBAL 'showIndex'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x17,0x81,0x51, // STORE_GLOBAL 'showIndex'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_led_show_bytes_async = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_led_show_bytes_async,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 29,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 169,
+        .line_info = fun_data_.\control_board_v1_led_show_bytes_async + 6,
+        .opcodes = fun_data_.\control_board_v1_led_show_bytes_async + 11,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_led_show_bytes
+static const byte fun_data_.\control_board_v1_led_show_bytes[68] = {
+    0x21,0x14, // prelude
+    0x81,0x2a,0x81,0x64, // names: led_show_bytes, show_bytes
+    0x90,0xd9,0x27,0x2a,0x5a,0x2b, // code info
+    0x12,0x81,0x29, // LOAD_GLOBAL 'led_show_bytes_async'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x59, // POP_TOP
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x5a, // POP_JUMP_IF_FALSE 26
+    0x12,0x08, // LOAD_GLOBAL 'time'
+    0x14,0x81,0x04, // LOAD_METHOD 'sleep_ms'
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0xf3, // BINARY_OP 28 __sub__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf4, // BINARY_OP 29 __mul__
+    0x22,0x83,0x10, // LOAD_CONST_SMALL_INT 400
+    0xf2, // BINARY_OP 27 __add__
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x42,0x4b, // JUMP 11
+    0x12,0x08, // LOAD_GLOBAL 'time'
+    0x14,0x81,0x04, // LOAD_METHOD 'sleep_ms'
+    0x22,0x83,0x10, // LOAD_CONST_SMALL_INT 400
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_led_show_bytes = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_led_show_bytes,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 68,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 170,
+        .line_info = fun_data_.\control_board_v1_led_show_bytes + 6,
+        .opcodes = fun_data_.\control_board_v1_led_show_bytes + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_led_show_string
+static const byte fun_data_.\control_board_v1_led_show_string[52] = {
+    0x29,0x14, // prelude
+    0x81,0x2b,0x81,0x65, // names: led_show_string, show_string
+    0xa0,0x4b,0x27,0x25,0x4f,0x2b, // code info
+    0x12,0x81,0x2c, // LOAD_GLOBAL 'led_show_string_async'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x4f, // POP_JUMP_IF_FALSE 15
+    0x12,0x08, // LOAD_GLOBAL 'time'
+    0x14,0x81,0x04, // LOAD_METHOD 'sleep_ms'
+    0xb1, // LOAD_FAST 1
+    0x22,0x81,0x00, // LOAD_CONST_SMALL_INT 128
+    0xf4, // BINARY_OP 29 __mul__
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x42,0x4b, // JUMP 11
+    0x12,0x08, // LOAD_GLOBAL 'time'
+    0x14,0x81,0x04, // LOAD_METHOD 'sleep_ms'
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_led_show_string = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_led_show_string,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 52,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 171,
+        .line_info = fun_data_.\control_board_v1_led_show_string + 6,
+        .opcodes = fun_data_.\control_board_v1_led_show_string + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_led_show_string_async
+static const byte fun_data_.\control_board_v1_led_show_string_async[154] = {
+    0x49,0x2a, // prelude
+    0x81,0x2c,0x81,0x65, // names: led_show_string_async, show_string
+    0xa0,0x54,0x27,0x26,0x2d,0x25,0x29,0x4c,0x26,0x26,0x28,0x29,0x4c,0x2f,0x28,0x20,0x28, // code info
+    0x12,0x81,0x5b, // LOAD_GLOBAL 'str'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc0, // STORE_FAST 0
+    0x12,0x81,0x4e, // LOAD_GLOBAL 'bytearray'
+    0x34,0x00, // CALL_FUNCTION 0
+    0xc1, // STORE_FAST 1
+    0x12,0x81,0x66, // LOAD_GLOBAL 'min'
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x5b, // POP_JUMP_IF_FALSE 27
+    0xb0, // LOAD_FAST 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0x12,0x81,0x4f, // LOAD_GLOBAL 'charPointMap'
+    0xdd, // BINARY_OP 6 <in>
+    0x44,0x4c, // POP_JUMP_IF_FALSE 12
+    0xb1, // LOAD_FAST 1
+    0x12,0x81,0x4f, // LOAD_GLOBAL 'charPointMap'
+    0xb0, // LOAD_FAST 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0x55, // LOAD_SUBSCR
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc1, // STORE_FAST 1
+    0x42,0x46, // JUMP 6
+    0xb1, // LOAD_FAST 1
+    0x12,0x81,0x50, // LOAD_GLOBAL 'defaultCharPointMap'
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc1, // STORE_FAST 1
+    0xb2, // LOAD_FAST 2
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x42,0x67, // JUMP 39
+    0x57, // DUP_TOP
+    0xc3, // STORE_FAST 3
+    0xb1, // LOAD_FAST 1
+    0x14,0x81,0x01, // LOAD_METHOD 'append'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0xb3, // LOAD_FAST 3
+    0x55, // LOAD_SUBSCR
+    0x12,0x81,0x4f, // LOAD_GLOBAL 'charPointMap'
+    0xdd, // BINARY_OP 6 <in>
+    0x44,0x4c, // POP_JUMP_IF_FALSE 12
+    0xb1, // LOAD_FAST 1
+    0x12,0x81,0x4f, // LOAD_GLOBAL 'charPointMap'
+    0xb0, // LOAD_FAST 0
+    0xb3, // LOAD_FAST 3
+    0x55, // LOAD_SUBSCR
+    0x55, // LOAD_SUBSCR
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc1, // STORE_FAST 1
+    0x42,0x46, // JUMP 6
+    0xb1, // LOAD_FAST 1
+    0x12,0x81,0x50, // LOAD_GLOBAL 'defaultCharPointMap'
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc1, // STORE_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x14, // POP_JUMP_IF_TRUE -44
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x12,0x81,0x00, // LOAD_GLOBAL 'uart_write'
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xb1, // LOAD_FAST 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x12,0x81,0x51, // LOAD_GLOBAL 'showIndex'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x17,0x81,0x51, // STORE_GLOBAL 'showIndex'
+    0x12,0x81,0x53, // LOAD_GLOBAL 'len'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_led_show_string_async = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_led_show_string_async,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 154,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 10,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 172,
+        .line_info = fun_data_.\control_board_v1_led_show_string_async + 6,
+        .opcodes = fun_data_.\control_board_v1_led_show_string_async + 23,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_read_volume
+static const byte fun_data_.\control_board_v1_read_volume[15] = {
+    0x10,0x08, // prelude
+    0x81,0x2d, // names: read_volume
+    0xa0,0x69, // code info
+    0x12,0x7f, // LOAD_GLOBAL 'uart_read'
+    0x92, // LOAD_CONST_SMALL_INT 18
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x34,0x02, // CALL_FUNCTION 2
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x55, // LOAD_SUBSCR
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_read_volume = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_read_volume,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 15,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 3,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 173,
+        .line_info = fun_data_.\control_board_v1_read_volume + 4,
+        .opcodes = fun_data_.\control_board_v1_read_volume + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_CheckForward
+static const byte fun_data_.\control_board_v1_CheckForward[58] = {
+    0xb9,0x04,0x1c, // prelude
+    0x81,0x2e,0x81,0x67,0x81,0x68,0x81,0x69,0x81,0x6a,0x81,0x6b, // names: CheckForward, acc, x_mid, y_mid, z_mid, margin
+    0xa0,0x6d, // code info
+    0x12,0x81,0x6c, // LOAD_GLOBAL 'abs'
+    0xb0, // LOAD_FAST 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb4, // LOAD_FAST 4
+    0xd7, // BINARY_OP 0 __lt__
+    0x46,0x1a, // JUMP_IF_FALSE_OR_POP 26
+    0x12,0x81,0x6c, // LOAD_GLOBAL 'abs'
+    0xb0, // LOAD_FAST 0
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0xb2, // LOAD_FAST 2
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb4, // LOAD_FAST 4
+    0xd7, // BINARY_OP 0 __lt__
+    0x46,0x0c, // JUMP_IF_FALSE_OR_POP 12
+    0x12,0x81,0x6c, // LOAD_GLOBAL 'abs'
+    0xb0, // LOAD_FAST 0
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0xb3, // LOAD_FAST 3
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0xb4, // LOAD_FAST 4
+    0xd7, // BINARY_OP 0 __lt__
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_CheckForward = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 5,
+    .fun_data = fun_data_.\control_board_v1_CheckForward,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 58,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 5,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 174,
+        .line_info = fun_data_.\control_board_v1_CheckForward + 15,
+        .opcodes = fun_data_.\control_board_v1_CheckForward + 17,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_IsForward
+static const byte fun_data_.\control_board_v1_IsForward[164] = {
+    0x21,0x28, // prelude
+    0x81,0x2f,0x81,0x6d, // names: IsForward, forward
+    0xa0,0x71,0x26,0x25,0x28,0x25,0x28,0x25,0x1f,0x25,0x25,0x1f,0x25,0x25,0x28,0x25, // code info
+    0x12,0x81,0x09, // LOAD_GLOBAL 'GetAccelerationRaw'
+    0x34,0x00, // CALL_FUNCTION 0
+    0xc1, // STORE_FAST 1
+    0xb0, // LOAD_FAST 0
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0x22,0xfa,0x44, // LOAD_CONST_SMALL_INT -700
+    0xd7, // BINARY_OP 0 __lt__
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0x22,0x85,0x3c, // LOAD_CONST_SMALL_INT 700
+    0xd8, // BINARY_OP 1 __gt__
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x64, // POP_JUMP_IF_FALSE 36
+    0xb1, // LOAD_FAST 1
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0x22,0xfa,0x44, // LOAD_CONST_SMALL_INT -700
+    0xd7, // BINARY_OP 0 __lt__
+    0x46,0x1a, // JUMP_IF_FALSE_OR_POP 26
+    0x12,0x81,0x6c, // LOAD_GLOBAL 'abs'
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0x22,0x82,0x2c, // LOAD_CONST_SMALL_INT 300
+    0xd7, // BINARY_OP 0 __lt__
+    0x46,0x0c, // JUMP_IF_FALSE_OR_POP 12
+    0x12,0x81,0x6c, // LOAD_GLOBAL 'abs'
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0x22,0x82,0x2c, // LOAD_CONST_SMALL_INT 300
+    0xd7, // BINARY_OP 0 __lt__
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x64, // POP_JUMP_IF_FALSE 36
+    0xb1, // LOAD_FAST 1
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x55, // LOAD_SUBSCR
+    0x22,0x85,0x3c, // LOAD_CONST_SMALL_INT 700
+    0xd8, // BINARY_OP 1 __gt__
+    0x46,0x1a, // JUMP_IF_FALSE_OR_POP 26
+    0x12,0x81,0x6c, // LOAD_GLOBAL 'abs'
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0x22,0x82,0x2c, // LOAD_CONST_SMALL_INT 300
+    0xd7, // BINARY_OP 0 __lt__
+    0x46,0x0c, // JUMP_IF_FALSE_OR_POP 12
+    0x12,0x81,0x6c, // LOAD_GLOBAL 'abs'
+    0xb1, // LOAD_FAST 1
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x55, // LOAD_SUBSCR
+    0x34,0x01, // CALL_FUNCTION 1
+    0x22,0x82,0x2c, // LOAD_CONST_SMALL_INT 300
+    0xd7, // BINARY_OP 0 __lt__
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0x22,0x85,0x3c, // LOAD_CONST_SMALL_INT 700
+    0xd8, // BINARY_OP 1 __gt__
+    0x63, // RETURN_VALUE
+    0xb0, // LOAD_FAST 0
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb1, // LOAD_FAST 1
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x55, // LOAD_SUBSCR
+    0x22,0xfa,0x44, // LOAD_CONST_SMALL_INT -700
+    0xd7, // BINARY_OP 0 __lt__
+    0x63, // RETURN_VALUE
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_IsForward = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\control_board_v1_IsForward,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 164,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 175,
+        .line_info = fun_data_.\control_board_v1_IsForward + 6,
+        .opcodes = fun_data_.\control_board_v1_IsForward + 22,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_voidCommand
+static const byte fun_data_.\control_board_v1_voidCommand[8] = {
+    0x00,0x08, // prelude
+    0x81,0x30, // names: voidCommand
+    0xa0,0x81, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_voidCommand = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_voidCommand,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 8,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 1,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 176,
+        .line_info = fun_data_.\control_board_v1_voidCommand + 4,
+        .opcodes = fun_data_.\control_board_v1_voidCommand + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\control_board_v1__lt_module_gt_
+// frozen bytecode for file .\control_board_v1.py, scope .\control_board_v1_version
+static const byte fun_data_.\control_board_v1_version[9] = {
+    0x00,0x08, // prelude
+    0x81,0x31, // names: version
+    0xa0,0x85, // code info
+    0x23,0x0a, // LOAD_CONST_OBJ 10
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\control_board_v1_version = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1_version,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 9,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 1,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 177,
+        .line_info = fun_data_.\control_board_v1_version + 4,
+        .opcodes = fun_data_.\control_board_v1_version + 6,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const mp_raw_code_t *const children_.\control_board_v1__lt_module_gt_[] = {
+    &raw_code_.\control_board_v1_calc_checksum,
+    &raw_code_.\control_board_v1_uart_read_buf,
+    &raw_code_.\control_board_v1_uart_read,
+    &raw_code_.\control_board_v1_uart_write,
+    &raw_code_.\control_board_v1_uart_write_buf,
+    &raw_code_.\control_board_v1_Clamp,
+    &raw_code_.\control_board_v1_average,
+    &raw_code_.\control_board_v1_GetSysTime,
+    &raw_code_.\control_board_v1_GetAccelerationRaw,
+    &raw_code_.\control_board_v1_GetAcceleration,
+    &raw_code_.\control_board_v1_ReadPin,
+    &raw_code_.\control_board_v1_WritePin,
+    &raw_code_.\control_board_v1_ReadAdc,
+    &raw_code_.\control_board_v1_WritePwm,
+    &raw_code_.\control_board_v1_UpdateButtonStatus,
+    &raw_code_.\control_board_v1_GetLastPinStatus,
+    &raw_code_.\control_board_v1_PlayRecordMission,
+    &raw_code_.\control_board_v1_PushPlayRecordMission,
+    &raw_code_.\control_board_v1_play_record_loop,
+    &raw_code_.\control_board_v1_playAsync,
+    &raw_code_.\control_board_v1_playUntilDone,
+    &raw_code_.\control_board_v1_play,
+    &raw_code_.\control_board_v1_recAsync,
+    &raw_code_.\control_board_v1_recUntilDone,
+    &raw_code_.\control_board_v1_stopRecord,
+    &raw_code_.\control_board_v1_rec,
+    &raw_code_.\control_board_v1_led_show_bytes_async,
+    &raw_code_.\control_board_v1_led_show_bytes,
+    &raw_code_.\control_board_v1_led_show_string,
+    &raw_code_.\control_board_v1_led_show_string_async,
+    &raw_code_.\control_board_v1_read_volume,
+    &raw_code_.\control_board_v1_CheckForward,
+    &raw_code_.\control_board_v1_IsForward,
+    &raw_code_.\control_board_v1_voidCommand,
+    &raw_code_.\control_board_v1_version,
+};
+
+static const mp_raw_code_t raw_code_.\control_board_v1__lt_module_gt_ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\control_board_v1__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 2642,
+    #endif
+    .children = (void *)&children_.\control_board_v1__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 35,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 10,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 1,
+        .line_info = fun_data_.\control_board_v1__lt_module_gt_ + 4,
+        .opcodes = fun_data_.\control_board_v1__lt_module_gt_ + 195,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const qstr_short_t const_qstr_table_data_.\control_board_v1[240] = {
+    MP_QSTR__dot__backslash_control_board_v1_dot_py,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_ADC,
+    MP_QSTR_machine,
+    MP_QSTR_PWM,
+    MP_QSTR_Pin,
+    MP_QSTR_SoftI2C,
+    MP_QSTR_gc,
+    MP_QSTR_time,
+    MP_QSTR_math,
+    MP_QSTR_os,
+    MP_QSTR_scl,
+    MP_QSTR_sda,
+    MP_QSTR_freq,
+    MP_QSTR_scan,
+    MP_QSTR_writeto_mem,
+    MP_QSTR_mode,
+    MP_QSTR_OUT,
+    MP_QSTR_value,
+    MP_QSTR_IN,
+    MP_QSTR_PULL_DOWN,
+    MP_QSTR_UART,
+    MP_QSTR_tx,
+    MP_QSTR_rx,
+    MP_QSTR_timeout,
+    MP_QSTR_PlayRecordMission,
+    MP_QSTR_test,
+    MP_QSTR_0,
+    MP_QSTR_1,
+    MP_QSTR_2,
+    MP_QSTR_3,
+    MP_QSTR_4,
+    MP_QSTR_5,
+    MP_QSTR_6,
+    MP_QSTR_7,
+    MP_QSTR_8,
+    MP_QSTR_9,
+    MP_QSTR_a,
+    MP_QSTR_b,
+    MP_QSTR_c,
+    MP_QSTR_d,
+    MP_QSTR_e,
+    MP_QSTR_f,
+    MP_QSTR_g,
+    MP_QSTR_h,
+    MP_QSTR_i,
+    MP_QSTR_j,
+    MP_QSTR_k,
+    MP_QSTR_l,
+    MP_QSTR_m,
+    MP_QSTR_n,
+    MP_QSTR_o,
+    MP_QSTR_p,
+    MP_QSTR_q,
+    MP_QSTR_r,
+    MP_QSTR_s,
+    MP_QSTR_t,
+    MP_QSTR_u,
+    MP_QSTR_v,
+    MP_QSTR_w,
+    MP_QSTR_x,
+    MP_QSTR_y,
+    MP_QSTR_z,
+    MP_QSTR_A,
+    MP_QSTR_B,
+    MP_QSTR_C,
+    MP_QSTR_D,
+    MP_QSTR_E,
+    MP_QSTR_F,
+    MP_QSTR_G,
+    MP_QSTR_H,
+    MP_QSTR_I,
+    MP_QSTR_J,
+    MP_QSTR_K,
+    MP_QSTR_L,
+    MP_QSTR_M,
+    MP_QSTR_N,
+    MP_QSTR_O,
+    MP_QSTR_P,
+    MP_QSTR_Q,
+    MP_QSTR_R,
+    MP_QSTR_S,
+    MP_QSTR_T,
+    MP_QSTR_U,
+    MP_QSTR_V,
+    MP_QSTR_W,
+    MP_QSTR_X,
+    MP_QSTR_Y,
+    MP_QSTR_Z,
+    MP_QSTR__0x60_,
+    MP_QSTR__tilde_,
+    MP_QSTR__bang_,
+    MP_QSTR__at_sign_,
+    MP_QSTR__hash_,
+    MP_QSTR__dollar_,
+    MP_QSTR__percent_,
+    MP_QSTR__caret_,
+    MP_QSTR__amp_,
+    MP_QSTR__paren_open_,
+    MP_QSTR__paren_close_,
+    MP_QSTR__,
+    MP_QSTR__equals_,
+    MP_QSTR__bracket_open_,
+    MP_QSTR__bracket_close_,
+    MP_QSTR__brace_open_,
+    MP_QSTR__brace_close_,
+    MP_QSTR__backslash_,
+    MP_QSTR__pipe_,
+    MP_QSTR__semicolon_,
+    MP_QSTR__colon_,
+    MP_QSTR__squot_,
+    MP_QSTR__quot_,
+    MP_QSTR__comma_,
+    MP_QSTR__dot_,
+    MP_QSTR__lt_,
+    MP_QSTR__gt_,
+    MP_QSTR__question_,
+    MP_QSTR__plus_,
+    MP_QSTR__hyphen_,
+    MP_QSTR__star_,
+    MP_QSTR__slash_,
+    MP_QSTR_calc_checksum,
+    MP_QSTR_uart_read_buf,
+    MP_QSTR_collect,
+    MP_QSTR_write,
+    MP_QSTR_readinto,
+    MP_QSTR_extend,
+    MP_QSTR_uart_read,
+    MP_QSTR_uart_write,
+    MP_QSTR_append,
+    MP_QSTR_read,
+    MP_QSTR_uart_write_buf,
+    MP_QSTR_sleep_ms,
+    MP_QSTR_Clamp,
+    MP_QSTR_average,
+    MP_QSTR_GetSysTime,
+    MP_QSTR_ticks_ms,
+    MP_QSTR_GetAccelerationRaw,
+    MP_QSTR_readfrom_mem,
+    MP_QSTR_GetAcceleration,
+    MP_QSTR_sqrt,
+    MP_QSTR_ReadPin,
+    MP_QSTR_WritePin,
+    MP_QSTR_ReadAdc,
+    MP_QSTR_atten,
+    MP_QSTR_ATTN_11DB,
+    MP_QSTR_read_u16,
+    MP_QSTR_WritePwm,
+    MP_QSTR_deinit,
+    MP_QSTR_duty,
+    MP_QSTR_UpdateButtonStatus,
+    MP_QSTR_GetLastPinStatus,
+    MP_QSTR_PushPlayRecordMission,
+    MP_QSTR_interrupt,
+    MP_QSTR_play_record_loop,
+    MP_QSTR_isFinish,
+    MP_QSTR_tickStep,
+    MP_QSTR_playAsync,
+    MP_QSTR_listdir,
+    MP_QSTR_playUntilDone,
+    MP_QSTR_play,
+    MP_QSTR_close,
+    MP_QSTR_recAsync,
+    MP_QSTR_recUntilDone,
+    MP_QSTR_stopRecord,
+    MP_QSTR_isRecord,
+    MP_QSTR_rec,
+    MP_QSTR_err1,
+    MP_QSTR_err2,
+    MP_QSTR_led_show_bytes_async,
+    MP_QSTR_led_show_bytes,
+    MP_QSTR_led_show_string,
+    MP_QSTR_led_show_string_async,
+    MP_QSTR_read_volume,
+    MP_QSTR_CheckForward,
+    MP_QSTR_IsForward,
+    MP_QSTR_voidCommand,
+    MP_QSTR_version,
+    MP_QSTR___init__,
+    MP_QSTR_fileName,
+    MP_QSTR_currentFileName,
+    MP_QSTR_recordSec,
+    MP_QSTR_step,
+    MP_QSTR_count,
+    MP_QSTR_read_len,
+    MP_QSTR_playing_buf,
+    MP_QSTR_file,
+    MP_QSTR_recordingBufCnt,
+    MP_QSTR_recordingUartReadLen,
+    MP_QSTR_byte_read,
+    MP_QSTR_uart_buf,
+    MP_QSTR_byte_to_write,
+    MP_QSTR_rec_buf,
+    MP_QSTR_already_write,
+    MP_QSTR___stop,
+    MP_QSTR___tickRecord,
+    MP_QSTR___tickPlay,
+    MP_QSTR_i2c,
+    MP_QSTR_addr,
+    MP_QSTR_pin_map,
+    MP_QSTR_uart,
+    MP_QSTR_pa_last_status,
+    MP_QSTR_pb_last_status,
+    MP_QSTR_pc_last_status,
+    MP_QSTR_nextMission,
+    MP_QSTR_currentMission,
+    MP_QSTR_bytearray,
+    MP_QSTR_charPointMap,
+    MP_QSTR_defaultCharPointMap,
+    MP_QSTR_showIndex,
+    MP_QSTR_data,
+    MP_QSTR_len,
+    MP_QSTR_print,
+    MP_QSTR_min_value,
+    MP_QSTR_max_value,
+    MP_QSTR_nums,
+    MP_QSTR_axial,
+    MP_QSTR_round,
+    MP_QSTR_pin_port,
+    MP_QSTR_str,
+    MP_QSTR___name__,
+    MP_QSTR___module__,
+    MP_QSTR___qualname__,
+    MP_QSTR_is_record,
+    MP_QSTR_file_name,
+    MP_QSTR_sec,
+    MP_QSTR_path,
+    MP_QSTR_open,
+    MP_QSTR_show_bytes,
+    MP_QSTR_show_string,
+    MP_QSTR_min,
+    MP_QSTR_acc,
+    MP_QSTR_x_mid,
+    MP_QSTR_y_mid,
+    MP_QSTR_z_mid,
+    MP_QSTR_margin,
+    MP_QSTR_abs,
+    MP_QSTR_forward,
+    MP_QSTR_self,
+    MP_QSTR_is_recording,
+};
+
+// constants
+static const mp_obj_str_t const_obj_.\control_board_v1_0 = {{&mp_type_bytes}, 97, 1, (const byte*)"\xc4"};
+static const mp_obj_str_t const_obj_.\control_board_v1_1 = {{&mp_type_bytes}, 130, 1, (const byte*)"\x27"};
+static const mp_obj_str_t const_obj_.\control_board_v1_2 = {{&mp_type_bytes}, 109, 3, (const byte*)"\x80\x00\x08"};
+static const mp_obj_str_t const_obj_.\control_board_v1_4 = {{&mp_type_bytes}, 165, 1, (const byte*)"\x00"};
+static const mp_obj_str_t const_obj_.\control_board_v1_5 = {{&mp_type_bytes}, 53, 1, (const byte*)"\x90"};
+static const mp_obj_str_t const_obj_.\control_board_v1_8 = {{&mp_type_bytes}, 92, 3, (const byte*)"\x80\x11\x08"};
+
+// constant table
+static const mp_rom_obj_t const_obj_table_data_.\control_board_v1[11] = {
+    MP_ROM_PTR(&const_obj_.\control_board_v1_0),
+    MP_ROM_PTR(&const_obj_.\control_board_v1_1),
+    MP_ROM_PTR(&const_obj_.\control_board_v1_2),
+    MP_ROM_QSTR(MP_QSTR_checksum_space_error),
+    MP_ROM_PTR(&const_obj_.\control_board_v1_4),
+    MP_ROM_PTR(&const_obj_.\control_board_v1_5),
+    MP_ROM_QSTR(MP_QSTR_write_space_error_colon__space_),
+    MP_ROM_QSTR(MP_QSTR_record_start_dot_dat),
+    MP_ROM_PTR(&const_obj_.\control_board_v1_8),
+    MP_ROM_QSTR(MP_QSTR_record_end_dot_dat),
+    MP_ROM_QSTR(MP_QSTR_v_2020_7_31),
+};
+
+static const mp_frozen_module_t frozen_module_.\control_board_v1 = {
+    .constants = {
+        .qstr_table = (qstr_short_t *)&const_qstr_table_data_.\control_board_v1,
+        .obj_table = (mp_obj_t *)&const_obj_table_data_.\control_board_v1,
+    },
+    .rc = &raw_code_.\control_board_v1__lt_module_gt_,
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// collection of all frozen modules
+
+const char mp_frozen_names[] = {
+    #ifdef MP_FROZEN_STR_NAMES
+    MP_FROZEN_STR_NAMES
+    #endif
+    ".\control_board_v1.py\0"
+    "\0"
+};
+
+const mp_frozen_module_t *const mp_frozen_mpy_content[] = {
+    &frozen_module_.\control_board_v1,
+};
+
+#ifdef MICROPY_FROZEN_LIST_ITEM
+MICROPY_FROZEN_LIST_ITEM(".\control_board_v1", ".\control_board_v1.py")
+#endif
+
+/*
+byte sizes:
+qstr content: 226 unique, 1926 bytes
+bc content: 6430
+const str content: 10
+const int content: 0
+const obj content: 96
+const table qstr content: 0 entries, 0 bytes
+const table ptr content: 11 entries, 44 bytes
+raw code content: 43 * 4 = 688
+mp_frozen_mpy_names_content: 23
+mp_frozen_mpy_content_size: 4
+total: 9221
+*/

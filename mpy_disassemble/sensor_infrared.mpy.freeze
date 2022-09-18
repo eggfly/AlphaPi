@@ -1,0 +1,345 @@
+#include "py/mpconfig.h"
+#include "py/objint.h"
+#include "py/objstr.h"
+#include "py/emitglue.h"
+#include "py/nativeglue.h"
+
+#if MICROPY_LONGINT_IMPL != 2
+#error "incompatible MICROPY_LONGINT_IMPL"
+#endif
+
+#if MPZ_DIG_SIZE != 16
+#error "incompatible MPZ_DIG_SIZE"
+#endif
+
+#if MICROPY_PY_BUILTINS_FLOAT
+typedef struct _mp_obj_float_t {
+    mp_obj_base_t base;
+    mp_float_t value;
+} mp_obj_float_t;
+#endif
+
+#if MICROPY_PY_BUILTINS_COMPLEX
+typedef struct _mp_obj_complex_t {
+    mp_obj_base_t base;
+    mp_float_t real;
+    mp_float_t imag;
+} mp_obj_complex_t;
+#endif
+
+enum {
+    MP_QSTR__0x0a_ = MP_QSTRnumber_of,
+    MP_QSTR__space_,
+    MP_QSTR__star_,
+    MP_QSTR__slash_,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_utf_hyphen_8,
+    MP_QSTR__dot__backslash_sensor_infrared_dot_py,
+    MP_QSTR_Pin,
+    MP_QSTR_machine,
+    MP_QSTR_pin_map,
+    MP_QSTR_control_board_v1,
+    MP_QSTR_read_infrared_sensor,
+    MP_QSTR_IN,
+    MP_QSTR_version,
+    MP_QSTR_pin_port,
+    MP_QSTR_v_2020_7_30,
+};
+
+const qstr_hash_t mp_qstr_frozen_const_hashes[] = {
+    175,
+    133,
+    143,
+    138,
+    189,
+    183,
+    120,
+    18,
+    96,
+    81,
+    95,
+    1,
+    34,
+    191,
+    180,
+    216,
+};
+
+const qstr_len_t mp_qstr_frozen_const_lengths[] = {
+    1,
+    1,
+    1,
+    1,
+    8,
+    5,
+    20,
+    3,
+    7,
+    7,
+    16,
+    20,
+    2,
+    7,
+    8,
+    11,
+};
+
+extern const qstr_pool_t mp_qstr_const_pool;
+const qstr_pool_t mp_qstr_frozen_const_pool = {
+    &mp_qstr_const_pool, // previous pool
+    MP_QSTRnumber_of, // previous pool size
+    10, // allocated entries
+    16, // used entries
+    (qstr_hash_t *)mp_qstr_frozen_const_hashes,
+    (qstr_len_t *)mp_qstr_frozen_const_lengths,
+    {
+        "\x0a",
+        " ",
+        "*",
+        "/",
+        "<module>",
+        "utf-8",
+        "\x2e\x5c\x73\x65\x6e\x73\x6f\x72\x5f\x69\x6e\x66\x72\x61\x72\x65\x64\x2e\x70\x79",
+        "Pin",
+        "machine",
+        "pin_map",
+        "control_board_v1",
+        "read_infrared_sensor",
+        "IN",
+        "version",
+        "pin_port",
+        "v_2020_7_30",
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// frozen module .\sensor_infrared
+// - original source file: ./rootfs/sensor_infrared.mpy
+// - frozen file name: .\sensor_infrared.py
+// - .mpy header: 4d:06:00:1f
+
+// frozen bytecode for file .\sensor_infrared.py, scope .\sensor_infrared__lt_module_gt_
+static const byte fun_data_.\sensor_infrared__lt_module_gt_[41] = {
+    0x08,0x0a, // prelude
+    0x01, // names: <module>
+    0x2c,0x6c,0x64,0x40, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x10,0x02, // LOAD_CONST_STRING 'Pin'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x1b,0x03, // IMPORT_NAME 'machine'
+    0x1c,0x02, // IMPORT_FROM 'Pin'
+    0x16,0x02, // STORE_NAME 'Pin'
+    0x59, // POP_TOP
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x10,0x04, // LOAD_CONST_STRING 'pin_map'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x1b,0x05, // IMPORT_NAME 'control_board_v1'
+    0x1c,0x04, // IMPORT_FROM 'pin_map'
+    0x16,0x04, // STORE_NAME 'pin_map'
+    0x59, // POP_TOP
+    0x32,0x00, // MAKE_FUNCTION 0
+    0x16,0x06, // STORE_NAME 'read_infrared_sensor'
+    0x32,0x01, // MAKE_FUNCTION 1
+    0x16,0x09, // STORE_NAME 'version'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+// child of .\sensor_infrared__lt_module_gt_
+// frozen bytecode for file .\sensor_infrared.py, scope .\sensor_infrared_read_infrared_sensor
+static const byte fun_data_.\sensor_infrared_read_infrared_sensor[29] = {
+    0x19,0x0a, // prelude
+    0x06,0x0a, // names: read_infrared_sensor, pin_port
+    0x60,0x40,0x2d, // code info
+    0x12,0x02, // LOAD_GLOBAL 'Pin'
+    0xb0, // LOAD_FAST 0
+    0x12,0x02, // LOAD_GLOBAL 'Pin'
+    0x13,0x07, // LOAD_ATTR 'IN'
+    0x34,0x02, // CALL_FUNCTION 2
+    0x12,0x04, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x56, // STORE_SUBSCR
+    0x12,0x04, // LOAD_GLOBAL 'pin_map'
+    0xb0, // LOAD_FAST 0
+    0x55, // LOAD_SUBSCR
+    0x14,0x08, // LOAD_METHOD 'value'
+    0x36,0x00, // CALL_METHOD 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\sensor_infrared_read_infrared_sensor = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\sensor_infrared_read_infrared_sensor,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 29,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 6,
+        .line_info = fun_data_.\sensor_infrared_read_infrared_sensor + 4,
+        .opcodes = fun_data_.\sensor_infrared_read_infrared_sensor + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\sensor_infrared__lt_module_gt_
+// frozen bytecode for file .\sensor_infrared.py, scope .\sensor_infrared_version
+static const byte fun_data_.\sensor_infrared_version[8] = {
+    0x00,0x06, // prelude
+    0x09, // names: version
+    0x80,0x0a, // code info
+    0x23,0x00, // LOAD_CONST_OBJ 0
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\sensor_infrared_version = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\sensor_infrared_version,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 8,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 1,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 9,
+        .line_info = fun_data_.\sensor_infrared_version + 3,
+        .opcodes = fun_data_.\sensor_infrared_version + 5,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const mp_raw_code_t *const children_.\sensor_infrared__lt_module_gt_[] = {
+    &raw_code_.\sensor_infrared_read_infrared_sensor,
+    &raw_code_.\sensor_infrared_version,
+};
+
+static const mp_raw_code_t raw_code_.\sensor_infrared__lt_module_gt_ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\sensor_infrared__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 41,
+    #endif
+    .children = (void *)&children_.\sensor_infrared__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 2,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 2,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 1,
+        .line_info = fun_data_.\sensor_infrared__lt_module_gt_ + 3,
+        .opcodes = fun_data_.\sensor_infrared__lt_module_gt_ + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const qstr_short_t const_qstr_table_data_.\sensor_infrared[11] = {
+    MP_QSTR__dot__backslash_sensor_infrared_dot_py,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_Pin,
+    MP_QSTR_machine,
+    MP_QSTR_pin_map,
+    MP_QSTR_control_board_v1,
+    MP_QSTR_read_infrared_sensor,
+    MP_QSTR_IN,
+    MP_QSTR_value,
+    MP_QSTR_version,
+    MP_QSTR_pin_port,
+};
+
+// constants
+
+// constant table
+static const mp_rom_obj_t const_obj_table_data_.\sensor_infrared[1] = {
+    MP_ROM_QSTR(MP_QSTR_v_2020_7_30),
+};
+
+static const mp_frozen_module_t frozen_module_.\sensor_infrared = {
+    .constants = {
+        .qstr_table = (qstr_short_t *)&const_qstr_table_data_.\sensor_infrared,
+        .obj_table = (mp_obj_t *)&const_obj_table_data_.\sensor_infrared,
+    },
+    .rc = &raw_code_.\sensor_infrared__lt_module_gt_,
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// collection of all frozen modules
+
+const char mp_frozen_names[] = {
+    #ifdef MP_FROZEN_STR_NAMES
+    MP_FROZEN_STR_NAMES
+    #endif
+    ".\sensor_infrared.py\0"
+    "\0"
+};
+
+const mp_frozen_module_t *const mp_frozen_mpy_content[] = {
+    &frozen_module_.\sensor_infrared,
+};
+
+#ifdef MICROPY_FROZEN_LIST_ITEM
+MICROPY_FROZEN_LIST_ITEM(".\sensor_infrared", ".\sensor_infrared.py")
+#endif
+
+/*
+byte sizes:
+qstr content: 16 unique, 166 bytes
+bc content: 78
+const str content: 0
+const int content: 0
+const obj content: 0
+const table qstr content: 0 entries, 0 bytes
+const table ptr content: 1 entries, 4 bytes
+raw code content: 3 * 4 = 48
+mp_frozen_mpy_names_content: 22
+mp_frozen_mpy_content_size: 4
+total: 322
+*/

@@ -1,0 +1,2229 @@
+#include "py/mpconfig.h"
+#include "py/objint.h"
+#include "py/objstr.h"
+#include "py/emitglue.h"
+#include "py/nativeglue.h"
+
+#if MICROPY_LONGINT_IMPL != 2
+#error "incompatible MICROPY_LONGINT_IMPL"
+#endif
+
+#if MPZ_DIG_SIZE != 16
+#error "incompatible MPZ_DIG_SIZE"
+#endif
+
+#if MICROPY_PY_BUILTINS_FLOAT
+typedef struct _mp_obj_float_t {
+    mp_obj_base_t base;
+    mp_float_t value;
+} mp_obj_float_t;
+#endif
+
+#if MICROPY_PY_BUILTINS_COMPLEX
+typedef struct _mp_obj_complex_t {
+    mp_obj_base_t base;
+    mp_float_t real;
+    mp_float_t imag;
+} mp_obj_complex_t;
+#endif
+
+enum {
+    MP_QSTR__0x0a_ = MP_QSTRnumber_of,
+    MP_QSTR__space_,
+    MP_QSTR__star_,
+    MP_QSTR__slash_,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_utf_hyphen_8,
+    MP_QSTR__dot__backslash_actuator_led_dot_py,
+    MP_QSTR_neopixel,
+    MP_QSTR_machine,
+    MP_QSTR_DataStruct,
+    MP_QSTR_basic,
+    MP_QSTR_InitNP,
+    MP_QSTR_NeoPixel,
+    MP_QSTR_Pin,
+    MP_QSTR_n,
+    MP_QSTR_BrightnessUp,
+    MP_QSTR_IntValue,
+    MP_QSTR_SetBrightness,
+    MP_QSTR_UpdateBrightness,
+    MP_QSTR_GetBrightness,
+    MP_QSTR_ShowRainbow,
+    MP_QSTR_setPixelColorWithoutWrightRGBOne,
+    MP_QSTR_setPixelColorWithoutWright,
+    MP_QSTR_setPixelColor,
+    MP_QSTR_pixelMove,
+    MP_QSTR_pixelShowU,
+    MP_QSTR_clamp,
+    MP_QSTR_hsl,
+    MP_QSTR_packRGB,
+    MP_QSTR_packRGBd,
+    MP_QSTR_unpackR,
+    MP_QSTR_unpackG,
+    MP_QSTR_unpackB,
+    MP_QSTR_version,
+    MP_QSTR_brightness,
+    MP_QSTR_np,
+    MP_QSTR_rawRGB,
+    MP_QSTR_pin_port,
+    MP_QSTR_br_d,
+    MP_QSTR_rgb,
+    MP_QSTR_r,
+    MP_QSTR_g,
+    MP_QSTR_b,
+    MP_QSTR_index_d,
+    MP_QSTR_rgb_d,
+    MP_QSTR_step_d,
+    MP_QSTR_towards,
+    MP_QSTR_value_d,
+    MP_QSTR_max_value_d,
+    MP_QSTR_minValue,
+    MP_QSTR_maxValue,
+    MP_QSTR_h,
+    MP_QSTR_s,
+    MP_QSTR_l,
+    MP_QSTR_r_d,
+    MP_QSTR_g_d,
+    MP_QSTR_b_d,
+    MP_QSTR_v_2020_7_30,
+};
+
+const qstr_hash_t mp_qstr_frozen_const_hashes[] = {
+    175,
+    133,
+    143,
+    138,
+    189,
+    183,
+    9,
+    105,
+    96,
+    2,
+    31,
+    225,
+    105,
+    18,
+    203,
+    105,
+    61,
+    238,
+    253,
+    250,
+    168,
+    90,
+    201,
+    242,
+    156,
+    59,
+    246,
+    178,
+    203,
+    79,
+    181,
+    160,
+    165,
+    191,
+    76,
+    91,
+    54,
+    180,
+    14,
+    178,
+    215,
+    194,
+    199,
+    96,
+    41,
+    12,
+    205,
+    21,
+    62,
+    68,
+    26,
+    205,
+    214,
+    201,
+    140,
+    153,
+    156,
+    216,
+};
+
+const qstr_len_t mp_qstr_frozen_const_lengths[] = {
+    1,
+    1,
+    1,
+    1,
+    8,
+    5,
+    17,
+    8,
+    7,
+    10,
+    5,
+    6,
+    8,
+    3,
+    1,
+    12,
+    8,
+    13,
+    16,
+    13,
+    11,
+    32,
+    26,
+    13,
+    9,
+    10,
+    5,
+    3,
+    7,
+    8,
+    7,
+    7,
+    7,
+    7,
+    10,
+    2,
+    6,
+    8,
+    4,
+    3,
+    1,
+    1,
+    1,
+    7,
+    5,
+    6,
+    7,
+    7,
+    11,
+    8,
+    8,
+    1,
+    1,
+    1,
+    3,
+    3,
+    3,
+    11,
+};
+
+extern const qstr_pool_t mp_qstr_const_pool;
+const qstr_pool_t mp_qstr_frozen_const_pool = {
+    &mp_qstr_const_pool, // previous pool
+    MP_QSTRnumber_of, // previous pool size
+    10, // allocated entries
+    58, // used entries
+    (qstr_hash_t *)mp_qstr_frozen_const_hashes,
+    (qstr_len_t *)mp_qstr_frozen_const_lengths,
+    {
+        "\x0a",
+        " ",
+        "*",
+        "/",
+        "<module>",
+        "utf-8",
+        "\x2e\x5c\x61\x63\x74\x75\x61\x74\x6f\x72\x5f\x6c\x65\x64\x2e\x70\x79",
+        "neopixel",
+        "machine",
+        "DataStruct",
+        "basic",
+        "InitNP",
+        "NeoPixel",
+        "Pin",
+        "n",
+        "BrightnessUp",
+        "IntValue",
+        "SetBrightness",
+        "UpdateBrightness",
+        "GetBrightness",
+        "ShowRainbow",
+        "setPixelColorWithoutWrightRGBOne",
+        "setPixelColorWithoutWright",
+        "setPixelColor",
+        "pixelMove",
+        "pixelShowU",
+        "clamp",
+        "hsl",
+        "packRGB",
+        "packRGBd",
+        "unpackR",
+        "unpackG",
+        "unpackB",
+        "version",
+        "brightness",
+        "np",
+        "rawRGB",
+        "pin_port",
+        "br_d",
+        "rgb",
+        "r",
+        "g",
+        "b",
+        "index_d",
+        "rgb_d",
+        "step_d",
+        "towards",
+        "value_d",
+        "max_value_d",
+        "minValue",
+        "maxValue",
+        "h",
+        "s",
+        "l",
+        "r_d",
+        "g_d",
+        "b_d",
+        "v_2020_7_30",
+    },
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// frozen module .\actuator_led
+// - original source file: ./rootfs/actuator_led.mpy
+// - frozen file name: .\actuator_led.py
+// - .mpy header: 4d:06:00:1f
+
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led__lt_module_gt_
+static const byte fun_data_.\actuator_led__lt_module_gt_[157] = {
+    0x08,0x56, // prelude
+    0x01, // names: <module>
+    0x26,0x26,0x4c,0x23,0x23,0x64,0x84,0x0a,0x84,0x08,0x84,0x07,0x84,0x0d,0x64,0x20,0x84,0x21,0x84,0x07,0x84,0x10,0x84,0x0b,0x84,0x16,0x84,0x18,0x84,0x08,0x84,0x2e,0x64,0x20,0x84,0x07,0x64,0x40,0x64,0x40,0x64,0x40, // code info
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x02, // IMPORT_NAME 'neopixel'
+    0x16,0x02, // STORE_NAME 'neopixel'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x51, // LOAD_CONST_NONE
+    0x1b,0x03, // IMPORT_NAME 'machine'
+    0x16,0x03, // STORE_NAME 'machine'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x10,0x04, // LOAD_CONST_STRING 'DataStruct'
+    0x2a,0x01, // BUILD_TUPLE 1
+    0x1b,0x05, // IMPORT_NAME 'basic'
+    0x1c,0x04, // IMPORT_FROM 'DataStruct'
+    0x16,0x04, // STORE_NAME 'DataStruct'
+    0x59, // POP_TOP
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x17,0x21, // STORE_GLOBAL 'brightness'
+    0x51, // LOAD_CONST_NONE
+    0x17,0x22, // STORE_GLOBAL 'np'
+    0x2b,0x00, // BUILD_LIST 0
+    0x16,0x23, // STORE_NAME 'rawRGB'
+    0x32,0x00, // MAKE_FUNCTION 0
+    0x16,0x06, // STORE_NAME 'InitNP'
+    0x32,0x01, // MAKE_FUNCTION 1
+    0x16,0x0d, // STORE_NAME 'BrightnessUp'
+    0x32,0x02, // MAKE_FUNCTION 2
+    0x16,0x0f, // STORE_NAME 'SetBrightness'
+    0x32,0x03, // MAKE_FUNCTION 3
+    0x16,0x10, // STORE_NAME 'UpdateBrightness'
+    0x32,0x04, // MAKE_FUNCTION 4
+    0x16,0x11, // STORE_NAME 'GetBrightness'
+    0x32,0x05, // MAKE_FUNCTION 5
+    0x16,0x12, // STORE_NAME 'ShowRainbow'
+    0x32,0x06, // MAKE_FUNCTION 6
+    0x16,0x13, // STORE_NAME 'setPixelColorWithoutWrightRGBOne'
+    0x32,0x07, // MAKE_FUNCTION 7
+    0x16,0x14, // STORE_NAME 'setPixelColorWithoutWright'
+    0x32,0x08, // MAKE_FUNCTION 8
+    0x16,0x15, // STORE_NAME 'setPixelColor'
+    0x32,0x09, // MAKE_FUNCTION 9
+    0x16,0x16, // STORE_NAME 'pixelMove'
+    0x32,0x0a, // MAKE_FUNCTION 10
+    0x16,0x18, // STORE_NAME 'pixelShowU'
+    0x32,0x0b, // MAKE_FUNCTION 11
+    0x16,0x19, // STORE_NAME 'clamp'
+    0x32,0x0c, // MAKE_FUNCTION 12
+    0x16,0x1a, // STORE_NAME 'hsl'
+    0x32,0x0d, // MAKE_FUNCTION 13
+    0x16,0x1b, // STORE_NAME 'packRGB'
+    0x32,0x0e, // MAKE_FUNCTION 14
+    0x16,0x1c, // STORE_NAME 'packRGBd'
+    0x32,0x0f, // MAKE_FUNCTION 15
+    0x16,0x1d, // STORE_NAME 'unpackR'
+    0x32,0x10, // MAKE_FUNCTION 16
+    0x16,0x1e, // STORE_NAME 'unpackG'
+    0x32,0x11, // MAKE_FUNCTION 17
+    0x16,0x1f, // STORE_NAME 'unpackB'
+    0x32,0x12, // MAKE_FUNCTION 18
+    0x16,0x20, // STORE_NAME 'version'
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_InitNP
+static const byte fun_data_.\actuator_led_InitNP[78] = {
+    0x39,0x14, // prelude
+    0x06,0x24, // names: InitNP, pin_port
+    0x80,0x0a,0x20,0x30,0x27,0x29,0x2a,0x2f, // code info
+    0x12,0x02, // LOAD_GLOBAL 'neopixel'
+    0x14,0x07, // LOAD_METHOD 'NeoPixel'
+    0x12,0x03, // LOAD_GLOBAL 'machine'
+    0x14,0x08, // LOAD_METHOD 'Pin'
+    0xb0, // LOAD_FAST 0
+    0x36,0x01, // CALL_METHOD 1
+    0x8e, // LOAD_CONST_SMALL_INT 14
+    0x36,0x02, // CALL_METHOD 2
+    0x17,0x22, // STORE_GLOBAL 'np'
+    0x12,0x23, // LOAD_GLOBAL 'rawRGB'
+    0x14,0x09, // LOAD_METHOD 'clear'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x54, // JUMP 20
+    0x57, // DUP_TOP
+    0xc1, // STORE_FAST 1
+    0x12,0x23, // LOAD_GLOBAL 'rawRGB'
+    0x14,0x0b, // LOAD_METHOD 'insert'
+    0xb1, // LOAD_FAST 1
+    0x23,0x00, // LOAD_CONST_OBJ 0
+    0x36,0x02, // CALL_METHOD 2
+    0x59, // POP_TOP
+    0x23,0x00, // LOAD_CONST_OBJ 0
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0xb1, // LOAD_FAST 1
+    0x56, // STORE_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x27, // POP_JUMP_IF_TRUE -25
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x14,0x0c, // LOAD_METHOD 'write'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_InitNP = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\actuator_led_InitNP,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 78,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 8,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 6,
+        .line_info = fun_data_.\actuator_led_InitNP + 4,
+        .opcodes = fun_data_.\actuator_led_InitNP + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_BrightnessUp
+static const byte fun_data_.\actuator_led_BrightnessUp[41] = {
+    0x29,0x10, // prelude
+    0x0d,0x25, // names: BrightnessUp, br_d
+    0x80,0x14,0x26,0x20,0x26,0x2c, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc1, // STORE_FAST 1
+    0x12,0x21, // LOAD_GLOBAL 'brightness'
+    0xb1, // LOAD_FAST 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x17,0x21, // STORE_GLOBAL 'brightness'
+    0x12,0x19, // LOAD_GLOBAL 'clamp'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0x12,0x21, // LOAD_GLOBAL 'brightness'
+    0x34,0x03, // CALL_FUNCTION 3
+    0x17,0x21, // STORE_GLOBAL 'brightness'
+    0x12,0x10, // LOAD_GLOBAL 'UpdateBrightness'
+    0x34,0x00, // CALL_FUNCTION 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_BrightnessUp = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\actuator_led_BrightnessUp,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 41,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 13,
+        .line_info = fun_data_.\actuator_led_BrightnessUp + 4,
+        .opcodes = fun_data_.\actuator_led_BrightnessUp + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_SetBrightness
+static const byte fun_data_.\actuator_led_SetBrightness[33] = {
+    0x29,0x0e, // prelude
+    0x0f,0x25, // names: SetBrightness, br_d
+    0x80,0x1c,0x26,0x20,0x2b, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc1, // STORE_FAST 1
+    0x12,0x19, // LOAD_GLOBAL 'clamp'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xb1, // LOAD_FAST 1
+    0x34,0x03, // CALL_FUNCTION 3
+    0x17,0x21, // STORE_GLOBAL 'brightness'
+    0x12,0x10, // LOAD_GLOBAL 'UpdateBrightness'
+    0x34,0x00, // CALL_FUNCTION 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_SetBrightness = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\actuator_led_SetBrightness,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 33,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 15,
+        .line_info = fun_data_.\actuator_led_SetBrightness + 4,
+        .opcodes = fun_data_.\actuator_led_SetBrightness + 9,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_UpdateBrightness
+static const byte fun_data_.\actuator_led_UpdateBrightness[88] = {
+    0x48,0x18, // prelude
+    0x10, // names: UpdateBrightness
+    0x80,0x23,0x20,0x2b,0x20,0x29,0x29,0x26,0x26,0x26,0x32, // code info
+    0x12,0x21, // LOAD_GLOBAL 'brightness'
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xf4, // BINARY_OP 29 __mul__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xc0, // STORE_FAST 0
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x68, // JUMP 40
+    0x57, // DUP_TOP
+    0xc1, // STORE_FAST 1
+    0x12,0x23, // LOAD_GLOBAL 'rawRGB'
+    0xb1, // LOAD_FAST 1
+    0x55, // LOAD_SUBSCR
+    0x30,0x03, // UNPACK_SEQUENCE 3
+    0xc2, // STORE_FAST 2
+    0xc3, // STORE_FAST 3
+    0xc4, // STORE_FAST 4
+    0xb2, // LOAD_FAST 2
+    0xb0, // LOAD_FAST 0
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc2, // STORE_FAST 2
+    0xb3, // LOAD_FAST 3
+    0xb0, // LOAD_FAST 0
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc3, // STORE_FAST 3
+    0xb4, // LOAD_FAST 4
+    0xb0, // LOAD_FAST 0
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc4, // STORE_FAST 4
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0xb4, // LOAD_FAST 4
+    0x2a,0x03, // BUILD_TUPLE 3
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0xb1, // LOAD_FAST 1
+    0x56, // STORE_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x13, // POP_JUMP_IF_TRUE -45
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x14,0x0c, // LOAD_METHOD 'write'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_UpdateBrightness = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\actuator_led_UpdateBrightness,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 88,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 10,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 16,
+        .line_info = fun_data_.\actuator_led_UpdateBrightness + 3,
+        .opcodes = fun_data_.\actuator_led_UpdateBrightness + 14,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_GetBrightness
+static const byte fun_data_.\actuator_led_GetBrightness[8] = {
+    0x00,0x06, // prelude
+    0x11, // names: GetBrightness
+    0x80,0x30, // code info
+    0x12,0x21, // LOAD_GLOBAL 'brightness'
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_GetBrightness = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\actuator_led_GetBrightness,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 8,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 1,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 17,
+        .line_info = fun_data_.\actuator_led_GetBrightness + 3,
+        .opcodes = fun_data_.\actuator_led_GetBrightness + 5,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_ShowRainbow
+static const byte fun_data_.\actuator_led_ShowRainbow[250] = {
+    0xf0,0x10,0x40, // prelude
+    0x12, // names: ShowRainbow
+    0x80,0x34,0x20,0x25,0x25,0x22,0x22,0x24,0x2c,0x28,0x22,0x26,0x24,0x24,0x24,0x24,0x24,0x26,0x23,0x23,0x23,0x25,0x26,0x27,0x2d,0x2a,0x30,0x2c,0x2e,0x3b,0x2f, // code info
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0xc0, // STORE_FAST 0
+    0xb0, // LOAD_FAST 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xda, // BINARY_OP 3 __le__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xc1, // STORE_FAST 1
+    0x22,0x82,0x68, // LOAD_CONST_SMALL_INT 360
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x22,0x82,0x68, // LOAD_CONST_SMALL_INT 360
+    0xf2, // BINARY_OP 27 __add__
+    0xb1, // LOAD_FAST 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x22,0x82,0x68, // LOAD_CONST_SMALL_INT 360
+    0xf8, // BINARY_OP 33 __mod__
+    0xc3, // STORE_FAST 3
+    0xb3, // LOAD_FAST 3
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf4, // BINARY_OP 29 __mul__
+    0xb0, // LOAD_FAST 0
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xc4, // STORE_FAST 4
+    0xb4, // LOAD_FAST 4
+    0xc5, // STORE_FAST 5
+    0xb1, // LOAD_FAST 1
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf4, // BINARY_OP 29 __mul__
+    0xc6, // STORE_FAST 6
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xc7, // STORE_FAST 7
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xc8, // STORE_FAST 8
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xc9, // STORE_FAST 9
+    0xb9, // LOAD_FAST 9
+    0xb8, // LOAD_FAST 8
+    0xf3, // BINARY_OP 28 __sub__
+    0xca, // STORE_FAST 10
+    0xba, // LOAD_FAST 10
+    0xb0, // LOAD_FAST 0
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xcb, // STORE_FAST 11
+    0xb8, // LOAD_FAST 8
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf4, // BINARY_OP 29 __mul__
+    0xcc, // STORE_FAST 12
+    0x22,0x32, // LOAD_CONST_SMALL_INT 50
+    0xcd, // STORE_FAST 13
+    0x22,0x32, // LOAD_CONST_SMALL_INT 50
+    0xce, // STORE_FAST 14
+    0x22,0x32, // LOAD_CONST_SMALL_INT 50
+    0xcf, // STORE_FAST 15
+    0xbf, // LOAD_FAST 15
+    0xbe, // LOAD_FAST 14
+    0xf3, // BINARY_OP 28 __sub__
+    0x26,0x10, // STORE_FAST_N 16
+    0x24,0x10, // LOAD_FAST_N 16
+    0xb0, // LOAD_FAST 0
+    0xf6, // BINARY_OP 31 __floordiv__
+    0x26,0x11, // STORE_FAST_N 17
+    0xbe, // LOAD_FAST 14
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf4, // BINARY_OP 29 __mul__
+    0x26,0x12, // STORE_FAST_N 18
+    0x12,0x13, // LOAD_GLOBAL 'setPixelColorWithoutWrightRGBOne'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x12,0x1a, // LOAD_GLOBAL 'hsl'
+    0xb1, // LOAD_FAST 1
+    0xb7, // LOAD_FAST 7
+    0xbd, // LOAD_FAST 13
+    0x34,0x03, // CALL_FUNCTION 3
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0xb0, // LOAD_FAST 0
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x42,0xc0,0x80, // JUMP 64
+    0x57, // DUP_TOP
+    0x26,0x13, // STORE_FAST_N 19
+    0xb6, // LOAD_FAST 6
+    0x24,0x13, // LOAD_FAST_N 19
+    0xb5, // LOAD_FAST 5
+    0xf4, // BINARY_OP 29 __mul__
+    0xf2, // BINARY_OP 27 __add__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf6, // BINARY_OP 31 __floordiv__
+    0x22,0x82,0x68, // LOAD_CONST_SMALL_INT 360
+    0xf2, // BINARY_OP 27 __add__
+    0x26,0x14, // STORE_FAST_N 20
+    0xbc, // LOAD_FAST 12
+    0x24,0x13, // LOAD_FAST_N 19
+    0xbb, // LOAD_FAST 11
+    0xf4, // BINARY_OP 29 __mul__
+    0xf2, // BINARY_OP 27 __add__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf6, // BINARY_OP 31 __floordiv__
+    0x26,0x15, // STORE_FAST_N 21
+    0x24,0x12, // LOAD_FAST_N 18
+    0x24,0x13, // LOAD_FAST_N 19
+    0x24,0x11, // LOAD_FAST_N 17
+    0xf4, // BINARY_OP 29 __mul__
+    0xf2, // BINARY_OP 27 __add__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf6, // BINARY_OP 31 __floordiv__
+    0x26,0x16, // STORE_FAST_N 22
+    0x12,0x13, // LOAD_GLOBAL 'setPixelColorWithoutWrightRGBOne'
+    0x24,0x13, // LOAD_FAST_N 19
+    0x12,0x1a, // LOAD_GLOBAL 'hsl'
+    0x24,0x14, // LOAD_FAST_N 20
+    0x24,0x15, // LOAD_FAST_N 21
+    0x24,0x16, // LOAD_FAST_N 22
+    0x34,0x03, // CALL_FUNCTION 3
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0xba,0x7f, // POP_JUMP_IF_TRUE -70
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x12,0x13, // LOAD_GLOBAL 'setPixelColorWithoutWrightRGBOne'
+    0xb0, // LOAD_FAST 0
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xf3, // BINARY_OP 28 __sub__
+    0x12,0x1a, // LOAD_GLOBAL 'hsl'
+    0xb2, // LOAD_FAST 2
+    0xb7, // LOAD_FAST 7
+    0xbd, // LOAD_FAST 13
+    0x34,0x03, // CALL_FUNCTION 3
+    0x34,0x02, // CALL_FUNCTION 2
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x14,0x0c, // LOAD_METHOD 'write'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_ShowRainbow = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\actuator_led_ShowRainbow,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 250,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 31,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 18,
+        .line_info = fun_data_.\actuator_led_ShowRainbow + 4,
+        .opcodes = fun_data_.\actuator_led_ShowRainbow + 35,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_setPixelColorWithoutWrightRGBOne
+static const byte fun_data_.\actuator_led_setPixelColorWithoutWrightRGBOne[39] = {
+    0x4a,0x10, // prelude
+    0x13,0x26,0x27, // names: setPixelColorWithoutWrightRGBOne, index, rgb
+    0x80,0x55,0x26,0x26,0x26, // code info
+    0x12,0x1d, // LOAD_GLOBAL 'unpackR'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0x12,0x1e, // LOAD_GLOBAL 'unpackG'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc3, // STORE_FAST 3
+    0x12,0x1f, // LOAD_GLOBAL 'unpackB'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc4, // STORE_FAST 4
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0xb0, // LOAD_FAST 0
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0xb4, // LOAD_FAST 4
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_setPixelColorWithoutWrightRGBOne = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\actuator_led_setPixelColorWithoutWrightRGBOne,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 39,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 10,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 19,
+        .line_info = fun_data_.\actuator_led_setPixelColorWithoutWrightRGBOne + 5,
+        .opcodes = fun_data_.\actuator_led_setPixelColorWithoutWrightRGBOne + 10,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_setPixelColorWithoutWright
+static const byte fun_data_.\actuator_led_setPixelColorWithoutWright[116] = {
+    0xe8,0x04,0x24, // prelude
+    0x14,0x26,0x28,0x29,0x2a, // names: setPixelColorWithoutWright, index, r, g, b
+    0x80,0x5c,0x20,0x20,0x2b,0x26,0x26,0x26,0x28,0x29,0x29,0x54,0x29, // code info
+    0x12,0x21, // LOAD_GLOBAL 'brightness'
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xf4, // BINARY_OP 29 __mul__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xc4, // STORE_FAST 4
+    0xb1, // LOAD_FAST 1
+    0xb4, // LOAD_FAST 4
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc5, // STORE_FAST 5
+    0xb2, // LOAD_FAST 2
+    0xb4, // LOAD_FAST 4
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc6, // STORE_FAST 6
+    0xb3, // LOAD_FAST 3
+    0xb4, // LOAD_FAST 4
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc7, // STORE_FAST 7
+    0xb0, // LOAD_FAST 0
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0xdb, // BINARY_OP 4 __ge__
+    0x44,0x66, // POP_JUMP_IF_FALSE 38
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x56, // JUMP 22
+    0x57, // DUP_TOP
+    0xc8, // STORE_FAST 8
+    0xb5, // LOAD_FAST 5
+    0xb6, // LOAD_FAST 6
+    0xb7, // LOAD_FAST 7
+    0x2a,0x03, // BUILD_TUPLE 3
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0xb8, // LOAD_FAST 8
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0x2a,0x03, // BUILD_TUPLE 3
+    0x12,0x23, // LOAD_GLOBAL 'rawRGB'
+    0xb8, // LOAD_FAST 8
+    0x56, // STORE_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x25, // POP_JUMP_IF_TRUE -27
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x42,0x52, // JUMP 18
+    0xb5, // LOAD_FAST 5
+    0xb6, // LOAD_FAST 6
+    0xb7, // LOAD_FAST 7
+    0x2a,0x03, // BUILD_TUPLE 3
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0xb0, // LOAD_FAST 0
+    0x56, // STORE_SUBSCR
+    0xb1, // LOAD_FAST 1
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0x2a,0x03, // BUILD_TUPLE 3
+    0x12,0x23, // LOAD_GLOBAL 'rawRGB'
+    0xb0, // LOAD_FAST 0
+    0x56, // STORE_SUBSCR
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_setPixelColorWithoutWright = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 4,
+    .fun_data = fun_data_.\actuator_led_setPixelColorWithoutWright,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 116,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 14,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 4,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 20,
+        .line_info = fun_data_.\actuator_led_setPixelColorWithoutWright + 8,
+        .opcodes = fun_data_.\actuator_led_setPixelColorWithoutWright + 21,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_setPixelColor
+static const byte fun_data_.\actuator_led_setPixelColor[62] = {
+    0x5a,0x18, // prelude
+    0x15,0x2b,0x2c, // names: setPixelColor, index_d, rgb_d
+    0x80,0x6c,0x20,0x26,0x26,0x26,0x26,0x26,0x29, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0xb1, // LOAD_FAST 1
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc3, // STORE_FAST 3
+    0x12,0x1d, // LOAD_GLOBAL 'unpackR'
+    0xb3, // LOAD_FAST 3
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc4, // STORE_FAST 4
+    0x12,0x1e, // LOAD_GLOBAL 'unpackG'
+    0xb3, // LOAD_FAST 3
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc5, // STORE_FAST 5
+    0x12,0x1f, // LOAD_GLOBAL 'unpackB'
+    0xb3, // LOAD_FAST 3
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc6, // STORE_FAST 6
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0xb2, // LOAD_FAST 2
+    0xb4, // LOAD_FAST 4
+    0xb5, // LOAD_FAST 5
+    0xb6, // LOAD_FAST 6
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x14,0x0c, // LOAD_METHOD 'write'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_setPixelColor = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\actuator_led_setPixelColor,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 62,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 12,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 21,
+        .line_info = fun_data_.\actuator_led_setPixelColor + 5,
+        .opcodes = fun_data_.\actuator_led_setPixelColor + 14,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_pixelMove
+static const byte fun_data_.\actuator_led_pixelMove[178] = {
+    0x62,0x2e, // prelude
+    0x16,0x2d,0x2e, // names: pixelMove, step_d, towards
+    0x80,0x77,0x26,0x20,0x27,0x25,0x22,0x23,0x23,0x2b,0x2a,0x33,0x2b,0x26,0x2a,0x2b,0x25,0x2b,0x27,0x31, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0xf8, // BINARY_OP 33 __mod__
+    0xc2, // STORE_FAST 2
+    0xb2, // LOAD_FAST 2
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+    0x2b,0x00, // BUILD_LIST 0
+    0xc3, // STORE_FAST 3
+    0x2b,0x00, // BUILD_LIST 0
+    0xc4, // STORE_FAST 4
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf3, // BINARY_OP 28 __sub__
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x58, // JUMP 24
+    0x57, // DUP_TOP
+    0xc5, // STORE_FAST 5
+    0xb3, // LOAD_FAST 3
+    0x14,0x17, // LOAD_METHOD 'append'
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0xb5, // LOAD_FAST 5
+    0x55, // LOAD_SUBSCR
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0xb4, // LOAD_FAST 4
+    0x14,0x17, // LOAD_METHOD 'append'
+    0x12,0x23, // LOAD_GLOBAL 'rawRGB'
+    0xb5, // LOAD_FAST 5
+    0x55, // LOAD_SUBSCR
+    0x36,0x01, // CALL_METHOD 1
+    0x59, // POP_TOP
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x23, // POP_JUMP_IF_TRUE -29
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf3, // BINARY_OP 28 __sub__
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x7d, // JUMP 61
+    0x57, // DUP_TOP
+    0xc5, // STORE_FAST 5
+    0xb5, // LOAD_FAST 5
+    0xb2, // LOAD_FAST 2
+    0xb1, // LOAD_FAST 1
+    0xf4, // BINARY_OP 29 __mul__
+    0xf3, // BINARY_OP 28 __sub__
+    0xc6, // STORE_FAST 6
+    0xb6, // LOAD_FAST 6
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf3, // BINARY_OP 28 __sub__
+    0xdb, // BINARY_OP 4 __ge__
+    0x44,0x4b, // POP_JUMP_IF_FALSE 11
+    0xb6, // LOAD_FAST 6
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf3, // BINARY_OP 28 __sub__
+    0xe6, // BINARY_OP 15 __isub__
+    0xc6, // STORE_FAST 6
+    0x42,0x50, // JUMP 16
+    0xb6, // LOAD_FAST 6
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x4b, // POP_JUMP_IF_FALSE 11
+    0xb6, // LOAD_FAST 6
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x13,0x0a, // LOAD_ATTR 'n'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf3, // BINARY_OP 28 __sub__
+    0xe5, // BINARY_OP 14 __iadd__
+    0xc6, // STORE_FAST 6
+    0x42,0x40, // JUMP 0
+    0xb3, // LOAD_FAST 3
+    0xb6, // LOAD_FAST 6
+    0x55, // LOAD_SUBSCR
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0xb5, // LOAD_FAST 5
+    0x56, // STORE_SUBSCR
+    0xb4, // LOAD_FAST 4
+    0xb6, // LOAD_FAST 6
+    0x55, // LOAD_SUBSCR
+    0x12,0x23, // LOAD_GLOBAL 'rawRGB'
+    0xb5, // LOAD_FAST 5
+    0x56, // STORE_SUBSCR
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x58, // DUP_TOP_TWO
+    0x5a, // ROT_TWO
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0xbd,0x7f, // POP_JUMP_IF_TRUE -67
+    0x59, // POP_TOP
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x14,0x0c, // LOAD_METHOD 'write'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_pixelMove = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\actuator_led_pixelMove,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 178,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 13,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 22,
+        .line_info = fun_data_.\actuator_led_pixelMove + 5,
+        .opcodes = fun_data_.\actuator_led_pixelMove + 25,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_pixelShowU
+static const byte fun_data_.\actuator_led_pixelShowU[233] = {
+    0x52,0x32, // prelude
+    0x18,0x2f,0x30, // names: pixelShowU, value_d, max_value_d
+    0x80,0x8d,0x26,0x28,0x25,0x31,0x25,0x2d,0x2d,0x27,0x2d,0x2d,0x27,0x2d,0x2d,0x27,0x2d,0x2d,0x27,0x2c,0x2c,0x20, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc2, // STORE_FAST 2
+    0xb1, // LOAD_FAST 1
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0x86, // LOAD_CONST_SMALL_INT 6
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xc3, // STORE_FAST 3
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x42,0x4d, // JUMP 13
+    0x57, // DUP_TOP
+    0xc4, // STORE_FAST 4
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0xb4, // LOAD_FAST 4
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xe5, // BINARY_OP 14 __iadd__
+    0x57, // DUP_TOP
+    0x8e, // LOAD_CONST_SMALL_INT 14
+    0xd7, // BINARY_OP 0 __lt__
+    0x43,0x2e, // POP_JUMP_IF_TRUE -18
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0xb3, // LOAD_FAST 3
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x5a, // POP_JUMP_IF_FALSE 26
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x8b, // LOAD_CONST_SMALL_INT 11
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xb3, // LOAD_FAST 3
+    0xf4, // BINARY_OP 29 __mul__
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x5a, // POP_JUMP_IF_FALSE 26
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x81,0x4c, // LOAD_CONST_SMALL_INT 204
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x8a, // LOAD_CONST_SMALL_INT 10
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x81,0x4c, // LOAD_CONST_SMALL_INT 204
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xb3, // LOAD_FAST 3
+    0xf4, // BINARY_OP 29 __mul__
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x5a, // POP_JUMP_IF_FALSE 26
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x81,0x19, // LOAD_CONST_SMALL_INT 153
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x89, // LOAD_CONST_SMALL_INT 9
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x81,0x19, // LOAD_CONST_SMALL_INT 153
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xb3, // LOAD_FAST 3
+    0xf4, // BINARY_OP 29 __mul__
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x5a, // POP_JUMP_IF_FALSE 26
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x80,0x66, // LOAD_CONST_SMALL_INT 102
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x80,0x66, // LOAD_CONST_SMALL_INT 102
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0xb2, // LOAD_FAST 2
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0xb3, // LOAD_FAST 3
+    0xf4, // BINARY_OP 29 __mul__
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x58, // POP_JUMP_IF_FALSE 24
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x33, // LOAD_CONST_SMALL_INT 51
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x12,0x14, // LOAD_GLOBAL 'setPixelColorWithoutWright'
+    0x87, // LOAD_CONST_SMALL_INT 7
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0x22,0x33, // LOAD_CONST_SMALL_INT 51
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x34,0x04, // CALL_FUNCTION 4
+    0x59, // POP_TOP
+    0x12,0x22, // LOAD_GLOBAL 'np'
+    0x14,0x0c, // LOAD_METHOD 'write'
+    0x36,0x00, // CALL_METHOD 0
+    0x59, // POP_TOP
+    0x51, // LOAD_CONST_NONE
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_pixelShowU = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 2,
+    .fun_data = fun_data_.\actuator_led_pixelShowU,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 233,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 11,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 2,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 24,
+        .line_info = fun_data_.\actuator_led_pixelShowU + 5,
+        .opcodes = fun_data_.\actuator_led_pixelShowU + 27,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_clamp
+static const byte fun_data_.\actuator_led_clamp[28] = {
+    0x23,0x14, // prelude
+    0x19,0x31,0x32,0x33, // names: clamp, minValue, maxValue, value
+    0x80,0xa5,0x25,0x22,0x25,0x22, // code info
+    0xb2, // LOAD_FAST 2
+    0xb0, // LOAD_FAST 0
+    0xd7, // BINARY_OP 0 __lt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb0, // LOAD_FAST 0
+    0x63, // RETURN_VALUE
+    0xb2, // LOAD_FAST 2
+    0xb1, // LOAD_FAST 1
+    0xd8, // BINARY_OP 1 __gt__
+    0x44,0x42, // POP_JUMP_IF_FALSE 2
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+    0xb2, // LOAD_FAST 2
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_clamp = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 3,
+    .fun_data = fun_data_.\actuator_led_clamp,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 28,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 5,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 3,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 25,
+        .line_info = fun_data_.\actuator_led_clamp + 6,
+        .opcodes = fun_data_.\actuator_led_clamp + 12,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_hsl
+static const byte fun_data_.\actuator_led_hsl[284] = {
+    0x93,0x10,0x60, // prelude
+    0x1a,0x34,0x35,0x36, // names: hsl, h, s, l
+    0x80,0xad,0x26,0x26,0x26,0x26,0x2a,0x2a,0x39,0x25,0x2e,0x30,0x2a,0x22,0x22,0x22,0x25,0x22,0x22,0x25,0x25,0x22,0x22,0x24,0x25,0x22,0x22,0x24,0x25,0x22,0x22,0x24,0x25,0x22,0x22,0x24,0x25,0x22,0x22,0x24,0x2e,0x24,0x24,0x24, // code info
+    0x12,0x37, // LOAD_GLOBAL 'round'
+    0xb0, // LOAD_FAST 0
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc0, // STORE_FAST 0
+    0x12,0x37, // LOAD_GLOBAL 'round'
+    0xb1, // LOAD_FAST 1
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc1, // STORE_FAST 1
+    0x12,0x37, // LOAD_GLOBAL 'round'
+    0xb2, // LOAD_FAST 2
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc2, // STORE_FAST 2
+    0xb0, // LOAD_FAST 0
+    0x22,0x82,0x68, // LOAD_CONST_SMALL_INT 360
+    0xf8, // BINARY_OP 33 __mod__
+    0xc0, // STORE_FAST 0
+    0x12,0x19, // LOAD_GLOBAL 'clamp'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x63, // LOAD_CONST_SMALL_INT 99
+    0xb1, // LOAD_FAST 1
+    0x34,0x03, // CALL_FUNCTION 3
+    0xc1, // STORE_FAST 1
+    0x12,0x19, // LOAD_GLOBAL 'clamp'
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0x22,0x80,0x63, // LOAD_CONST_SMALL_INT 99
+    0xb2, // LOAD_FAST 2
+    0x34,0x03, // CALL_FUNCTION 3
+    0xc2, // STORE_FAST 2
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0x12,0x38, // LOAD_GLOBAL 'abs'
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xb2, // LOAD_FAST 2
+    0xf4, // BINARY_OP 29 __mul__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0xf3, // BINARY_OP 28 __sub__
+    0xb1, // LOAD_FAST 1
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf0, // BINARY_OP 25 __lshift__
+    0x22,0x80,0xce,0x10, // LOAD_CONST_SMALL_INT 10000
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xc3, // STORE_FAST 3
+    0xb0, // LOAD_FAST 0
+    0x22,0x3c, // LOAD_CONST_SMALL_INT 60
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xc4, // STORE_FAST 4
+    0xb0, // LOAD_FAST 0
+    0xb4, // LOAD_FAST 4
+    0x22,0x3c, // LOAD_CONST_SMALL_INT 60
+    0xf4, // BINARY_OP 29 __mul__
+    0xf3, // BINARY_OP 28 __sub__
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf4, // BINARY_OP 29 __mul__
+    0x22,0x3c, // LOAD_CONST_SMALL_INT 60
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xc5, // STORE_FAST 5
+    0x12,0x38, // LOAD_GLOBAL 'abs'
+    0xb4, // LOAD_FAST 4
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf8, // BINARY_OP 33 __mod__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf0, // BINARY_OP 25 __lshift__
+    0xb5, // LOAD_FAST 5
+    0xf2, // BINARY_OP 27 __add__
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xf3, // BINARY_OP 28 __sub__
+    0x34,0x01, // CALL_FUNCTION 1
+    0xc6, // STORE_FAST 6
+    0xb3, // LOAD_FAST 3
+    0x22,0x82,0x00, // LOAD_CONST_SMALL_INT 256
+    0xb6, // LOAD_FAST 6
+    0xf3, // BINARY_OP 28 __sub__
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0xc7, // STORE_FAST 7
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc8, // STORE_FAST 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc9, // STORE_FAST 9
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xca, // STORE_FAST 10
+    0xb4, // LOAD_FAST 4
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x49, // POP_JUMP_IF_FALSE 9
+    0xb7, // LOAD_FAST 7
+    0xc8, // STORE_FAST 8
+    0xb3, // LOAD_FAST 3
+    0xc9, // STORE_FAST 9
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xca, // STORE_FAST 10
+    0x42,0xc1,0x80, // JUMP 65
+    0xb4, // LOAD_FAST 4
+    0x81, // LOAD_CONST_SMALL_INT 1
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb3, // LOAD_FAST 3
+    0xc8, // STORE_FAST 8
+    0xb7, // LOAD_FAST 7
+    0xc9, // STORE_FAST 9
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xca, // STORE_FAST 10
+    0x42,0x74, // JUMP 52
+    0xb4, // LOAD_FAST 4
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc8, // STORE_FAST 8
+    0xb3, // LOAD_FAST 3
+    0xc9, // STORE_FAST 9
+    0xb7, // LOAD_FAST 7
+    0xca, // STORE_FAST 10
+    0x42,0x67, // JUMP 39
+    0xb4, // LOAD_FAST 4
+    0x83, // LOAD_CONST_SMALL_INT 3
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc8, // STORE_FAST 8
+    0xb7, // LOAD_FAST 7
+    0xc9, // STORE_FAST 9
+    0xb3, // LOAD_FAST 3
+    0xca, // STORE_FAST 10
+    0x42,0x5a, // JUMP 26
+    0xb4, // LOAD_FAST 4
+    0x84, // LOAD_CONST_SMALL_INT 4
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb7, // LOAD_FAST 7
+    0xc8, // STORE_FAST 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc9, // STORE_FAST 9
+    0xb3, // LOAD_FAST 3
+    0xca, // STORE_FAST 10
+    0x42,0x4d, // JUMP 13
+    0xb4, // LOAD_FAST 4
+    0x85, // LOAD_CONST_SMALL_INT 5
+    0xd9, // BINARY_OP 2 __eq__
+    0x44,0x48, // POP_JUMP_IF_FALSE 8
+    0xb3, // LOAD_FAST 3
+    0xc8, // STORE_FAST 8
+    0x80, // LOAD_CONST_SMALL_INT 0
+    0xc9, // STORE_FAST 9
+    0xb7, // LOAD_FAST 7
+    0xca, // STORE_FAST 10
+    0x42,0x40, // JUMP 0
+    0xb2, // LOAD_FAST 2
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf4, // BINARY_OP 29 __mul__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf0, // BINARY_OP 25 __lshift__
+    0x22,0x80,0x64, // LOAD_CONST_SMALL_INT 100
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xb3, // LOAD_FAST 3
+    0xf3, // BINARY_OP 28 __sub__
+    0x82, // LOAD_CONST_SMALL_INT 2
+    0xf6, // BINARY_OP 31 __floordiv__
+    0xcb, // STORE_FAST 11
+    0xb8, // LOAD_FAST 8
+    0xbb, // LOAD_FAST 11
+    0xf2, // BINARY_OP 27 __add__
+    0xcc, // STORE_FAST 12
+    0xb9, // LOAD_FAST 9
+    0xbb, // LOAD_FAST 11
+    0xf2, // BINARY_OP 27 __add__
+    0xcd, // STORE_FAST 13
+    0xba, // LOAD_FAST 10
+    0xbb, // LOAD_FAST 11
+    0xf2, // BINARY_OP 27 __add__
+    0xce, // STORE_FAST 14
+    0x12,0x1b, // LOAD_GLOBAL 'packRGB'
+    0xbc, // LOAD_FAST 12
+    0xbd, // LOAD_FAST 13
+    0xbe, // LOAD_FAST 14
+    0x34,0x03, // CALL_FUNCTION 3
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_hsl = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 3,
+    .fun_data = fun_data_.\actuator_led_hsl,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 284,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 19,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 3,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 26,
+        .line_info = fun_data_.\actuator_led_hsl + 7,
+        .opcodes = fun_data_.\actuator_led_hsl + 51,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_packRGB
+static const byte fun_data_.\actuator_led_packRGB[30] = {
+    0x2b,0x0c, // prelude
+    0x1b,0x28,0x29,0x2a, // names: packRGB, r, g, b
+    0x80,0xdb, // code info
+    0xb0, // LOAD_FAST 0
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xf0, // BINARY_OP 25 __lshift__
+    0xb1, // LOAD_FAST 1
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf0, // BINARY_OP 25 __lshift__
+    0xed, // BINARY_OP 22 __or__
+    0xb2, // LOAD_FAST 2
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0xed, // BINARY_OP 22 __or__
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_packRGB = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 3,
+    .fun_data = fun_data_.\actuator_led_packRGB,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 30,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 6,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 3,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 27,
+        .line_info = fun_data_.\actuator_led_packRGB + 6,
+        .opcodes = fun_data_.\actuator_led_packRGB + 8,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_packRGBd
+static const byte fun_data_.\actuator_led_packRGBd[55] = {
+    0x4b,0x12, // prelude
+    0x1c,0x39,0x3a,0x3b, // names: packRGBd, r_d, g_d, b_d
+    0x80,0xdf,0x26,0x26,0x26, // code info
+    0xb0, // LOAD_FAST 0
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc3, // STORE_FAST 3
+    0xb1, // LOAD_FAST 1
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc4, // STORE_FAST 4
+    0xb2, // LOAD_FAST 2
+    0x14,0x0e, // LOAD_METHOD 'IntValue'
+    0x36,0x00, // CALL_METHOD 0
+    0xc5, // STORE_FAST 5
+    0x12,0x04, // LOAD_GLOBAL 'DataStruct'
+    0xb3, // LOAD_FAST 3
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xf0, // BINARY_OP 25 __lshift__
+    0xb4, // LOAD_FAST 4
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf0, // BINARY_OP 25 __lshift__
+    0xed, // BINARY_OP 22 __or__
+    0xb5, // LOAD_FAST 5
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0xed, // BINARY_OP 22 __or__
+    0x34,0x01, // CALL_FUNCTION 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_packRGBd = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 3,
+    .fun_data = fun_data_.\actuator_led_packRGBd,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 55,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 10,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 3,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 28,
+        .line_info = fun_data_.\actuator_led_packRGBd + 6,
+        .opcodes = fun_data_.\actuator_led_packRGBd + 11,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_unpackR
+static const byte fun_data_.\actuator_led_unpackR[17] = {
+    0x19,0x0a, // prelude
+    0x1d,0x27, // names: unpackR, rgb
+    0x80,0xe6,0x28, // code info
+    0xb0, // LOAD_FAST 0
+    0x90, // LOAD_CONST_SMALL_INT 16
+    0xf1, // BINARY_OP 26 __rshift__
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_unpackR = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\actuator_led_unpackR,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 17,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 29,
+        .line_info = fun_data_.\actuator_led_unpackR + 4,
+        .opcodes = fun_data_.\actuator_led_unpackR + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_unpackG
+static const byte fun_data_.\actuator_led_unpackG[17] = {
+    0x19,0x0a, // prelude
+    0x1e,0x27, // names: unpackG, rgb
+    0x80,0xeb,0x28, // code info
+    0xb0, // LOAD_FAST 0
+    0x88, // LOAD_CONST_SMALL_INT 8
+    0xf1, // BINARY_OP 26 __rshift__
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_unpackG = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\actuator_led_unpackG,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 17,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 30,
+        .line_info = fun_data_.\actuator_led_unpackG + 4,
+        .opcodes = fun_data_.\actuator_led_unpackG + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_unpackB
+static const byte fun_data_.\actuator_led_unpackB[15] = {
+    0x19,0x0a, // prelude
+    0x1f,0x27, // names: unpackB, rgb
+    0x80,0xf0,0x26, // code info
+    0xb0, // LOAD_FAST 0
+    0x22,0x81,0x7f, // LOAD_CONST_SMALL_INT 255
+    0xef, // BINARY_OP 24 __and__
+    0xc1, // STORE_FAST 1
+    0xb1, // LOAD_FAST 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_unpackB = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 1,
+    .fun_data = fun_data_.\actuator_led_unpackB,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 15,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 4,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 1,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 31,
+        .line_info = fun_data_.\actuator_led_unpackB + 4,
+        .opcodes = fun_data_.\actuator_led_unpackB + 7,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+// child of .\actuator_led__lt_module_gt_
+// frozen bytecode for file .\actuator_led.py, scope .\actuator_led_version
+static const byte fun_data_.\actuator_led_version[8] = {
+    0x00,0x06, // prelude
+    0x20, // names: version
+    0x80,0xf5, // code info
+    0x23,0x01, // LOAD_CONST_OBJ 1
+    0x63, // RETURN_VALUE
+};
+static const mp_raw_code_t raw_code_.\actuator_led_version = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\actuator_led_version,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 8,
+    #endif
+    .children = NULL,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 0,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 1,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 32,
+        .line_info = fun_data_.\actuator_led_version + 3,
+        .opcodes = fun_data_.\actuator_led_version + 5,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const mp_raw_code_t *const children_.\actuator_led__lt_module_gt_[] = {
+    &raw_code_.\actuator_led_InitNP,
+    &raw_code_.\actuator_led_BrightnessUp,
+    &raw_code_.\actuator_led_SetBrightness,
+    &raw_code_.\actuator_led_UpdateBrightness,
+    &raw_code_.\actuator_led_GetBrightness,
+    &raw_code_.\actuator_led_ShowRainbow,
+    &raw_code_.\actuator_led_setPixelColorWithoutWrightRGBOne,
+    &raw_code_.\actuator_led_setPixelColorWithoutWright,
+    &raw_code_.\actuator_led_setPixelColor,
+    &raw_code_.\actuator_led_pixelMove,
+    &raw_code_.\actuator_led_pixelShowU,
+    &raw_code_.\actuator_led_clamp,
+    &raw_code_.\actuator_led_hsl,
+    &raw_code_.\actuator_led_packRGB,
+    &raw_code_.\actuator_led_packRGBd,
+    &raw_code_.\actuator_led_unpackR,
+    &raw_code_.\actuator_led_unpackG,
+    &raw_code_.\actuator_led_unpackB,
+    &raw_code_.\actuator_led_version,
+};
+
+static const mp_raw_code_t raw_code_.\actuator_led__lt_module_gt_ = {
+    .kind = MP_CODE_BYTECODE,
+    .scope_flags = 0x00,
+    .n_pos_args = 0,
+    .fun_data = fun_data_.\actuator_led__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE || MICROPY_DEBUG_PRINTERS
+    .fun_data_len = 157,
+    #endif
+    .children = (void *)&children_.\actuator_led__lt_module_gt_,
+    #if MICROPY_PERSISTENT_CODE_SAVE
+    .n_children = 19,
+    #if MICROPY_PY_SYS_SETTRACE
+    .prelude = {
+        .n_state = 2,
+        .n_exc_stack = 0,
+        .scope_flags = 0,
+        .n_pos_args = 0,
+        .n_kwonly_args = 0,
+        .n_def_pos_args = 0,
+        .qstr_block_name_idx = 1,
+        .line_info = fun_data_.\actuator_led__lt_module_gt_ + 3,
+        .opcodes = fun_data_.\actuator_led__lt_module_gt_ + 45,
+    },
+    .line_of_definition = 0,
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .prelude_offset = 0,
+    #endif
+    #endif
+    #if MICROPY_EMIT_MACHINE_CODE
+    .type_sig = 0,
+    #endif
+};
+
+static const qstr_short_t const_qstr_table_data_.\actuator_led[60] = {
+    MP_QSTR__dot__backslash_actuator_led_dot_py,
+    MP_QSTR__lt_module_gt_,
+    MP_QSTR_neopixel,
+    MP_QSTR_machine,
+    MP_QSTR_DataStruct,
+    MP_QSTR_basic,
+    MP_QSTR_InitNP,
+    MP_QSTR_NeoPixel,
+    MP_QSTR_Pin,
+    MP_QSTR_clear,
+    MP_QSTR_n,
+    MP_QSTR_insert,
+    MP_QSTR_write,
+    MP_QSTR_BrightnessUp,
+    MP_QSTR_IntValue,
+    MP_QSTR_SetBrightness,
+    MP_QSTR_UpdateBrightness,
+    MP_QSTR_GetBrightness,
+    MP_QSTR_ShowRainbow,
+    MP_QSTR_setPixelColorWithoutWrightRGBOne,
+    MP_QSTR_setPixelColorWithoutWright,
+    MP_QSTR_setPixelColor,
+    MP_QSTR_pixelMove,
+    MP_QSTR_append,
+    MP_QSTR_pixelShowU,
+    MP_QSTR_clamp,
+    MP_QSTR_hsl,
+    MP_QSTR_packRGB,
+    MP_QSTR_packRGBd,
+    MP_QSTR_unpackR,
+    MP_QSTR_unpackG,
+    MP_QSTR_unpackB,
+    MP_QSTR_version,
+    MP_QSTR_brightness,
+    MP_QSTR_np,
+    MP_QSTR_rawRGB,
+    MP_QSTR_pin_port,
+    MP_QSTR_br_d,
+    MP_QSTR_index,
+    MP_QSTR_rgb,
+    MP_QSTR_r,
+    MP_QSTR_g,
+    MP_QSTR_b,
+    MP_QSTR_index_d,
+    MP_QSTR_rgb_d,
+    MP_QSTR_step_d,
+    MP_QSTR_towards,
+    MP_QSTR_value_d,
+    MP_QSTR_max_value_d,
+    MP_QSTR_minValue,
+    MP_QSTR_maxValue,
+    MP_QSTR_value,
+    MP_QSTR_h,
+    MP_QSTR_s,
+    MP_QSTR_l,
+    MP_QSTR_round,
+    MP_QSTR_abs,
+    MP_QSTR_r_d,
+    MP_QSTR_g_d,
+    MP_QSTR_b_d,
+};
+
+// constants
+static const mp_rom_obj_tuple_t const_obj_.\actuator_led_0 = {{&mp_type_tuple}, 3, {
+    MP_ROM_INT(0),
+    MP_ROM_INT(0),
+    MP_ROM_INT(0),
+}};
+
+// constant table
+static const mp_rom_obj_t const_obj_table_data_.\actuator_led[2] = {
+    MP_ROM_PTR(&const_obj_.\actuator_led_0),
+    MP_ROM_QSTR(MP_QSTR_v_2020_7_30),
+};
+
+static const mp_frozen_module_t frozen_module_.\actuator_led = {
+    .constants = {
+        .qstr_table = (qstr_short_t *)&const_qstr_table_data_.\actuator_led,
+        .obj_table = (mp_obj_t *)&const_obj_table_data_.\actuator_led,
+    },
+    .rc = &raw_code_.\actuator_led__lt_module_gt_,
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// collection of all frozen modules
+
+const char mp_frozen_names[] = {
+    #ifdef MP_FROZEN_STR_NAMES
+    MP_FROZEN_STR_NAMES
+    #endif
+    ".\actuator_led.py\0"
+    "\0"
+};
+
+const mp_frozen_module_t *const mp_frozen_mpy_content[] = {
+    &frozen_module_.\actuator_led,
+};
+
+#ifdef MICROPY_FROZEN_LIST_ITEM
+MICROPY_FROZEN_LIST_ITEM(".\actuator_led", ".\actuator_led.py")
+#endif
+
+/*
+byte sizes:
+qstr content: 58 unique, 588 bytes
+bc content: 1737
+const str content: 0
+const int content: 0
+const obj content: 0
+const table qstr content: 0 entries, 0 bytes
+const table ptr content: 2 entries, 8 bytes
+raw code content: 20 * 4 = 320
+mp_frozen_mpy_names_content: 19
+mp_frozen_mpy_content_size: 4
+total: 2676
+*/

@@ -32,4 +32,17 @@ control_board_v1.led_show_bytes_async(bytearray([9, 8, 0, 0, 0]))
 ### Classes
 * control_board_v1.PlayRecordMission
 
+# GPIO
+已知：
+button a ————— GPIO 10
+button b ————— GPIO 20
+button c ————— GPIO 21
+I2C(SC7A20国产三轴) ————— SDA 6 SCL 7
+UART (5x5 led)————— TX 8 RX 9 baudrate=460929
+未知：
+P1
+P2
+I2S???
+
+
 TODO

@@ -282,7 +282,7 @@ const qstr_pool_t mp_qstr_frozen_const_pool = {
 
 ////////////////////////////////////////////////////////////////////////////////
 // frozen module .\actuator_led
-// - original source file: ./rootfs/actuator_led.mpy
+// - original source file: rootfs/actuator_led.mpy
 // - frozen file name: .\actuator_led.py
 // - .mpy header: 4d:06:00:1f
 

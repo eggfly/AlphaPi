@@ -1,4 +1,4 @@
-mpy_source_file: ./rootfs/basic.mpy
+mpy_source_file: rootfs/basic.mpy
 source_file: .\basic.py
 header: 4d:06:00:1f
 qstr_table[85]:
@@ -90,7 +90,7 @@ qstr_table[85]:
 obj_table: [180.0, 'v_2020_7_31', 0.0, 0.5, 1.401298e-07]
 simple_name: <module>
   raw bytecode: 107 10:38:01:26:26:66:84:09:89:b9:84:0f:64:20:64:60:84:0a:84:10:64:20:64:20:84:08:84:08:84:07:80:51:1b:02:16:02:80:51:1b:03:16:03:80:51:1b:04:16:04:32:00:16:06:54:32:01:10:05:34:02:16:05:32:02:16:08:32:03:16:0d:32:04:16:0f:32:05:16:10:32:06:16:14:32:07:16:15:32:08:16:17:32:09:16:18:32:0a:16:19:32:0b:16:1a:32:0c:16:1c:51:63
-  prelude: (3, 0, 0, 0, 0, 0)
+  prelude: n_state=3, n_exc_stack=0, scope_flags=0, n_pos_args=0, n_kwonly_args=0, n_def_pos_args=0
   args: []
   line info: 26:26:66:84:09:89:b9:84:0f:64:20:64:60:84:0a:84:10:64:20:64:20:84:08:84:08:84:07
   80          LOAD_CONST_SMALL_INT 0 
@@ -139,7 +139,7 @@ simple_name: <module>
   children: ['wait_time', 'DataStruct', 'data_struct_random', 'data_struct_and', 'data_struct_or', 'data_struct_substring', 'data_struct_normalization', 'DegreeToRadian', 'RadianToDegree', 'ClampD', 'FindDataInList', 'GetItemFromList', 'version']
 simple_name: wait_time
   raw bytecode: 50 a1:40:12:06:38:60:60:27:27:22:27:2a:12:02:14:07:36:00:c1:12:02:14:07:36:00:c2:42:4a:12:02:14:07:36:00:c2:52:67:59:b2:b1:f3:b0:d7:43:2f:50:67:59:51:63
-  prelude: (5, 0, 1, 1, 0, 0)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=1, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['time_ms']
   line info: 60:60:27:27:22:27:2a
   12:02       LOAD_GLOBAL time
@@ -172,7 +172,7 @@ simple_name: wait_time
   children: []
 simple_name: DataStruct
   raw bytecode: 195 08:70:05:88:0f:43:64:64:60:84:0c:84:07:84:07:64:40:84:07:84:14:84:08:64:64:68:64:60:64:60:84:07:64:60:64:60:64:20:64:60:64:60:64:60:64:60:64:60:64:60:64:60:64:40:64:64:64:60:11:39:16:3a:10:05:16:3b:80:16:1e:32:00:16:1d:32:01:16:11:32:02:16:13:32:03:16:0a:32:04:16:0c:32:05:16:1f:32:06:16:0e:32:07:16:09:32:08:16:24:32:09:16:12:32:0a:16:22:51:2a:01:53:33:0b:16:25:32:0c:16:26:32:0d:16:27:32:0e:16:28:32:0f:16:29:32:10:16:2a:32:11:16:2b:32:12:16:2c:32:13:16:2d:32:14:16:2e:32:15:16:2f:32:16:16:30:32:17:16:31:32:18:16:32:32:19:16:33:32:1a:16:34:32:1b:16:36:32:1c:16:37:32:1d:16:12:51:63
-  prelude: (2, 0, 0, 0, 0, 0)
+  prelude: n_state=2, n_exc_stack=0, scope_flags=0, n_pos_args=0, n_kwonly_args=0, n_def_pos_args=0
   args: []
   line info: 88:0f:43:64:64:60:84:0c:84:07:84:07:64:40:84:07:84:14:84:08:64:64:68:64:60:64:60:84:07:64:60:64:60:64:20:64:60:64:60:64:60:64:60:64:60:64:60:64:60:64:40:64:64:64:60
   11:39       LOAD_NAME __name__
@@ -249,7 +249,7 @@ simple_name: DataStruct
   children: ['__init__', 'SetValue', 'StringValue', 'IntValue', 'FloatValue', 'NumberValue', 'BoolValue', 'IsInt', 'IsNumber', 'length', 'find', '__round__', '__add__', '__radd__', '__iadd__', '__sub__', '__mul__', '__truediv__', '__lt__', '__gt__', '__le__', '__ge__', '__eq__', '__ne__', '__mod__', '__abs__', '__ceil__', '__floor__', 'contains', 'length']
 simple_name: __init__
   raw bytecode: 16 22:0a:1d:4c:41:80:12:b0:14:11:b1:36:01:59:51:63
-  prelude: (5, 0, 0, 2, 0, 0)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'v']
   line info: 80:12
   b0          LOAD_FAST 0 
@@ -262,7 +262,7 @@ simple_name: __init__
   children: []
 simple_name: SetValue
   raw bytecode: 33 1a:0e:11:4c:41:80:15:2a:48:12:4d:b1:34:01:12:05:de:44:48:b1:13:1e:b0:18:1e:42:44:b1:b0:18:1e:51:63
-  prelude: (4, 0, 0, 2, 0, 0)
+  prelude: n_state=4, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'v']
   line info: 80:15:2a:48
   12:4d       LOAD_GLOBAL type
@@ -284,7 +284,7 @@ simple_name: SetValue
   children: []
 simple_name: StringValue
   raw bytecode: 69 3d:16:13:4c:80:1b:23:22:2c:26:27:4c:49:10:1b:c1:49:2e:12:4d:b0:13:1e:34:01:12:4e:de:44:46:b0:13:1e:c1:42:5b:b0:14:09:36:00:44:4c:12:4e:b0:14:0a:36:00:34:01:c1:42:48:12:4e:b0:13:1e:34:01:c1:51:b1:63:5d:51:63
-  prelude: (8, 1, 0, 1, 0, 0)
+  prelude: n_state=8, n_exc_stack=1, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:1b:23:22:2c:26:27:4c:49
   10:1b       LOAD_CONST_STRING 
@@ -326,7 +326,7 @@ simple_name: StringValue
   children: []
 simple_name: IntValue
   raw bytecode: 27 35:0e:0a:4c:80:27:22:22:49:80:c1:49:09:12:4f:b0:13:1e:34:01:c1:51:b1:63:5d:51:63
-  prelude: (7, 1, 0, 1, 0, 0)
+  prelude: n_state=7, n_exc_stack=1, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:27:22:22:49
   80          LOAD_CONST_SMALL_INT 0 
@@ -346,7 +346,7 @@ simple_name: IntValue
   children: []
 simple_name: FloatValue
   raw bytecode: 28 35:0e:0c:4c:80:2e:23:22:49:23:02:c1:49:09:12:50:b0:13:1e:34:01:c1:51:b1:63:5d:51:63
-  prelude: (7, 1, 0, 1, 0, 0)
+  prelude: n_state=7, n_exc_stack=1, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:2e:23:22:49
   23:02       LOAD_CONST_OBJ 0.0
@@ -366,7 +366,7 @@ simple_name: FloatValue
   children: []
 simple_name: NumberValue
   raw bytecode: 27 11:0c:1f:4c:80:35:27:26:b0:14:09:36:00:44:46:b0:14:0a:36:00:63:b0:14:0c:36:00:63
-  prelude: (3, 0, 0, 1, 0, 0)
+  prelude: n_state=3, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:35:27:26
   b0          LOAD_FAST 0 
@@ -384,7 +384,7 @@ simple_name: NumberValue
   children: []
 simple_name: BoolValue
   raw bytecode: 27 35:0e:0e:4c:80:3a:22:22:49:50:c1:49:09:12:51:b0:13:1e:34:01:c1:51:b1:63:5d:51:63
-  prelude: (7, 1, 0, 1, 0, 0)
+  prelude: n_state=7, n_exc_stack=1, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:3a:22:22:49
   50          LOAD_CONST_FALSE 
@@ -404,7 +404,7 @@ simple_name: BoolValue
   children: []
 simple_name: IsInt
   raw bytecode: 146 45:26:09:4c:80:41:2c:22:2c:28:2c:22:2c:38:28:2b:42:22:22:28:43:12:4d:b0:13:1e:34:01:12:4f:de:44:42:52:63:12:4d:b0:13:1e:34:01:12:4e:de:44:48:b0:13:1e:14:20:36:00:63:12:4d:b0:13:1e:34:01:12:51:de:44:42:52:63:12:4d:b0:13:1e:34:01:12:50:de:44:58:12:52:b0:13:1e:12:04:14:21:b0:13:1e:23:03:f2:36:01:f3:34:01:23:04:d7:63:12:4e:b0:13:1e:34:01:c1:b1:14:22:10:23:36:01:7f:d8:44:42:50:63:50:c2:49:0b:12:4f:b0:13:1e:34:01:59:52:c2:51:b2:63:5d:51:63
-  prelude: (9, 1, 0, 1, 0, 0)
+  prelude: n_state=9, n_exc_stack=1, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:41:2c:22:2c:28:2c:22:2c:38:28:2b:42:22:22:28:43
   12:4d       LOAD_GLOBAL type
@@ -492,7 +492,7 @@ simple_name: IsInt
   children: []
 simple_name: IsNumber
   raw bytecode: 30 35:10:24:4c:80:55:22:22:28:43:50:c1:49:0b:12:50:b0:13:1e:34:01:59:52:c1:51:b1:63:5d:51:63
-  prelude: (7, 1, 0, 1, 0, 0)
+  prelude: n_state=7, n_exc_stack=1, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:55:22:22:28:43
   50          LOAD_CONST_FALSE 
@@ -514,7 +514,7 @@ simple_name: IsNumber
   children: []
 simple_name: length
   raw bytecode: 20 21:08:12:4c:80:5d:12:05:12:4a:b0:14:13:36:00:34:01:34:01:63
-  prelude: (5, 0, 0, 1, 0, 0)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:5d
   12:05       LOAD_GLOBAL DataStruct
@@ -528,7 +528,7 @@ simple_name: length
   children: []
 simple_name: find
   raw bytecode: 22 2a:0a:22:4c:53:80:60:b0:14:13:36:00:14:22:b1:14:13:36:00:36:01:63
-  prelude: (6, 0, 0, 2, 0, 0)
+  prelude: n_state=6, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:60
   b0          LOAD_FAST 0 
@@ -543,7 +543,7 @@ simple_name: find
   children: []
 simple_name: __round__
   raw bytecode: 18 a2:01:0a:25:4c:54:80:63:12:05:b0:14:0a:36:00:34:01:63
-  prelude: (5, 0, 0, 2, 0, 1)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=1
   args: ['self', 'n']
   line info: 80:63
   12:05       LOAD_GLOBAL DataStruct
@@ -555,7 +555,7 @@ simple_name: __round__
   children: []
 simple_name: __add__
   raw bytecode: 62 32:10:26:4c:53:80:66:26:2e:30:12:05:b1:34:01:c2:b0:14:09:36:00:44:57:b2:14:09:36:00:44:50:12:05:b0:14:0a:36:00:b2:14:0a:36:00:f2:34:01:63:12:05:b0:14:0c:36:00:b2:14:0c:36:00:f2:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:66:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -593,7 +593,7 @@ simple_name: __add__
   children: []
 simple_name: __radd__
   raw bytecode: 62 32:10:27:4c:53:80:6c:26:2e:30:12:05:b1:34:01:c2:b0:14:09:36:00:44:57:b2:14:09:36:00:44:50:12:05:b0:14:0a:36:00:b2:14:0a:36:00:f2:34:01:63:12:05:b0:14:0c:36:00:b2:14:0c:36:00:f2:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:6c:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -631,7 +631,7 @@ simple_name: __radd__
   children: []
 simple_name: __iadd__
   raw bytecode: 63 32:12:28:4c:53:80:72:26:2e:30:2e:12:05:b1:34:01:c2:b0:14:09:36:00:44:57:b2:14:09:36:00:44:50:12:05:b0:14:0a:36:00:b2:14:0a:36:00:f2:34:01:63:b0:14:0c:36:00:b2:14:0c:36:00:f2:b0:18:1e:b0:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:72:26:2e:30:2e
   12:05       LOAD_GLOBAL DataStruct
@@ -670,7 +670,7 @@ simple_name: __iadd__
   children: []
 simple_name: __sub__
   raw bytecode: 62 32:10:29:4c:53:80:79:26:2e:30:12:05:b1:34:01:c2:b0:14:09:36:00:44:57:b2:14:09:36:00:44:50:12:05:b0:14:0a:36:00:b2:14:0a:36:00:f3:34:01:63:12:05:b0:14:0c:36:00:b2:14:0c:36:00:f3:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:79:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -708,7 +708,7 @@ simple_name: __sub__
   children: []
 simple_name: __mul__
   raw bytecode: 62 32:10:2a:4c:53:80:7f:26:2e:30:12:05:b1:34:01:c2:b0:14:09:36:00:44:57:b2:14:09:36:00:44:50:12:05:b0:14:0a:36:00:b2:14:0a:36:00:f4:34:01:63:12:05:b0:14:0c:36:00:b2:14:0c:36:00:f4:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:7f:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -746,7 +746,7 @@ simple_name: __mul__
   children: []
 simple_name: __truediv__
   raw bytecode: 30 32:0c:2b:4c:53:80:85:26:12:05:b1:34:01:c2:12:05:b0:14:0c:36:00:b2:14:0c:36:00:f7:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:85:26
   12:05       LOAD_GLOBAL DataStruct
@@ -766,7 +766,7 @@ simple_name: __truediv__
   children: []
 simple_name: __lt__
   raw bytecode: 62 32:10:2c:4c:53:80:89:26:2e:30:12:05:b1:34:01:c2:b0:14:24:36:00:44:57:b2:14:24:36:00:44:50:12:05:b0:14:0c:36:00:b2:14:0c:36:00:d7:34:01:63:12:05:b0:14:13:36:00:b2:14:13:36:00:d7:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:89:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -804,7 +804,7 @@ simple_name: __lt__
   children: []
 simple_name: __gt__
   raw bytecode: 62 32:10:2d:4c:53:80:8f:26:2e:30:12:05:b1:34:01:c2:b0:14:24:36:00:44:57:b2:14:24:36:00:44:50:12:05:b0:14:0c:36:00:b2:14:0c:36:00:d8:34:01:63:12:05:b0:14:13:36:00:b2:14:13:36:00:d8:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:8f:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -842,7 +842,7 @@ simple_name: __gt__
   children: []
 simple_name: __le__
   raw bytecode: 62 32:10:2e:4c:53:80:95:26:2e:30:12:05:b1:34:01:c2:b0:14:24:36:00:44:57:b2:14:24:36:00:44:50:12:05:b0:14:0c:36:00:b2:14:0c:36:00:da:34:01:63:12:05:b0:14:13:36:00:b2:14:13:36:00:da:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:95:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -880,7 +880,7 @@ simple_name: __le__
   children: []
 simple_name: __ge__
   raw bytecode: 62 32:10:2f:4c:53:80:9b:26:2e:30:12:05:b1:34:01:c2:b0:14:24:36:00:44:57:b2:14:24:36:00:44:50:12:05:b0:14:0c:36:00:b2:14:0c:36:00:db:34:01:63:12:05:b0:14:13:36:00:b2:14:13:36:00:db:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:9b:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -918,7 +918,7 @@ simple_name: __ge__
   children: []
 simple_name: __eq__
   raw bytecode: 62 32:10:30:4c:53:80:a1:26:2e:30:12:05:b1:34:01:c2:b0:14:24:36:00:44:57:b2:14:24:36:00:44:50:12:05:b0:14:0c:36:00:b2:14:0c:36:00:d9:34:01:63:12:05:b0:14:13:36:00:b2:14:13:36:00:d9:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:a1:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -956,7 +956,7 @@ simple_name: __eq__
   children: []
 simple_name: __ne__
   raw bytecode: 62 32:10:31:4c:53:80:a7:26:2e:30:12:05:b1:34:01:c2:b0:14:24:36:00:44:57:b2:14:24:36:00:44:50:12:05:b0:14:0c:36:00:b2:14:0c:36:00:dc:34:01:63:12:05:b0:14:13:36:00:b2:14:13:36:00:dc:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:a7:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -994,7 +994,7 @@ simple_name: __ne__
   children: []
 simple_name: __mod__
   raw bytecode: 62 32:10:32:4c:53:80:ad:26:2e:30:12:05:b1:34:01:c2:b0:14:09:36:00:44:57:b2:14:09:36:00:44:50:12:05:b0:14:0a:36:00:b2:14:0a:36:00:f8:34:01:63:12:05:b0:14:0c:36:00:b2:14:0c:36:00:f8:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:ad:26:2e:30
   12:05       LOAD_GLOBAL DataStruct
@@ -1032,7 +1032,7 @@ simple_name: __mod__
   children: []
 simple_name: __abs__
   raw bytecode: 43 21:0c:33:4c:80:b3:27:2e:b0:14:09:36:00:44:4e:12:05:12:52:b0:14:0a:36:00:34:01:34:01:63:12:05:12:52:b0:14:0c:36:00:34:01:34:01:63
-  prelude: (5, 0, 0, 1, 0, 0)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:b3:27:2e
   b0          LOAD_FAST 0 
@@ -1058,7 +1058,7 @@ simple_name: __abs__
   children: []
 simple_name: __ceil__
   raw bytecode: 22 29:08:34:4c:80:b8:12:05:12:04:14:35:b0:14:0c:36:00:36:01:34:01:63
-  prelude: (6, 0, 0, 1, 0, 0)
+  prelude: n_state=6, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:b8
   12:05       LOAD_GLOBAL DataStruct
@@ -1073,7 +1073,7 @@ simple_name: __ceil__
   children: []
 simple_name: __floor__
   raw bytecode: 22 29:08:36:4c:80:bb:12:05:12:04:14:21:b0:14:0c:36:00:36:01:34:01:63
-  prelude: (6, 0, 0, 1, 0, 0)
+  prelude: n_state=6, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:bb
   12:05       LOAD_GLOBAL DataStruct
@@ -1088,7 +1088,7 @@ simple_name: __floor__
   children: []
 simple_name: contains
   raw bytecode: 41 42:10:37:4c:53:80:be:26:26:26:12:05:b1:34:01:c2:b0:14:13:36:00:c3:b2:14:13:36:00:c4:12:05:b3:14:22:b4:36:01:80:db:34:01:63
-  prelude: (9, 0, 0, 2, 0, 0)
+  prelude: n_state=9, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['self', 'other']
   line info: 80:be:26:26:26
   12:05       LOAD_GLOBAL DataStruct
@@ -1115,7 +1115,7 @@ simple_name: contains
   children: []
 simple_name: length
   raw bytecode: 20 21:08:12:4c:80:c4:12:05:12:4a:b0:14:13:36:00:34:01:34:01:63
-  prelude: (5, 0, 0, 1, 0, 0)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['self']
   line info: 80:c4
   12:05       LOAD_GLOBAL DataStruct
@@ -1129,7 +1129,7 @@ simple_name: length
   children: []
 simple_name: data_struct_random
   raw bytecode: 114 5a:20:08:3c:3d:80:c8:2e:26:26:25:28:2d:26:26:25:28:27:b0:14:09:36:00:44:6d:b1:14:09:36:00:44:66:b0:14:0a:36:00:c2:b1:14:0a:36:00:c3:b2:b3:d8:44:48:b3:b2:2a:02:30:02:c2:c3:12:05:12:03:14:0b:b2:b3:36:02:34:01:63:b0:14:0c:36:00:c4:b1:14:0c:36:00:c5:b4:b5:d8:44:48:b5:b4:2a:02:30:02:c4:c5:12:03:14:03:36:00:c6:12:05:b6:b5:b4:f3:f4:b4:f2:34:01:63
-  prelude: (12, 0, 0, 2, 0, 0)
+  prelude: n_state=12, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['v1', 'v2']
   line info: 80:c8:2e:26:26:25:28:2d:26:26:25:28:27
   b0          LOAD_FAST 0 
@@ -1201,7 +1201,7 @@ simple_name: data_struct_random
   children: []
 simple_name: data_struct_and
   raw bytecode: 24 22:0a:0d:3c:3d:80:d7:12:05:b0:14:0e:36:00:46:05:b1:14:0e:36:00:34:01:63
-  prelude: (5, 0, 0, 2, 0, 0)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['v1', 'v2']
   line info: 80:d7
   12:05       LOAD_GLOBAL DataStruct
@@ -1217,7 +1217,7 @@ simple_name: data_struct_and
   children: []
 simple_name: data_struct_or
   raw bytecode: 38 32:0e:0f:3c:3d:80:db:26:26:12:05:b0:34:01:c2:12:05:b1:34:01:c3:12:05:b2:14:0e:36:00:45:05:b3:14:0e:36:00:34:01:63
-  prelude: (7, 0, 0, 2, 0, 0)
+  prelude: n_state=7, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['v1', 'v2']
   line info: 80:db:26:26
   12:05       LOAD_GLOBAL DataStruct
@@ -1241,7 +1241,7 @@ simple_name: data_struct_or
   children: []
 simple_name: data_struct_substring
   raw bytecode: 99 c8:04:1a:10:3c:3e:3f:40:80:e1:25:28:25:26:33:2f:b2:b3:d8:44:48:b3:b2:2a:02:30:02:c2:c3:b1:82:d9:44:68:b2:14:0a:36:00:c4:b2:14:11:b0:14:12:36:00:b3:14:0a:36:00:f3:81:f3:36:01:59:b3:14:11:b0:14:12:36:00:b4:f3:81:f3:36:01:59:12:05:b0:14:13:36:00:b2:13:0a:b3:b2:f3:81:f2:14:0a:36:00:2e:02:55:34:01:63
-  prelude: (10, 0, 0, 4, 0, 0)
+  prelude: n_state=10, n_exc_stack=0, scope_flags=0, n_pos_args=4, n_kwonly_args=0, n_def_pos_args=0
   args: ['v1', 'f', 'start_pos', 'end_pos']
   line info: 80:e1:25:28:25:26:33:2f
   b2          LOAD_FAST 2 
@@ -1306,7 +1306,7 @@ simple_name: data_struct_substring
   children: []
 simple_name: data_struct_normalization
   raw bytecode: 127 c9:04:2a:14:41:42:43:44:45:80:eb:1f:23:25:28:25:28:25:22:25:22:2e:23:2a:b0:14:09:36:00:46:1a:b1:14:09:36:00:46:13:b2:14:09:36:00:46:0c:b3:14:09:36:00:46:05:b4:14:09:36:00:c5:b1:b2:d8:44:48:b2:b1:2a:02:30:02:c1:c2:b3:b4:d8:44:48:b4:b3:2a:02:30:02:c3:c4:b0:b1:d7:44:42:b3:63:b0:b2:d8:44:42:b4:63:b0:b1:f3:b2:b1:f3:f7:b4:b3:f3:f4:b3:f2:c6:b5:44:4a:12:05:b6:14:0a:36:00:34:01:63:b6:63
-  prelude: (10, 0, 0, 5, 0, 0)
+  prelude: n_state=10, n_exc_stack=0, scope_flags=0, n_pos_args=5, n_kwonly_args=0, n_def_pos_args=0
   args: ['v', 'min1', 'max1', 'min2', 'max2']
   line info: 80:eb:1f:23:25:28:25:28:25:22:25:22:2e:23:2a
   b0          LOAD_FAST 0 
@@ -1388,7 +1388,7 @@ simple_name: data_struct_normalization
   children: []
 simple_name: DegreeToRadian
   raw bytecode: 20 19:08:15:41:80:fb:12:05:b0:12:04:13:16:f4:23:00:f7:34:01:63
-  prelude: (4, 0, 0, 1, 0, 0)
+  prelude: n_state=4, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['v']
   line info: 80:fb
   12:05       LOAD_GLOBAL DataStruct
@@ -1403,7 +1403,7 @@ simple_name: DegreeToRadian
   children: []
 simple_name: RadianToDegree
   raw bytecode: 20 19:08:17:41:80:ff:12:05:b0:23:00:f4:12:04:13:16:f7:34:01:63
-  prelude: (4, 0, 0, 1, 0, 0)
+  prelude: n_state=4, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['v']
   line info: 80:ff
   12:05       LOAD_GLOBAL DataStruct
@@ -1418,7 +1418,7 @@ simple_name: RadianToDegree
   children: []
 simple_name: ClampD
   raw bytecode: 28 23:14:18:1e:46:47:90:03:25:22:25:22:b0:b2:d8:44:42:b2:63:b0:b1:d7:44:42:b1:63:b0:63
-  prelude: (5, 0, 0, 3, 0, 0)
+  prelude: n_state=5, n_exc_stack=0, scope_flags=0, n_pos_args=3, n_kwonly_args=0, n_def_pos_args=0
   args: ['value', 'min_value', 'max_value']
   line info: 90:03:25:22:25:22
   b0          LOAD_FAST 0 
@@ -1438,7 +1438,7 @@ simple_name: ClampD
   children: []
 simple_name: FindDataInList
   raw bytecode: 51 3a:12:19:48:49:90:0b:26:2a:2b:2b:b1:14:13:36:00:c2:12:4a:b0:34:01:80:42:51:57:c3:b0:b3:55:14:13:36:00:b2:d9:44:42:b3:63:81:e5:58:5a:d7:43:2a:59:59:7f:63
-  prelude: (8, 0, 0, 2, 0, 0)
+  prelude: n_state=8, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['list_variable', 'data']
   line info: 90:0b:26:2a:2b:2b
   b1          LOAD_FAST 1 
@@ -1475,7 +1475,7 @@ simple_name: FindDataInList
   children: []
 simple_name: GetItemFromList
   raw bytecode: 41 2a:10:1a:48:4b:90:13:26:2e:27:b1:14:0a:36:00:c2:b2:80:d7:43:49:b2:12:4a:b0:34:01:db:44:47:12:05:10:1b:34:01:63:b0:b2:55:63
-  prelude: (6, 0, 0, 2, 0, 0)
+  prelude: n_state=6, n_exc_stack=0, scope_flags=0, n_pos_args=2, n_kwonly_args=0, n_def_pos_args=0
   args: ['list_variable', 'index_data']
   line info: 90:13:26:2e:27
   b1          LOAD_FAST 1 
@@ -1503,7 +1503,7 @@ simple_name: GetItemFromList
   children: []
 simple_name: version
   raw bytecode: 8 00:06:1c:90:1a:23:01:63
-  prelude: (1, 0, 0, 0, 0, 0)
+  prelude: n_state=1, n_exc_stack=0, scope_flags=0, n_pos_args=0, n_kwonly_args=0, n_def_pos_args=0
   args: []
   line info: 90:1a
   23:01       LOAD_CONST_OBJ 'v_2020_7_31'

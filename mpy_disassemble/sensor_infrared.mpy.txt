@@ -1,4 +1,4 @@
-mpy_source_file: ./rootfs/sensor_infrared.mpy
+mpy_source_file: rootfs/sensor_infrared.mpy
 source_file: .\sensor_infrared.py
 header: 4d:06:00:1f
 qstr_table[11]:
@@ -16,7 +16,7 @@ qstr_table[11]:
 obj_table: ['v_2020_7_30']
 simple_name: <module>
   raw bytecode: 41 08:0a:01:2c:6c:64:40:80:10:02:2a:01:1b:03:1c:02:16:02:59:80:10:04:2a:01:1b:05:1c:04:16:04:59:32:00:16:06:32:01:16:09:51:63
-  prelude: (2, 0, 0, 0, 0, 0)
+  prelude: n_state=2, n_exc_stack=0, scope_flags=0, n_pos_args=0, n_kwonly_args=0, n_def_pos_args=0
   args: []
   line info: 2c:6c:64:40
   80          LOAD_CONST_SMALL_INT 0 
@@ -42,7 +42,7 @@ simple_name: <module>
   children: ['read_infrared_sensor', 'version']
 simple_name: read_infrared_sensor
   raw bytecode: 29 19:0a:06:0a:60:40:2d:12:02:b0:12:02:13:07:34:02:12:04:b0:56:12:04:b0:55:14:08:36:00:63
-  prelude: (4, 0, 0, 1, 0, 0)
+  prelude: n_state=4, n_exc_stack=0, scope_flags=0, n_pos_args=1, n_kwonly_args=0, n_def_pos_args=0
   args: ['pin_port']
   line info: 60:40:2d
   12:02       LOAD_GLOBAL Pin
@@ -62,7 +62,7 @@ simple_name: read_infrared_sensor
   children: []
 simple_name: version
   raw bytecode: 8 00:06:09:80:0a:23:00:63
-  prelude: (1, 0, 0, 0, 0, 0)
+  prelude: n_state=1, n_exc_stack=0, scope_flags=0, n_pos_args=0, n_kwonly_args=0, n_def_pos_args=0
   args: []
   line info: 80:0a
   23:00       LOAD_CONST_OBJ 'v_2020_7_30'

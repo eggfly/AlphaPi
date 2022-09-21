@@ -32,17 +32,23 @@ control_board_v1.led_show_bytes_async(bytearray([9, 8, 0, 0, 0]))
 ### Classes
 * control_board_v1.PlayRecordMission
 
-# GPIO
-已知：
-button a ————— GPIO 10
-button b ————— GPIO 20
-button c ————— GPIO 21
-I2C(SC7A20国产三轴) ————— SDA 6 SCL 7
-UART (5x5 led)————— TX 8 RX 9 baudrate=460929
-未知：
-P1
-P2
-I2S???
+### Examples
+* 01 5X5 LED(OFFICAL METHODS)
+* 02 ACEL
+* 03 BUTTON
+* 04 5X5 LED(WITH SOURCE CODE)
 
 
+# GPIO对应
+已知：  
+button a ————— GPIO 10  
+button b ————— GPIO 20  
+button c ————— GPIO 21  
+I2C(SC7A20国产三轴) ————— SDA 6 SCL 7  
+UART ————— TX 8 RX 9 baudrate=460800
+板子上还有个国产MUC，主要通过UART通信实现音频录制播放、5x5 led的功能  
+未知：  
+P1 ————— GPIO5  
+P2 ————— GPIO4    
+到此alphapi的硬件基本挖掘完毕，通过螺丝柱供电这种方式确实第一次见。  
 TODO

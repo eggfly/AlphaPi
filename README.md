@@ -16,6 +16,19 @@ Disassemble .mpy files using:
 $ micropython/tools/mpy-tool.py -d ./rootfs/control_board_v1.mpy  > ./rootfs/control_board_v1.mpy.txt
 ```
 
+
+```shell
+>>> import esp32
+>>> esp32.Partition.find()
+[<Partition type=0, subtype=0, address=65536, size=2031616, label=factory, encrypted=0>]
+```
+
+
+```shell
+# flash_read:
+esp.flash_read(byte_offset, length_or_buffer)¶
+```
+
 # APIs and Docs
 ## control_board_v1.mpy
 

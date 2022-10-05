@@ -1,5 +1,16 @@
 # AlphaPi
 
+官网:
+
+http://lingxi.hetao101.com/alphapi
+
+
+固件使用如下命令提取 4M flash:
+
+```shell
+~/Library/Arduino15/packages/esp32/tools/esptool_py/4.2.1/esptool -p /dev/cu.usbmodem101 read_flash 0 0x400000 flash_contents.bin
+```
+
 Disassemble .mpy files using:
 ```shell
 $ micropython/tools/mpy-tool.py -d ./rootfs/control_board_v1.mpy  > ./rootfs/control_board_v1.mpy.txt

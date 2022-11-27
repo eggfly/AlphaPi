@@ -1,5 +1,7 @@
 # AlphaPi
 
+注意！！AlphaPi 电路板的硬件版本和固件随时都在更新，这个项目的固件是比较老的版本，请一定要先提取自己板子上的固件版本，先做好备份！
+
 官网:
 
 http://lingxi.hetao101.com/alphapi

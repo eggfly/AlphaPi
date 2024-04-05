@@ -72,7 +72,7 @@ button b ————— GPIO 20
 button c ————— GPIO 21  
 I2C(SC7A20国产三轴) ————— SDA 6 SCL 7  
 UART ————— TX 8 RX 9 baudrate=460800
-板子上还有个国产MUC，主要通过UART通信实现音频录制播放、5x5 led的功能  
+板子上还有个国产MCU，主要通过UART通信实现音频录制播放、5x5 led的功能  
 未知：  
 P1 ————— GPIO5  
 P2 ————— GPIO4    

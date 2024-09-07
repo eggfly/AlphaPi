@@ -7,13 +7,13 @@
 http://lingxi.hetao101.com/alphapi
 
 
-固件使用如下命令提取 4M flash:
+固件使用如下命令提取 4M flash：
 
 ```shell
 ~/Library/Arduino15/packages/esp32/tools/esptool_py/4.2.1/esptool -p /dev/cu.usbmodem101 read_flash 0 0x400000 flash_contents.bin
 ```
 
-Disassemble .mpy files using:
+使用以下命令解析 .mpy 文件：
 ```shell
 $ micropython/tools/mpy-tool.py -d ./rootfs/control_board_v1.mpy  > ./rootfs/control_board_v1.mpy.txt
 ```
@@ -31,10 +31,10 @@ $ micropython/tools/mpy-tool.py -d ./rootfs/control_board_v1.mpy  > ./rootfs/con
 esp.flash_read(byte_offset, length_or_buffer)¶
 ```
 
-# APIs and Docs
+# 所有 API 和文档
 ## control_board_v1.mpy
 
-### Functions
+### 方法
 
 * control_board_v1.led_show_bytes(bytearray)
 
@@ -55,10 +55,10 @@ control_board_v1.led_show_bytes_async(bytearray([9, 8, 0, 0, 0]))
 ```
 
 
-### Classes
+### 类
 * control_board_v1.PlayRecordMission
 
-### Examples
+### 示例
 * 01 5X5 LED(OFFICAL METHODS)
 * 02 ACEL
 * 03 BUTTON
@@ -71,8 +71,8 @@ button a ————— GPIO 10
 button b ————— GPIO 20  
 button c ————— GPIO 21  
 I2C(SC7A20国产三轴) ————— SDA 6 SCL 7  
-UART ————— TX 8 RX 9 baudrate=460800
-板子上还有个国产MCU，主要通过UART通信实现音频录制播放、5x5 led的功能  
+UART ————— TX 8 RX 9 baudrate 460800
+板子上还有个国产MCU，主要通过UART通信实现音频录制播放、5x5 led的功能。
 未知：  
 P1 ————— GPIO5  
 P2 ————— GPIO4    
